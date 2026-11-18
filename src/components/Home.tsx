@@ -41,11 +41,13 @@ export function Home({ s: raw, set }: { s: HomeState; set: (p: Partial<HomeState
   }, []);
 
   const groups = buildGroups(s, lang, t);
+  // Titoli della vista corrente (senza doppioni): base delle statistiche in alto
+  const visible = [...new Map(groups.flatMap((g) => g.items).map((d) => [d.id, d])).values()];
   let n = 0; // numerazione continua tra i gruppi
 
   return (
     <div className="page page-enter">
-      <Kpis />
+      <Kpis items={visible} />
 
       <div className="list-head">
         <h1>{t("list")}</h1>

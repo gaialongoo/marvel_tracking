@@ -1,6 +1,7 @@
 /* ============================================================================
    STATISTICHE — tutto calcolato dai dati salvati
-   <Kpis/>        = 4 riquadri in cima alla Home
+   <Kpis items/>  = 4 riquadri in cima alla Home, calcolati SOLO sui titoli
+                    della vista corrente (universo, ordine/percorso, tipi)
    <StatsDetail/> = barre per universo, Fase, tipo e distribuzione dei voti
    ============================================================================ */
 import { DATA } from "../data/titles";
@@ -12,27 +13,27 @@ import type { Title } from "../types";
 import { fmtMin, watchedMin } from "../utils";
 import { GemsRow } from "./Gem";
 
-/** Calcoli comuni */
-function useStats() {
+/** Calcoli comuni su un elenco di titoli (predefinito: tutto il catalogo) */
+function useStats(list: Title[] = DATA) {
   const { data } = useStore();
-  const seen = DATA.filter((d) => data.seen[d.id]);
-  const rated = DATA.filter((d) => data.rating[d.id]);
+  const seen = list.filter((d) => data.seen[d.id]);
+  const rated = list.filter((d) => data.rating[d.id]);
   const avg = rated.length ? rated.reduce((a, d) => a + data.rating[d.id], 0) / rated.length : 0;
   // Preferito = voto più alto; a parità, il primo in ordine di uscita
   const fav = [...rated].sort((a, b) => data.rating[b.id] - data.rating[a.id])[0];
-  const minutes = DATA.reduce((a, d) => a + watchedMin(d, data), 0);
+  const minutes = list.reduce((a, d) => a + watchedMin(d, data), 0);
   return { data, seen, rated, avg, fav, minutes };
 }
 
-export function Kpis() {
+export function Kpis({ items }: { items: Title[] }) {
   const { t, lang } = useT();
-  const { seen, avg, fav, minutes } = useStats();
-  const pct = (seen.length / DATA.length) * 100;
+  const { seen, avg, fav, minutes } = useStats(items);
+  const pct = items.length ? (seen.length / items.length) * 100 : 0;
   return (
     <div className="grid4" style={{ marginTop: 0 }}>
       <div className="panel kpi">
         <span className="eyebrow">{t("done")}</span>
-        <b>{Math.round(pct)}<small>% · {seen.length}/{DATA.length}</small></b>
+        <b>{Math.round(pct)}<small>% · {seen.length}/{items.length}</small></b>
         <div className="progress" style={{ "--w": `${pct}%`, marginTop: 10 } as React.CSSProperties}><i /></div>
       </div>
       <div className="panel kpi"><span className="eyebrow">{t("hours")}</span><b>{fmtMin(minutes)}</b></div>

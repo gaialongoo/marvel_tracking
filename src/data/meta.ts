@@ -70,30 +70,22 @@ export const PATHS: Path[] = [
       stagioni; "Avengers: Endgame Extra" (versione Extra) = Avengers: Endgame.
     - Avengers: Secret Wars: Disney indica solo "dicembre 2027" →
       il giorno è provvisorio (approx = true); nessuna lista ufficiale.
-    Nessuna proposta nostra: solo liste ufficiali (scelta dell'utente).
-    I ripassi sono ancora testi segnaposto. */
+    Nessuna proposta nostra: solo liste ufficiali (scelta dell'utente). */
 export interface Upcoming {
   id: string;
   t: string;
   date: string;          // AAAA-MM-GG
   approx?: boolean;      // true = giorno esatto non ancora annunciato
   list: string[];        // lista ufficiale (vuota = non ancora pubblicata)
-  recap: { title: I18nText; text: I18nText }[];
 }
 export const UPCOMING: Upcoming[] = [
   {
     id: "doomsday", t: "Avengers: Doomsday", date: "2026-12-18",
     list: ["xmen", "x2", "ca", "avg", "iw", "eg", "loki1", "loki2", "shangchi", "nwh"],
-    recap: [
-      { title: { it: "Fine della Saga dell'Infinito", en: "End of the Infinity Saga" }, text: { it: "Testo segnaposto: cosa è successo in Endgame.", en: "Placeholder: what happened in Endgame." } },
-      { title: { it: "Il Multiverso è aperto", en: "The Multiverse is open" }, text: { it: "Testo segnaposto: le conseguenze di Loki.", en: "Placeholder: consequences of Loki." } },
-      { title: { it: "Chi tenere d'occhio", en: "Who to watch" }, text: { it: "Testo segnaposto: i personaggi chiave.", en: "Placeholder: key characters." } },
-    ],
   },
   {
     id: "secretwars", t: "Avengers: Secret Wars", date: "2027-12-17", approx: true,
     list: [],
-    recap: [{ title: { it: "Testo segnaposto", en: "Placeholder" }, text: { it: "Da scrivere.", en: "To be written." } }],
   },
 ];
 

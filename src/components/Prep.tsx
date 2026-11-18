@@ -45,7 +45,8 @@ export function Prep() {
         </div>
       </div>
 
-      <div className="grid2">
+      {/* Lista ufficiale (il ripasso veloce è stato tolto su richiesta) */}
+      <div style={{ marginTop: 18 }}>
         <div className="panel">
           <h2>{t("officialList")}</h2>
           <div className="eyebrow" style={{ margin: "-6px 0 6px" }}>{t("officialListSrc")}</div>
@@ -61,13 +62,6 @@ export function Prep() {
           </div>
         </div>
 
-        <div className="panel">
-          <h2>{t("recap")}</h2>
-          <div className="eyebrow" style={{ margin: "-6px 0 14px" }}>{t("recapSub")}</div>
-          {u.recap.map((r, i) => (
-            <div key={i} className="recap"><b>{r.title[lang]}</b><span className="placeholder">{r.text[lang]}</span></div>
-          ))}
-        </div>
       </div>
     </div>
   );

@@ -15,8 +15,8 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Episodi** | Per serie e animazione si spuntano i singoli episodi; nell'elenco un anello mostra la % vista, al 100% diventa la spunta |
 | **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
-| **Preparazione** | Prossime uscite con conto alla rovescia, lista **ufficiale** (Disney+) con tempo mancante, nessuna proposta nostra, ripasso veloce |
-| **Statistiche** | Completamento, ore viste, media voti, preferito; dettaglio per universo, Fase, tipo e voti |
+| **Preparazione** | Prossime uscite con conto alla rovescia, lista **ufficiale** (Disney+) con tempo mancante, nessuna proposta nostra |
+| **Statistiche** | In alto: completamento, ore viste, media voti e preferito **della vista corrente** (universo, ordine/percorso, tipi scelti); dettaglio per universo, Fase, tipo e voti |
 | **Salvataggio** | Automatico, **solo su questo PC** (nel browser). Niente account. Backup esportabile/importabile in `.json` |
 | **Lingue** | Italiano e inglese |
 
