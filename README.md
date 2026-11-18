@@ -11,7 +11,7 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Universi** | Come le collezioni di Disney+: Tutto, MCU, X-Men, Spider-Man (Sony)… Si combinano con qualsiasi ordine |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
-| **Tipi** | Film, Serie (TV), Animazione (ANI), Speciali (SPC, es. Licantropus), Corti One-Shot (ONE): la sigla compare nell'angolo della miniatura |
+| **Tipi** | Film, Serie (TV), Animazione (ANI), Speciali (SPC, es. Licantropus), Corti One-Shot (ONE): la sigla compare nell'angolo della miniatura. I filtri per tipo sono a **scelta multipla** (es. Film + Serie, senza Corti) |
 | **Episodi** | Per serie e animazione si spuntano i singoli episodi; nell'elenco un anello mostra la % vista, al 100% diventa la spunta |
 | **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |

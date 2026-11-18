@@ -4,12 +4,15 @@
    ============================================================================ */
 import type { TitleType } from "./types";
 
+/** Tutti i tipi, nell'ordine dei filtri */
+export const ALL_TYPES: TitleType[] = ["film", "serie", "anim", "special", "short"];
+
 export interface HomeState {
   uni: string;                                   // "all" | "mcu" | "xmen"…
   order: "release" | "chrono" | "phase" | "paths";
   path: string;                                  // percorso scelto (order = "paths")
-  type: "all" | TitleType;                       // filtro tipo
+  types: TitleType[];                            // tipi mostrati (scelta multipla; vuoto = tutti)
   statsOpen: boolean;                            // statistiche dettagliate aperte
 }
 
-export const defaultHome: HomeState = { uni: "all", order: "release", path: "ironman", type: "all", statsOpen: false };
+export const defaultHome: HomeState = { uni: "all", order: "release", path: "ironman", types: [], statsOpen: false };

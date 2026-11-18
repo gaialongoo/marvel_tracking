@@ -9,7 +9,7 @@ import { DATA } from "../data/titles";
 import { PATHS, UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";
 import { useStore } from "../store";
-import type { HomeState } from "../homeState";
+import { ALL_TYPES, type HomeState } from "../homeState";
 import type { Title } from "../types";
 import { Backup } from "./Backup";
 import { Kpis, StatsDetail } from "./Stats";
@@ -63,8 +63,14 @@ export function Home({ s, set }: { s: HomeState; set: (p: Partial<HomeState>) =>
             </select>
           )}
           <div className="chips" style={{ marginLeft: "auto" }}>
-            {(["all", "film", "serie", "anim", "special", "short"] as const).map((ty) => (
-              <button key={ty} className={`chip${s.type === ty ? " on" : ""}`} onClick={() => set({ type: ty })}>{t(ty)}</button>
+            {/* Filtri tipo a scelta multipla: "Tutti" azzera, gli altri si accendono/spengono */}
+            <button className={`chip${s.types.length === 0 ? " on" : ""}`} onClick={() => set({ types: [] })}>{t("all")}</button>
+            {ALL_TYPES.map((ty) => (
+              <button key={ty} className={`chip${s.types.includes(ty) ? " on" : ""}`} aria-pressed={s.types.includes(ty)}
+                onClick={() => {
+                  const next = s.types.includes(ty) ? s.types.filter((x) => x !== ty) : [...s.types, ty];
+                  set({ types: next.length === ALL_TYPES.length ? [] : next }); // tutti accesi = "Tutti"
+                }}>{t(ty)}</button>
             ))}
           </div>
         </div>
@@ -106,7 +112,7 @@ export function Home({ s, set }: { s: HomeState; set: (p: Partial<HomeState>) =>
    - Percorsi: titoli del percorso; se attraversa più universi, per anno
    --------------------------------------------------------------------------- */
 function buildGroups(s: HomeState, lang: "it" | "en", t: (k: "phaseN" | "inf" | "multi" | "noPhase") => string): Group[] {
-  const items = DATA.filter((d) => (s.uni === "all" || d.uni === s.uni) && (s.type === "all" || d.type === s.type));
+  const items = DATA.filter((d) => (s.uni === "all" || d.uni === s.uni) && (s.types.length === 0 || s.types.includes(d.type)));
   const unis = UNIVERSES.filter((u) => u.k !== "all" && items.some((d) => d.uni === u.k));
   const byChrono = (arr: Title[]) => [...arr].sort((a, b) => a.chrono - b.chrono);
 
