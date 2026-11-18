@@ -75,3 +75,10 @@ marvel_tracker/
 
 - Tutto il codice è **commentato** (in italiano).
 - Questo README viene **aggiornato a ogni modifica** rilevante.
+
+## Pubblicazione online (GitHub Pages)
+
+L'app è online su **https://gaialongoo.github.io/marvel_tracking/** e si apre anche dal telefono.
+- A ogni push su `main`, il flusso `.github/workflows/deploy.yml` compila l'app e pubblica la cartella `dist`.
+- Va fatto **una volta sola**: su GitHub, Settings → Pages → Build and deployment → Source = **GitHub Actions**. Con "Deploy from a branch" GitHub pubblica i file sorgente e la pagina resta bianca.
+- "Visto" e voti restano salvati sul dispositivo su cui li segni: telefono e PC hanno dati separati. Per spostarli si usano esporta e importa.
