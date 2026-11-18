@@ -2,7 +2,7 @@
 
 Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fox e Sony, serie live-action non MCU e animazione.
 
-> **Stato attuale:** **Blocco 1 — MCU completo** inserito: 82 titoli (le 81 voci della timeline ufficiale marvel.com + Spider-Man: Brand New Day), con titoli italiani Disney+ e ordine cronologico ufficiale. Le serie Netflix sono nell'MCU perché la timeline ufficiale le include (gruppo "Marvel Television · Netflix", senza Fase). I campi non confermati da una fonte ufficiale (es. durate, episodi, post-credits) sono segnati nella scheda come **Da verificare**. **Blocco 2 (in parte):** 24 titoli fuori MCU presenti su Disney+ Italia (X-Men e Deadpool Fox, Fantastici 4 Fox, Amazing Spider-Man, Un nuovo universo, animazione Marvel), con titolo, anno e durata presi dalle pagine Disney+ dei singoli titoli. Prossimi: i film non presenti su Disney+, le serie live-action non MCU e il resto dell'animazione.
+> **Stato attuale:** catalogo con **188 titoli**: MCU completo (timeline ufficiale marvel.com), film Fox/Sony/altri studi, serie live-action fuori MCU e animazione (classica e recente, esclusa quella per bambini). **Fonti:** prima quelle ufficiali (marvel.com, pagine Disney+ Italia dei singoli titoli), poi fonti affidabili non ufficiali (it/en.wikipedia) solo dove le ufficiali non dicono nulla; se non coincidono vale Disney+. Restano **Da verificare** 25 titoli (soprattutto il numero di scene dopo i titoli dove le fonti non coincidono). Per le serie la durata totale è una stima (episodi × durata media).
 
 ## Funzionalità
 

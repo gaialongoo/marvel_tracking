@@ -162,16 +162,37 @@ const PHASE_OK = new Set([
   "wonderman", "punolk", "visionquest", "homecoming", "ffh", "nwh", "bnd", "os-item47", "os-carter", "os-king",
 ]);
 
-/** Verifiche unite: per ogni titolo i campi di REL e REL2 insieme */
+/* Terzo giro (en/it.wikipedia lette parola per parola).
+   Scene dopo i titoli: confermate solo se il testo letto coincide con le altre
+   fonti. Se la trama non ne parla ma altre fonti sì, il valore resta in SOFT. */
+const REL3: typeof REL = {
+  // MCU (sezione Trama delle voci dei film)
+  ffh: { pc: 2 }, bw: { pc: 1 }, shangchi: { pc: 2 }, eternals: { pc: 2 }, lat: { pc: 2 }, wf: { pc: 1 },
+  quantumania: { pc: 2 }, marvels: { pc: 1 }, bnw: { pc: 1 }, "os-consultant": { pc: 0 }, "os-hammer": { pc: 0 },
+  // Film fuori MCU
+  daredevil03: { it: true, y: true, min: 103, pc: 0 }, elektra: { it: true, y: true, min: 97, pc: 0 },
+  punisher04: { it: true, y: true, min: 123, pc: 0 }, warzone: { it: true, y: true, min: 103, pc: 0 },
+  manthing: { it: true, y: true, min: 97, pc: 0 }, ghostrider: { it: true, y: true, min: 110 },
+  ghostrider2: { it: true, y: true, min: 95 }, blade3: { it: true, y: true, min: 113, pc: 0 },
+  technovore: { it: true, y: true, min: 88, pc: 0 }, avconf: { it: "Avengers Confidential: La Vedova Nera & Punisher", y: true, min: 83, pc: 0 },
+  rising: { it: "Marvel Rising - Secret Warriors", y: true, min: 80, pc: 0 }, genx: { it: true, y: true, min: 87, pc: 0 },
+  nickfury98: { it: "Nick Fury", y: true, min: 90, pc: 0 },
+  punisher89: { pc: 0 }, capamerica90: { pc: 0 }, blade: { pc: 0 }, blade2: { pc: 0 }, hulk03: { y: true },
+  deadpool2: { pc: 2 }, spiderverse: { pc: 1 }, hulkwmd: { pc: 0 }, imhulk: { pc: 0 }, imcap: { pc: 0 },
+  // Marvel Anime (Madhouse): anni ed episodi; i titoli italiani coincidono con gli originali
+  "anime-im": { it: true }, "anime-wolv": { it: true, y: true }, "anime-xmen": { it: true, y: true }, "anime-blade": { it: true, y: true },
+};
+
+/** Verifiche unite: per ogni titolo i campi di REL, REL2 e REL3 insieme */
 const VER: typeof REL = { ...REL };
-for (const [id, f] of Object.entries(REL2)) VER[id] = { ...VER[id], ...f };
+for (const extra of [REL2, REL3]) for (const [id, f] of Object.entries(extra)) VER[id] = { ...VER[id], ...f };
 
 /* Valori aggiornati da un riassunto delle fonti affidabili, NON ancora
    confermati parola per parola: si usano ma restano "da verificare". */
 const SOFT: Record<string, { pc?: number }> = {
-  holiday: { pc: 1 }, bnd: { pc: 1 }, ffh: { pc: 2 }, deadpool2: { pc: 1 }, tasm2: { pc: 1 }, spiderverse: { pc: 1 }, atsv: { pc: 0 },
-  shangchi: { pc: 2 }, eternals: { pc: 2 }, nwh: { pc: 2 }, dsmom: { pc: 2 }, lat: { pc: 2 }, wf: { pc: 1 },
-  quantumania: { pc: 2 }, gotg3: { pc: 2 }, marvels: { pc: 1 }, dpw: { pc: 1 }, bnw: { pc: 1 }, thunderbolts: { pc: 2 }, ff: { pc: 2 },
+  // la trama su Wikipedia ne cita meno di quante indicate dalle altre letture → resta da verificare
+  holiday: { pc: 1 }, bnd: { pc: 1 }, nwh: { pc: 2 }, dsmom: { pc: 2 }, gotg3: { pc: 2 }, dpw: { pc: 1 },
+  thunderbolts: { pc: 2 }, ff: { pc: 2 }, tasm2: { pc: 1 }, atsv: { pc: 0 },
 };
 
 function mk(s: Spec): Title {
