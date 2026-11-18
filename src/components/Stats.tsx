@@ -66,7 +66,8 @@ export function StatsDetail() {
   const { data, rated } = useStats();
   const seenOf = (arr: Title[]) => arr.filter((d) => data.seen[d.id]).length;
   const mcu = DATA.filter((d) => d.uni === "mcu");
-  const phases = [...new Set(mcu.map((d) => d.phase))].sort((a, b) => (a ?? 0) - (b ?? 0));
+  // Senza Fase (serie Netflix) = ultima barra
+  const phases = [...new Set(mcu.map((d) => d.phase))].sort((a, b) => (a ?? 99) - (b ?? 99));
 
   return (
     <div className="grid2" style={{ marginTop: 12 }}>
@@ -79,10 +80,10 @@ export function StatsDetail() {
         <h2 style={{ marginTop: 20 }}>{t("byPhase")} · MCU</h2>
         {phases.map((p) => {
           const arr = mcu.filter((d) => d.phase === p);
-          return <Bar key={p} label={`${t("phaseN")} ${p}`} done={seenOf(arr)} total={arr.length} />;
+          return <Bar key={p ?? "none"} label={p ? `${t("phaseN")} ${p}` : "Netflix"} done={seenOf(arr)} total={arr.length} />;
         })}
         <h2 style={{ marginTop: 20 }}>{t("byType")}</h2>
-        {(["film", "serie", "anim"] as const).map((ty) => {
+        {(["film", "serie", "anim", "special", "short"] as const).map((ty) => {
           const arr = DATA.filter((d) => d.type === ty);
           return <Bar key={ty} label={t(ty)} done={seenOf(arr)} total={arr.length} />;
         })}

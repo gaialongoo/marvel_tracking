@@ -2,7 +2,7 @@
 
 Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fox e Sony, serie live-action non MCU e animazione.
 
-> **Stato attuale:** l'**app React** è pronta e funzionante, ma usa ancora **16 titoli di esempio** (non verificati). Prossimo passo: inserire i dati veri, verificati sulle fonti ufficiali, a blocchi.
+> **Stato attuale:** **Blocco 1 — MCU completo** inserito: 82 titoli (le 81 voci della timeline ufficiale marvel.com + Spider-Man: Brand New Day), con titoli italiani Disney+ e ordine cronologico ufficiale. Le serie Netflix sono nell'MCU perché la timeline ufficiale le include (gruppo "Marvel Television · Netflix", senza Fase). I campi non confermati da una fonte ufficiale (es. durate, episodi, post-credits) sono segnati nella scheda come **Da verificare**. X-Men e Spider-Man Sony sono ancora di esempio: arrivano con i prossimi blocchi.
 
 ## Funzionalità
 
@@ -11,6 +11,7 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Universi** | Come le collezioni di Disney+: Tutto, MCU, X-Men, Spider-Man (Sony)… Si combinano con qualsiasi ordine |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
+| **Tipi** | Film, Serie (TV), Animazione (ANI), Speciali (SPC, es. Licantropus), Corti One-Shot (ONE): la sigla compare nell'angolo della miniatura |
 | **Episodi** | Per serie e animazione si spuntano i singoli episodi; nell'elenco un anello mostra la % vista, al 100% diventa la spunta |
 | **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
@@ -55,7 +56,7 @@ marvel_tracker/
 │   ├── homeState.ts        ← scelte dell'elenco (universo, ordine…)
 │   ├── hooks.ts, utils.ts, toast.ts
 │   ├── data/
-│   │   ├── titles.ts       ← CATALOGO dei titoli (ora: esempio)
+│   │   ├── titles.ts       ← CATALOGO dei titoli (fonti in cima al file)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
 │   └── components/         ← TopBar, Home, Detail, Prep, ConnectionMap, Gem…
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)

@@ -11,8 +11,11 @@ export interface I18nText {
   en: string;
 }
 
-/** Tipo di titolo: film, serie live-action, animazione */
-export type TitleType = "film" | "serie" | "anim";
+/** Tipo di titolo: film, serie live-action, animazione, speciale, corto (One-Shot) */
+export type TitleType = "film" | "serie" | "anim" | "special" | "short";
+
+/** Campi di un titolo che possono essere verificati sulle fonti ufficiali */
+export type Field = "it" | "y" | "min" | "eps" | "phase" | "chrono" | "pc";
 
 /** Collegamento verso un altro titolo, con il motivo */
 export interface Link {
@@ -29,7 +32,7 @@ export interface Title {
   y: number;             // anno di uscita
   min: number;           // durata in minuti (serie: totale approssimativo)
   eps?: number;          // numero di episodi (solo serie/animazione)
-  phase?: number;        // Fase MCU (solo uni = "mcu")
+  phase?: number;        // Fase MCU (assente per le serie Netflix)
   saga?: "inf" | "multi";// Saga MCU
   chrono: number;        // posizione nella linea temporale DEL SUO universo
   c: string;             // colore della miniatura generata
@@ -41,8 +44,7 @@ export interface Title {
   after: Link[];         // cosa viene dopo
   pc: number;            // numero di scene post-credits
   officialUrl?: string;  // pagina ufficiale (marvel.com / Disney+)
-  sources?: string[];    // fonti ufficiali usate per verificare i dati
-  verified: boolean;     // false = dato segnaposto, non ancora verificato
+  unverified: Field[];   // campi NON ancora confermati da una fonte ufficiale (vuoto = tutto verificato)
 }
 
 /** Dati personali salvati su questo PC (nel browser) */

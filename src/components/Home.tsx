@@ -63,7 +63,7 @@ export function Home({ s, set }: { s: HomeState; set: (p: Partial<HomeState>) =>
             </select>
           )}
           <div className="chips" style={{ marginLeft: "auto" }}>
-            {(["all", "film", "serie", "anim"] as const).map((ty) => (
+            {(["all", "film", "serie", "anim", "special", "short"] as const).map((ty) => (
               <button key={ty} className={`chip${s.type === ty ? " on" : ""}`} onClick={() => set({ type: ty })}>{t(ty)}</button>
             ))}
           </div>
@@ -105,7 +105,7 @@ export function Home({ s, set }: { s: HomeState; set: (p: Partial<HomeState>) =>
    - Fase: Fasi per l'MCU, un gruppo per ciascun altro universo
    - Percorsi: titoli del percorso; se attraversa più universi, per anno
    --------------------------------------------------------------------------- */
-function buildGroups(s: HomeState, lang: "it" | "en", t: (k: "phaseN" | "inf" | "multi") => string): Group[] {
+function buildGroups(s: HomeState, lang: "it" | "en", t: (k: "phaseN" | "inf" | "multi" | "noPhase") => string): Group[] {
   const items = DATA.filter((d) => (s.uni === "all" || d.uni === s.uni) && (s.type === "all" || d.type === s.type));
   const unis = UNIVERSES.filter((u) => u.k !== "all" && items.some((d) => d.uni === u.k));
   const byChrono = (arr: Title[]) => [...arr].sort((a, b) => a.chrono - b.chrono);
@@ -119,10 +119,12 @@ function buildGroups(s: HomeState, lang: "it" | "en", t: (k: "phaseN" | "inf" | 
 
   if (s.order === "phase") {
     const mcu = items.filter((d) => d.uni === "mcu");
-    const phases = [...new Set(mcu.map((d) => d.phase))].sort((a, b) => (a ?? 0) - (b ?? 0));
+    // Fasi numerate in ordine; i titoli senza Fase (serie Netflix) in un gruppo a parte in fondo
+    const phases = [...new Set(mcu.map((d) => d.phase))].sort((a, b) => (a ?? 99) - (b ?? 99));
     return [
       ...phases.map((p) => {
         const its = mcu.filter((d) => d.phase === p);
+        if (p === undefined) return { h: t("noPhase"), items: its };
         return { h: `${t("phaseN")} ${p} · ${its[0].saga ? t(its[0].saga) : ""}`, items: its };
       }),
       ...unis.filter((u) => u.k !== "mcu").map((u) => ({ h: u[lang], items: items.filter((d) => d.uni === u.k) })),

@@ -30,9 +30,9 @@ export function Detail({ id }: { id: string }) {
     );
   }
 
-  // Contesto: Fase per l'MCU, nome dell'universo per gli altri
+  // Contesto: Fase per l'MCU (o "Netflix" se senza Fase), nome dell'universo per gli altri
   const ctx = d.uni === "mcu"
-    ? `${t("phaseN")} ${d.phase} · ${d.saga ? t(d.saga) : ""}`
+    ? (d.phase ? `${t("phaseN")} ${d.phase} · ${d.saga ? t(d.saga) : ""}` : t("noPhase"))
     : UNIVERSES.find((u) => u.k === d.uni)?.[lang] ?? d.uni;
 
   return (
@@ -84,7 +84,12 @@ function Head({ d, ctx }: { d: Title; ctx: string }) {
           <span>{t("year")} <b>{d.y}</b></span>
           <span>{t("duration")} <b>{hasEps(d) ? `${d.eps} ${t("eps")}` : `${d.min} ${t("min")}`}</b></span>
           <span><b>{t(d.type)}</b></span>
-          {!d.verified && <span style={{ color: "var(--red)" }}>{t("sample")}</span>}
+          {/* Campi non ancora confermati da una fonte ufficiale */}
+          {d.unverified.length > 0 && (
+            <span style={{ color: "var(--red)" }} title={t("sample")}>
+              {t("sample")}: {d.unverified.map((f) => t(`f_${f}` as const)).join(", ")}
+            </span>
+          )}
         </div>
         <div className="actions">
           <button className={`btn ${seen ? "done" : "primary"}`} onClick={() => toggleSeen(d.id)}>

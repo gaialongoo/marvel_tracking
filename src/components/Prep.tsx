@@ -34,7 +34,7 @@ export function Prep() {
           <div>
             <span className="eyebrow">{t("next")}</span>
             <h2>{u.t}</h2>
-            <div className="mono" style={{ color: "var(--muted)", fontSize: 12 }}>{dateStr} · {t("dateNote")}</div>
+            <div className="mono" style={{ color: "var(--muted)", fontSize: 12 }}>{u.approx ? `${new Date(u.date + "T00:00:00").toLocaleDateString(lang === "it" ? "it-IT" : "en-GB", { month: "long", year: "numeric" })} · ${t("dateApprox")}` : `${dateStr} · ${t("dateNote")}`}</div>
           </div>
           <Countdown date={u.date} />
         </div>
