@@ -57,33 +57,27 @@ export const PATHS: Path[] = [
   { key: "defenders", kind: "themes", it: "Tema · Strade di New York (Defenders)", en: "Theme · Street level (Defenders)" },
 ];
 
-/** Prossime uscite con liste di preparazione (id dal catalogo).
+/** Prossime uscite con la lista di preparazione UFFICIALE (id dal catalogo).
     - Avengers: Doomsday: 18/12/2026 (Disney+ "Marvel Movies in Order").
-      Lista DISNEY+ = riga "Avengers: Doomsday – Inizia il conto alla
-      rovescia" di Disney+ Italia (fonte ufficiale). Conversioni: il
-      riquadro "Loki" = entrambe le stagioni; "Avengers: Endgame Extra"
-      (versione Extra) = Avengers: Endgame.
-      Lista COMPLETA = Disney+ + i titoli aggiunti da noi ("add").
-      Lista MINIMA = proposta, non ufficiale.
+      Lista = riga "Avengers: Doomsday – Inizia il conto alla rovescia" di
+      Disney+ Italia. Conversioni: il riquadro "Loki" = entrambe le
+      stagioni; "Avengers: Endgame Extra" (versione Extra) = Avengers: Endgame.
     - Avengers: Secret Wars: Disney indica solo "dicembre 2027" →
-      il giorno è provvisorio (approx = true); nessuna lista Disney+.
+      il giorno è provvisorio (approx = true); nessuna lista ufficiale.
+    Nessuna proposta nostra: solo liste ufficiali (scelta dell'utente).
     I ripassi sono ancora testi segnaposto. */
 export interface Upcoming {
   id: string;
   t: string;
   date: string;          // AAAA-MM-GG
   approx?: boolean;      // true = giorno esatto non ancora annunciato
-  min: string[];         // lista minima (proposta)
-  dp: string[];          // lista ufficiale Disney+ (vuota = non esiste)
-  add: string[];         // aggiunte per la lista completa
+  list: string[];        // lista ufficiale (vuota = non ancora pubblicata)
   recap: { title: I18nText; text: I18nText }[];
 }
 export const UPCOMING: Upcoming[] = [
   {
     id: "doomsday", t: "Avengers: Doomsday", date: "2026-12-18",
-    min: ["eg", "loki1", "loki2", "dpw", "thunderbolts", "ff"],
-    dp: ["xmen", "x2", "ca", "avg", "iw", "eg", "loki1", "loki2", "shangchi", "nwh"],
-    add: ["dsmom", "wf", "bnw", "dpw", "thunderbolts", "ff"],
+    list: ["xmen", "x2", "ca", "avg", "iw", "eg", "loki1", "loki2", "shangchi", "nwh"],
     recap: [
       { title: { it: "Fine della Saga dell'Infinito", en: "End of the Infinity Saga" }, text: { it: "Testo segnaposto: cosa è successo in Endgame.", en: "Placeholder: what happened in Endgame." } },
       { title: { it: "Il Multiverso è aperto", en: "The Multiverse is open" }, text: { it: "Testo segnaposto: le conseguenze di Loki.", en: "Placeholder: consequences of Loki." } },
@@ -92,7 +86,7 @@ export const UPCOMING: Upcoming[] = [
   },
   {
     id: "secretwars", t: "Avengers: Secret Wars", date: "2027-12-17", approx: true,
-    min: ["eg", "loki2", "dsmom"], dp: [], add: ["iw", "eg", "loki1", "loki2", "whatif1", "nwh", "dsmom", "dpw", "ff"],
+    list: [],
     recap: [{ title: { it: "Testo segnaposto", en: "Placeholder" }, text: { it: "Da scrivere.", en: "To be written." } }],
   },
 ];

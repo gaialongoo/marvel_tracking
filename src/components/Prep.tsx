@@ -15,14 +15,10 @@ export function Prep() {
   const { t, lang } = useT();
   const { data } = useStore();
   const [upId, setUpId] = useState(UPCOMING[0].id);
-  const [wl, setWl] = useState<"min" | "full">("min");
 
   const u = UPCOMING.find((x) => x.id === upId) ?? UPCOMING[0];
-  // Liste: Minima e Completa. (La lista "Disney+" da sola è per ora nascosta:
-  // la Completa = titoli della riga Disney+ + aggiunte, senza doppioni.)
-  const lists = ["min", "full"] as const;
-  const ids = wl === "min" ? u.min : [...new Set([...u.dp, ...u.add])];
-  const items = ids.map((id) => BY_ID[id]).filter(Boolean);
+  // Solo la lista ufficiale (Disney+); se non esiste ancora si mostra un avviso
+  const items = u.list.map((id) => BY_ID[id]).filter(Boolean);
   const done = items.filter((d) => data.seen[d.id]).length;
   const total = items.reduce((a, d) => a + d.min, 0);
   const left = items.reduce((a, d) => a + d.min - watchedMin(d, data), 0); // serie: solo episodi mancanti
@@ -51,20 +47,17 @@ export function Prep() {
 
       <div className="grid2">
         <div className="panel">
-          <div className="tabs-seg">
-            {lists.map((w) => (
-              <button key={w} className={wl === w ? "on" : ""} onClick={() => setWl(w)}>
-                {t(w === "min" ? "minList" : "fullList")}
-              </button>
-            ))}
-          </div>
+          <h2>{t("officialList")}</h2>
+          <div className="eyebrow" style={{ margin: "-6px 0 6px" }}>{t("officialListSrc")}</div>
           <div className="progress-row">
             <span>{t("progress")} <b>{done}/{items.length}</b></span>
             <span>{t("left")} <b>{fmtMin(left)}</b> / {fmtMin(total)}</span>
           </div>
           <div className="progress" style={{ "--w": `${items.length ? (done / items.length) * 100 : 0}%` } as React.CSSProperties}><i /></div>
           <div className="wl" style={{ marginTop: 8 }}>
-            {items.map((d) => <TitleRow key={d.id} d={d} />)}
+            {items.length
+              ? items.map((d) => <TitleRow key={d.id} d={d} />)
+              : <div className="empty" style={{ padding: "14px 0" }}>{t("noOfficialList")}</div>}
           </div>
         </div>
 
