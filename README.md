@@ -24,7 +24,9 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film So
 - **Home**: statistiche rapide, elenco a righe (con miniatura) e ordini di visione; statistiche dettagliate richiudibili in fondo.
 - **Scheda del titolo**: pagina a sé, si apre **solo** cliccando un titolo o dalla ricerca; ha un pulsante **Home** per tornare.
 
-**Gemme del voto** (forme ispirate ai film): Spazio = cubo (Tesseract), Mente = goccia, Realtà = forma fluida (Aether), Potere = sfera (Orb), Tempo = occhio (Occhio di Agamotto), Anima = ovale.
+**Mappa dei collegamenti** (nella scheda): tre colonne Prima → Questo titolo → Dopo, con frecce; linea continua = già visto, tratteggiata = da vedere. Su telefono diventa verticale.
+
+**Gemme del voto** (forme ispirate ai film, senza nomi sotto: il nome appare passando sopra): Spazio = cubo (Tesseract), Mente = goccia, Realtà = forma fluida (Aether), Potere = sfera (Orb), Tempo = occhio (Occhio di Agamotto), Anima = ovale.
 
 **Fonti:** date, ordini e sinossi solo da fonti ufficiali (marvel.com, Disney+, Marvel Studios). I riassunti completi sono scritti a parte e possono usare fonti secondarie.
 

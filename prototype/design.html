@@ -194,12 +194,11 @@ select.input{background:var(--surface);border:1px solid var(--line);border-radiu
 
 /* Versione grande cliccabile nella scheda */
 .rate{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}
-.rate button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 4px 10px;border:1px solid var(--line);border-radius:8px;transition:.15s}
+.rate button{display:grid;place-items:center;padding:14px 4px;border:1px solid var(--line);border-radius:8px;transition:.15s}
 .rate button:hover{border-color:var(--muted);background:var(--surface2)}
+.rate button:hover .gem{transform:scale(1.08)}
 .rate button.on{border-color:color-mix(in srgb,var(--c) 55%,var(--line));background:color-mix(in srgb,var(--c) 8%,transparent)}
-.rate .gem{width:34px;height:34px}
-.rate small{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.rate button.on small{color:var(--text)}
+.rate .gem{width:36px;height:36px;transition:transform .15s}
 .rate-head{display:flex;justify-content:space-between;align-items:baseline}
 .rate-head .score{font-family:var(--mono);font-size:22px;font-weight:600}
 .rate-head .score small{font-size:13px;color:var(--muted)}
@@ -262,15 +261,44 @@ a.btn{color:var(--text);text-decoration:none}
 .pc-item:first-child{border-top:none}
 .pc-item .n{font-family:var(--mono);font-size:11px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:4px;text-align:center;padding:2px 0}
 
-/* Mappa dei collegamenti (SVG generato) */
-.map svg{width:100%;height:auto;display:block}
-.map .node{cursor:pointer}
-.map .node rect{fill:var(--surface2);stroke:var(--line)}
-.map .node:hover rect{stroke:var(--gold)}
-.map .node.cur rect{fill:var(--gold-soft);stroke:var(--gold)}
-.map .node text{fill:var(--text);font-family:var(--mono);font-size:10px}
-.map .node .seen-dot{fill:var(--ok)}
-.map path{fill:none;stroke:#3a3f48;stroke-width:1}
+/* Mappa dei collegamenti
+   Tre colonne HTML [Prima | Questo titolo | Dopo]; le linee sono un SVG
+   disegnato SOPRA misurando la posizione reale dei riquadri (drawMap()),
+   così la mappa si adatta a qualsiasi larghezza.
+   Su schermi stretti le colonne diventano righe e le linee verticali. */
+.map2{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:34px;align-items:center}
+.map-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.map-lines path{fill:none;stroke:#4a505a;stroke-width:1.3}
+.map-lines path.todo{stroke-dasharray:4 4}         /* verso un titolo non ancora visto */
+.map-lines path.hot{stroke:var(--gold)}            /* evidenziata al passaggio del mouse */
+.mcol{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+/* Intestazione colonna: sfondo pieno così le linee non ci passano sopra */
+.mh{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  align-self:center;background:var(--bg);padding:2px 8px;margin-bottom:2px}
+/* Riquadro di un titolo nella mappa */
+.mnode{position:relative;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left;width:100%;
+  padding:8px 10px 8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);transition:.15s;overflow:hidden}
+.mnode::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}  /* striscia col colore del titolo */
+.mnode:hover{border-color:var(--gold)}
+.mnode b{font-size:12px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mnode small{grid-column:1;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.mnode .ms{grid-row:1/3;grid-column:2;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--off)}
+.mnode.seen .ms{background:var(--ok);border-color:var(--ok)}
+/* Titolo aperto: al centro, bordo oro */
+.mnode.cur{border-color:var(--gold);background:linear-gradient(var(--gold-soft),var(--gold-soft)),var(--surface2);box-shadow:0 0 0 3px rgba(201,162,75,.08);cursor:default}
+.mnode.cur b{font-size:13px;font-weight:600}
+.mempty{font-size:12px;color:var(--muted);text-align:center;padding:10px;border:1px dashed var(--line);border-radius:8px}
+.map-legend{display:flex;gap:16px;justify-content:flex-end;margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.map-legend span{display:inline-flex;align-items:center;gap:6px}
+.map-legend i{display:inline-block;width:18px;border-top:1.3px solid #4a505a}
+.map-legend i.todo{border-top-style:dashed}
+@media (max-width:560px){
+  .map2{grid-template-columns:1fr;gap:30px}
+  .mcol{flex-direction:row;flex-wrap:wrap;justify-content:center}
+  .mh{width:100%;text-align:center}   /* striscia piena: le linee "passano sotto" l'intestazione */
+  .mnode{width:calc(50% - 4px)}
+  .mnode.cur{width:70%}
+}
 
 /* ==========================================================================
    7. VISTE A PAGINA INTERA (Preparazione, Statistiche)
@@ -476,6 +504,7 @@ const STR = {
       fullSrc:"SCRITTO DA CLAUDE · FONTI SECONDARIE",
       postcredits:"Scene post-credits",noPc:"Nessuna scena post-credits.",pcText:"[Descrizione della scena e a cosa si collega — da inserire.]",
       links:"Collegamenti",before:"Da vedere prima",after:"Cosa viene dopo",none:"Nessuno",map:"Mappa dei collegamenti",
+      mapBefore:"Prima",mapNow:"Questo titolo",mapAfter:"Dopo",legSeen:"già visto",legTodo:"da vedere",
       back:"← Home",min:"min",eps:"ep.",year:"Anno",duration:"Durata",
       prepSub:"Cosa vedere prima delle prossime uscite",next:"Prossima uscita",dateNote:"Data di esempio · da verificare su marvel.com",
       d:"giorni",h:"ore",m:"min",s:"sec",minList:"Lista minima",extList:"Lista estesa",
@@ -496,6 +525,7 @@ const STR = {
       fullSrc:"WRITTEN BY CLAUDE · SECONDARY SOURCES",
       postcredits:"Post-credits scenes",noPc:"No post-credits scenes.",pcText:"[Scene description and what it connects to — to add.]",
       links:"Connections",before:"Watch before",after:"What comes next",none:"None",map:"Connection map",
+      mapBefore:"Before",mapNow:"This title",mapAfter:"After",legSeen:"seen",legTodo:"to watch",
       back:"← Home",min:"min",eps:"ep.",year:"Year",duration:"Runtime",
       prepSub:"What to watch before upcoming releases",next:"Next release",dateNote:"Example date · to verify on marvel.com",
       d:"days",h:"hours",m:"min",s:"sec",minList:"Essential list",extList:"Extended list",
@@ -740,7 +770,8 @@ function renderDetail(){
     <!-- Voto a Gemme: clic = voto; riclic sulla stessa gemma = azzera -->
     <div class="block">
       <div class="rate-head"><span class="eyebrow">${tr("rating")}</span><span class="score">${r ? r : "–"}<small>/6</small></span></div>
-      <div class="rate">${GEMS.map((g, i) => `<button class="${i < r ? "on" : ""}" style="--c:var(--${g.k})" data-act="rate" data-v="${i+1}" title="${g[ui.lang]}">${gemSVG(i, i < r)}<small>${g[ui.lang]}</small></button>`).join("")}</div>
+      <!-- Solo la gemma, senza nome sotto: il nome compare come suggerimento (title) -->
+      <div class="rate">${GEMS.map((g, i) => `<button class="${i < r ? "on" : ""}" style="--c:var(--${g.k})" data-act="rate" data-v="${i+1}" title="${g[ui.lang]} · ${i+1}/6" aria-label="${g[ui.lang]} ${i+1}/6">${gemSVG(i, i < r)}</button>`).join("")}</div>
       ${r === 6 ? `<div class="gauntlet">${tr("gauntlet")}</div>` : ""}
     </div>
 
@@ -774,37 +805,79 @@ function renderDetail(){
       </div>
     </div>
 
-    <!-- Mappa -->
+    </div></div><!-- fine detail-grid -->
+
+    <!-- Mappa dei collegamenti: a tutta larghezza sotto le due colonne -->
     <div class="block">
       <span class="eyebrow">${tr("map")}</span>
-      <div class="card map">${mapSVG(d)}</div>
+      <div class="card" style="padding:18px 20px">${mapHTML(d)}</div>
     </div>
-
-    </div></div><!-- fine detail-grid -->
   </div>`;
 }
 
-/* Mappa: colonna sinistra = prima, centro = titolo aperto, destra = dopo.
-   Linee curve tra i nodi; ogni nodo è cliccabile e apre quel titolo. */
-function mapSVG(d){
-  const W = 360, NW = 74, NH = 26;
-  const L = d.before.map(x => x[0]), R = d.after.map(x => x[0]);
-  const H = Math.max(L.length, R.length, 1) * 38 + 20;
-  const ys = n => Array.from({length:n}, (_, i) => (H / (n + 1)) * (i + 1));
-  const cx = W / 2, cy = H / 2, lx = 50, rx = W - 50;
-  const node = (id, x, y, cur) => `<g class="node${cur ? " cur" : ""}" data-act="open" data-id="${id}">
-      <rect x="${x - NW/2}" y="${y - NH/2}" width="${NW}" height="${NH}" rx="5"/>
-      <text x="${x}" y="${y + 3.5}" text-anchor="middle">${BY_ID[id].abbr}</text>
-      ${isSeen(id) ? `<circle class="seen-dot" cx="${x + NW/2 - 7}" cy="${y - NH/2 + 7}" r="2.5"/>` : ""}</g>`;
-  const curve = (x1, y1, x2, y2) => `<path d="M${x1} ${y1} C${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}"/>`;
-  let s = "";
-  ys(L.length).forEach((y, i) => { s += curve(lx + NW/2, y, cx - NW/2, cy); });
-  ys(R.length).forEach((y, i) => { s += curve(cx + NW/2, cy, rx - NW/2, y); });
-  ys(L.length).forEach((y, i) => { s += node(L[i], lx, y); });
-  ys(R.length).forEach((y, i) => { s += node(R[i], rx, y); });
-  s += node(d.id, cx, cy, true);
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${tr("map")}">${s}</svg>`;
+/* ============================================================================
+   MAPPA DEI COLLEGAMENTI
+   mapHTML() crea tre colonne di riquadri: Prima | Questo titolo | Dopo.
+   drawMap() poi misura dove sono finiti i riquadri e disegna le frecce:
+   - orizzontali se le colonne sono affiancate (PC)
+   - verticali se sono impilate (telefono)
+   Linea continua = l'altro titolo è già visto; tratteggiata = da vedere.
+   ============================================================================ */
+function mapHTML(d){
+  const node = (id, side) => {
+    const x = BY_ID[id];
+    return `<button class="mnode${side === "cur" ? " cur" : ""}${isSeen(id) ? " seen" : ""}" style="--c:${x.c}"
+              ${side === "cur" ? "" : `data-act="open" data-id="${id}"`} data-side="${side}" data-node="${id}" title="${title(x)}">
+              <b>${title(x)}</b><small>${x.y} · ${tr(x.type)}</small><span class="ms"></span></button>`;
+  };
+  const col = (key, ids, side) => `<div class="mcol"><div class="mh">${tr(key)}</div>${
+    ids.length ? ids.map(id => node(id, side)).join("") : `<div class="mempty">${tr("none")}</div>`}</div>`;
+  return `<div class="map2" id="map">
+      <svg class="map-lines" aria-hidden="true"></svg>
+      ${col("mapBefore", d.before.map(x => x[0]), "before")}
+      ${col("mapNow", [d.id], "cur")}
+      ${col("mapAfter", d.after.map(x => x[0]), "after")}
+    </div>
+    <div class="map-legend"><span><i></i>${tr("legSeen")}</span><span><i class="todo"></i>${tr("legTodo")}</span></div>`;
 }
+
+function drawMap(){
+  const map = document.getElementById("map");
+  if (!map) return;
+  const svg = map.querySelector(".map-lines");
+  const base = map.getBoundingClientRect();
+  const cur = map.querySelector('[data-side="cur"]').getBoundingClientRect();
+  // Coordinate relative al contenitore della mappa
+  const rel = r => ({l:r.left - base.left, r:r.right - base.left, t:r.top - base.top, b:r.bottom - base.top,
+                     cx:(r.left + r.right) / 2 - base.left, cy:(r.top + r.bottom) / 2 - base.top});
+  const C = rel(cur);
+  let paths = "";
+  map.querySelectorAll('.mnode[data-side="before"], .mnode[data-side="after"]').forEach(el => {
+    const N = rel(el.getBoundingClientRect());
+    const before = el.dataset.side === "before";
+    const [A, B] = before ? [N, C] : [C, N];           // la freccia va sempre da "prima" verso "dopo"
+    const side = A.r <= B.l + 1;                         // colonne affiancate?
+    let dd;
+    if (side){
+      const x1 = A.r, y1 = A.cy, x2 = B.l - 4, y2 = B.cy, mx = (x1 + x2) / 2;
+      dd = `M${x1} ${y1} C${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+    } else {
+      const x1 = A.cx, y1 = A.b, x2 = B.cx, y2 = B.t - 4, my = (y1 + y2) / 2;
+      dd = `M${x1} ${y1} C${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
+    }
+    paths += `<path d="${dd}" class="${isSeen(el.dataset.node) ? "" : "todo"}" data-for="${el.dataset.node}" marker-end="url(#arrow)"/>`;
+  });
+  svg.innerHTML = `<defs><marker id="arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L8 4L0 8z" fill="#6b717c" stroke="none"/></marker></defs>${paths}`;
+}
+/* Passando sopra un riquadro, la sua linea si accende d'oro */
+document.addEventListener("mouseover", e => {
+  const n = e.target.closest(".mnode[data-node]");
+  document.querySelectorAll(".map-lines path.hot").forEach(p => p.classList.remove("hot"));
+  if (n) document.querySelectorAll(`.map-lines path[data-for="${n.dataset.node}"]`).forEach(p => p.classList.add("hot"));
+});
+/* Ridisegna le linee quando cambia la larghezza della finestra */
+window.addEventListener("resize", drawMap);
 
 /* ============================================================================
    VISTA PREPARAZIONE — usa gli stessi titoli e lo stesso stato "visto"
@@ -924,7 +997,10 @@ function render(){
   // Se la tendina di ricerca è aperta, aggiorna anche lei (es. cambio lingua)
   if (document.getElementById("results").classList.contains("on")) renderResults();
   tick();
+  drawMap();                                    // linee della mappa (solo nella scheda)
 }
+/* Quando i font finiscono di caricare i riquadri cambiano misura: ridisegna */
+if (document.fonts) document.fonts.ready.then(drawMap);
 
 /* Apre la scheda di un titolo (da riga, collegamento, mappa o ricerca) */
 function openTitle(id){
