@@ -162,10 +162,13 @@ export const FILMS: Record<string, TitleTexts> = {
       en: "After returning to their universe, Eddie and Venom are wanted for Detective Mulligan's death. The creator of symbiotes, Knull, imprisoned on another world, sends the Xenophages to find the \"codex\", a key that exists when Eddie and Venom are bonded. Rex Strickland's army and scientist Teddy Paine capture them at Area 51, which is about to close and where other symbiotes are studied. The Xenophages attack; Mulligan, bonded to a symbiote, survives. To destroy the codex and save Eddie, Venom sacrifices himself in the flames. Eddie, alone, reaches New York and looks at the Statue of Liberty.",
     },
     pc: [
-      null,
       {
-        it: "Nel bar in Messico distrutto, uno scarafaggio con un frammento di simbionte sopravvive.",
-        en: "In the wrecked bar in Mexico, a cockroach carrying a fragment of symbiote survives.",
+        it: "Knull dichiara che, ora che Venom è caduto, l'universo non è più al sicuro da lui.",
+        en: "Knull declares that, now that Venom has fallen, the universe is no longer safe from him.",
+      },
+      {
+        it: "Il barista messicano fugge dalle rovine dell'Area 51; accanto a una fiala rotta che conteneva un campione di Venom esce uno scarafaggio nero.",
+        en: "The Mexican bartender escapes the ruins of Area 51; a black cockroach crawls out next to a broken vial that held a Venom sample.",
       },
     ],
   },

@@ -130,7 +130,10 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Wade, che ha lasciato la vita da Deadpool, viene portato alla TVA da Mr. Paradox: il suo universo sta morendo perché ha perso il suo «essere àncora», Logan, morto dopo Logan. Paradox vuole accelerarne la fine con una macchina. Wade cerca un altro Wolverine nel multiverso e trova il «peggiore», un Logan alcolizzato che ha abbandonato i suoi X-Men. Paradox li spedisce nel Vuoto, dove regna Cassandra Nova, la gemella di Charles Xavier. Lì incontrano una resistenza di eroi dimenticati: Elektra, Blade, X-23 e Gambit. Cassandra va alla TVA per usare la macchina e distruggere tutti gli universi. Deadpool e Wolverine bloccano la macchina con i loro corpi, che guariscono all'infinito; Cassandra muore e Paradox viene arrestato. La TVA aiuta Wade, e Logan resta nel suo universo come nuova àncora.",
       en: "Wade, who has left the Deadpool life behind, is taken to the TVA by Mr. Paradox: his universe is dying because it has lost its \"anchor being\", Logan, who died in Logan. Paradox wants to speed up its end with a machine. Wade searches the multiverse for another Wolverine and finds the \"worst\" one, an alcoholic Logan who abandoned his X-Men. Paradox sends them to the Void, ruled by Cassandra Nova, Charles Xavier's twin. There they meet a resistance of forgotten heroes: Elektra, Blade, X-23 and Gambit. Cassandra goes to the TVA to use the machine to destroy every universe. Deadpool and Wolverine block the machine with their bodies, which heal endlessly; Cassandra dies and Paradox is arrested. The TVA helps Wade, and Logan stays in his universe as the new anchor.",
     },
-    pc: [null],
+    pc: [{
+        it: "Nel Vuoto, Johnny Storm insulta Cassandra Nova con un monologo pieno di parolacce.",
+        en: "In the Void, Johnny Storm insults Cassandra Nova in an expletive-filled monologue.",
+      }],
   },
 
   agatha: {
@@ -148,6 +151,10 @@ export const MCU4: Record<string, TitleTexts> = {
     syn: {
       it: "Ultima stagione dell'antologia: l'Osservatore mostra nuovi mondi alternativi e alla fine deve affrontare le conseguenze di essere intervenuto nel multiverso.",
       en: "The anthology's final season: the Watcher shows new alternate worlds and in the end must face the consequences of having intervened in the multiverse.",
+    },
+    full: {
+      it: "Tra gli episodi: un esperimento di Banner crea un mostro gamma, e Banner diventa un «Mega-Hulk» che lo uccide e governa i mostri sopravvissuti; Agatha Harkness ruba il potere del Celestiale Tiamut, poi vi rinuncia; il Guardiano Rosso salva gli Stark e Bucky elimina Obadiah Stane; Riri Williams sconfigge la Federazione di Iron Man di Quentin Beck; Shang-Chi e Kate Bishop affrontano Hood, che si rivela una Xialing corrotta. Negli ultimi episodi Captain Carter cerca di salvare l'Osservatore, catturato dagli altri Osservatori guidati dall'Eminenza; anche Ultron dell'Infinito si pente e la aiuta. Nel finale Ultron si sacrifica e Carter dà la vita per mandare tutti nell'universo di Strange Supremo, che toglie i poteri agli Osservatori nemici. L'Osservatore invita Kahhori, Byrdie e Tempesta a vegliare con lui sul multiverso.",
+      en: "Among the episodes: a Banner experiment creates a gamma monster, and Banner becomes a \"Mega-Hulk\" who kills it and rules the surviving monsters; Agatha Harkness steals the Celestial Tiamut's power, then gives it up; Red Guardian saves the Starks and Bucky takes out Obadiah Stane; Riri Williams defeats Quentin Beck's Iron Federation; Shang-Chi and Kate Bishop face the Hood, who turns out to be a corrupted Xialing. In the last episodes Captain Carter tries to rescue the Watcher, captured by the other Watchers led by the Eminence; Infinity Ultron also repents and helps her. In the finale Ultron sacrifices himself and Carter gives her life to send everyone to Strange Supreme's universe, where Strange strips the enemy Watchers of their powers. The Watcher invites Kahhori, Byrdie and Storm to watch over the multiverse with him.",
     },
   },
 
@@ -223,6 +230,10 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "In una realtà alternativa devastata da un'epidemia di zombi, un gruppo di giovani eroi sopravvissuti cerca di raggiungere un segnale che potrebbe salvare il mondo.",
       en: "In an alternate reality ravaged by a zombie plague, a group of young surviving heroes tries to reach a signal that could save the world.",
     },
+    full: {
+      it: "Cinque anni dopo l'epidemia, Kamala Khan, Kate Bishop, Riri Williams e F.R.I.D.A.Y. cercano un trasmettitore all'Istituto North in Ohio. Carol Danvers, diventata zombi, uccide Kate; Riri e F.R.I.D.A.Y. si sacrificano per salvare Kamala, che viene soccorsa da Blade Knight. Il gruppo di Shang-Chi si unisce al loro nella prigione del Raft di Zemo: Namor zombi fa strage e Kamala lo uccide, mentre Yelena si sacrifica per far partire la capsula di fuga. In flashback si vede la morte di T'Challa contro Thanos zombi. A Nuova Asgard Wanda, la Regina dei Morti, rivela che il «cibo» era carne di zombi; i Nova Corps mettono la Terra in quarantena. Nel finale Banner diventa Hulk dell'Infinito; Wanda prende l'energia delle Gemme e convince Kamala ad aiutarla a rifare il mondo. Dopo un'esplosione Kamala si risveglia in un mondo normale con Riri e Kate, ma la vera Riri le rivela di aver violato il sistema: ciò che vede non è reale.",
+      en: "Five years after the outbreak, Kamala Khan, Kate Bishop, Riri Williams and F.R.I.D.A.Y. look for a transmitter at the North Institute in Ohio. A zombified Carol Danvers kills Kate; Riri and F.R.I.D.A.Y. sacrifice themselves to save Kamala, who is rescued by Blade Knight. Shang-Chi's group joins theirs at Zemo's Raft prison: a zombie Namor causes carnage and Kamala kills him, while Yelena sacrifices herself to launch the escape pod. Flashbacks show T'Challa's death against a zombie Thanos. In New Asgard Wanda, the Queen of the Dead, reveals the \"food\" was zombie flesh; the Nova Corps quarantine Earth. In the finale Banner becomes the Infinity Hulk; Wanda takes the Stones' energy and persuades Kamala to help her remake the world. After an explosion Kamala wakes in a normal world with Riri and Kate, but the real Riri reveals she has hacked the system: what Kamala sees is not real.",
+    },
   },
 
   ff: {
@@ -239,7 +250,10 @@ export const MCU4: Record<string, TitleTexts> = {
         it: "Quattro anni dopo, Sue legge una storia a Franklin; quando torna con un altro libro trova il bambino con un uomo dal mantello verde che tiene in mano una maschera di metallo.",
         en: "Four years later, Sue is reading to Franklin; when she comes back with another book she finds him with a man in a green cloak holding a metal mask.",
       },
-      null,
+      {
+        it: "Uno spezzone del cartone animato dei Fantastici Quattro del loro mondo, con il nemico Red Ghost.",
+        en: "A clip from the Fantastic Four's in-world cartoon, featuring the villain Red Ghost.",
+      },
     ],
   },
 
@@ -247,6 +261,10 @@ export const MCU4: Record<string, TitleTexts> = {
     syn: {
       it: "Simon Williams, attore in difficoltà con un potere segreto, stringe un'amicizia improbabile con un attore in declino mentre cerca di ottenere il ruolo di un supereroe.",
       en: "Simon Williams, a struggling actor with a secret power, forms an unlikely friendship with a washed-up actor while chasing the role of a superhero.",
+    },
+    full: {
+      it: "Simon nasconde i suoi poteri ionici per via della «clausola Doorman», che impedisce ai superumani di recitare. Conosce Trevor Slattery, l'attore che interpretava il Mandarino, che lo aiuta nei provini per il remake di Wonder Man del regista Von Kovak; in segreto, però, Trevor fa rapporto su Simon all'agente P. Cleary del Dipartimento di Controllo dei Danni. Entrambi ottengono una parte nel film. Mentre un giornalista del New York Times prepara un ritratto di Simon, Trevor confessa di averlo spiato: Simon perde il controllo e un'esplosione distrugge il set. Trevor si prende la colpa e finisce nella prigione di Yucca Valley, il film esce con successo e Cleary vuole usare Simon come risorsa. Alla fine Simon entra nella prigione fingendosi un documentarista, libera Trevor e vola via con lui.",
+      en: "Simon hides his ionic powers because of the \"Doorman Clause\", which bars superhumans from acting. He meets Trevor Slattery, the actor who played the Mandarin, who coaches him through auditions for director Von Kovak's Wonder Man remake; secretly, though, Trevor reports on Simon to Damage Control agent P. Cleary. Both are cast in the film. While a New York Times writer prepares a profile of Simon, Trevor confesses to spying on him: Simon loses control and an explosion destroys the set. Trevor takes the blame and ends up in Yucca Valley prison, the film is a success and Cleary wants to use Simon as an asset. In the end Simon gets into the prison posing as a documentary maker, breaks Trevor out and flies away with him.",
     },
   },
 
@@ -270,7 +288,10 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Peter sceglie di non farsi riconoscere da MJ e Ned e combatte il crimine, sconfiggendo Mac Gargan e i ninja della Mano e guadagnandosi la fiducia della detective Jean DeWolff. Una telepate che salta da un corpo all'altro aiuta Gargan a evadere; i nuovi poteri di Peter, come le ragnatele organiche, gli fanno perdere il controllo e ferisce un agente. Bruce Banner gli dà un inibitore. La telepate è la giovane Jean Grey, che attacca MJ dopo aver letto una lettera mai spedita; Peter la salva. Jean possiede Banner, che diventa Hulk, e Peter lo calma. Jean cerca la sorella Sara, rapita dal Dipartimento di Controllo dei Danni: nella loro base a Roosevelt Island crea un campo psichico che blocca tutti tranne Peter. Peter sconfigge la Mano, impedisce a Jean di uccidere, entra nella sua mente e la fa ragionare. Frank Castle spara a Jean e Peter la protegge, ferito gravemente; Jean lo tiene in vita. Jean lascia la città e Peter, deciso a non fare più tutto da solo, si fa riconoscere da Ned con la loro vecchia stretta di mano.",
       en: "Peter chooses not to reintroduce himself to MJ and Ned and fights crime, defeating Mac Gargan and the Hand ninjas and earning the trust of Detective Jean DeWolff. A body-hopping telepath helps Gargan escape; Peter's new powers, like organic webbing, make him lose control and he injures an officer. Bruce Banner gives him an inhibitor. The telepath is young Jean Grey, who attacks MJ after reading an unsent letter; Peter saves her. Jean possesses Banner, who becomes the Hulk, and Peter calms him. Jean is looking for her sister Sara, kidnapped by the Department of Damage Control: at their Roosevelt Island facility she creates a psychic field that freezes everyone except Peter. Peter defeats the Hand, stops Jean from killing, enters her mind and talks her down. Frank Castle shoots at Jean and Peter shields her, badly wounded; Jean keeps him alive. Jean leaves the city and Peter, determined not to do everything alone anymore, reintroduces himself to Ned with their old handshake.",
     },
-    pc: [null],
+    pc: [{
+        it: "L'app «Spidey Tracker» di Ned rileva un avvistamento di Spider-Man lontano dalla Terra.",
+        en: "Ned's \"Spidey Tracker\" app detects a Spider-Man sighting away from Earth.",
+      }],
   },
 
   punolk: {
@@ -288,6 +309,10 @@ export const MCU4: Record<string, TitleTexts> = {
     syn: {
       it: "Visione, incerto su chi sia davvero, vive nascosto a Edimburgo e dialoga con le intelligenze artificiali nella sua mente. Quando gli mettono una taglia sulla testa, fugge con un ragazzo che potrebbe essere suo figlio.",
       en: "Vision, unsure who he really is, hides in Edinburgh and talks with the AIs in his mind. When a bounty is placed on him, he goes on the run with a teenager who may be his son.",
+    },
+    full: {
+      it: "Visione lavora in un pub con il nome di Sherwood Ellis e nella sua mente lo aiutano altre intelligenze artificiali, mentre Ultron è rinchiuso in soffitta. Il cacciatore di taglie Paladin attacca il pub e cattura Thomas Shepherd, che dice di essere Tommy Maximoff. Visione lo salva ma resta gravemente ferito, e J.A.R.V.I.S. si cancella per salvare le altre IA. Un'androide assassina, la Butcherbird, si rivela Jocasta. Ultron tradisce Tommy e Visione abbassa le sue difese. Visione accetta Tommy come figlio. Nel finale il misterioso cliente si rivela Virgil Horton: Jocasta viene distrutta e i suoi nanobot danno un corpo a Ultron, che uccide Virgil. Visione intrappola Ultron in una sitcom e lo convince a ritirarsi, ma Ultron se ne va con parte dei nanobot. Billy Maximoff aiuta a riparare Visione, che con Tommy va a trovarlo. Nelle scene a metà titoli dell'ultima puntata Ultron tiene i dati di Jocasta e una figura incappucciata, il Dottor Destino, risveglia Wanda sul monte Wundagore.",
+      en: "Vision works at a pub as Sherwood Ellis and other AIs help him inside his mind, while Ultron is locked in the attic. Bounty hunter Paladin attacks the pub and captures Thomas Shepherd, who claims to be Tommy Maximoff. Vision rescues him but is badly wounded, and J.A.R.V.I.S. deletes himself to save the other AIs. An android killer, the Butcherbird, turns out to be Jocasta. Ultron betrays Tommy and Vision lowers his defenses. Vision accepts Tommy as his son. In the finale the mysterious client turns out to be Virgil Horton: Jocasta is destroyed and her nanobots give Ultron a body, and he kills Virgil. Vision traps Ultron in a sitcom and persuades him to stand down, but Ultron leaves with some of the nanobots. Billy Maximoff helps restore Vision, who visits him with Tommy. In the final episode's mid-credits scenes Ultron keeps Jocasta's data and a hooded figure, Doctor Doom, awakens Wanda on Mount Wundagore.",
     },
   },
 };

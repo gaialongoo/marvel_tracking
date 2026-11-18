@@ -502,6 +502,10 @@ export const ANIM: Record<string, TitleTexts> = {
       it: "In una realtà alternativa, Peter Parker inizia la carriera di Spider-Man con Norman Osborn come mentore invece di Tony Stark.",
       en: "In an alternate reality, Peter Parker begins his Spider-Man career with Norman Osborn as his mentor instead of Tony Stark.",
     },
+    full: {
+      it: "Peter, Spider-Man in segreto, fa uno stage alla Oscorp con Harry Osborn, Nico Minoru, Amadeus Cho e Jeanne Foucault. Norman rivela di conoscere la sua identità e gli propone una collaborazione. Peter si scontra con Daredevil, Mac Gargan diventa lo Scorpione e Otto Octavius viene arrestato. L'amico Lonnie Lincoln ottiene i poteri di Tombstone e impedisce a Peter di uccidere Gargan, che viene arrestato. Nel finale si attiva un portale della Oscorp: Peter e Doctor Strange rimandano indietro un simbionte, ma un ragno della Oscorp con il sangue di Peter attraversa il portale e morde il Peter più giovane: il potere di Peter nasce dal suo stesso sangue. Il portale viene distrutto, ma Norman trova un frammento del simbionte. Harry fonda la W.E.B. e Lonnie diventa capo della banda della 110ª strada.",
+      en: "Peter, secretly Spider-Man, interns at Oscorp with Harry Osborn, Nico Minoru, Amadeus Cho and Jeanne Foucault. Norman reveals he knows his identity and offers a partnership. Peter clashes with Daredevil, Mac Gargan becomes the Scorpion and Otto Octavius is arrested. His friend Lonnie Lincoln gains the powers of Tombstone and stops Peter from killing Gargan, who is arrested. In the finale an Oscorp gateway activates: Peter and Doctor Strange send a symbiote back, but an Oscorp spider carrying Peter's blood slips through the portal and bites the younger Peter: Peter's power comes from his own blood. The gateway is destroyed, but Norman finds a piece of the symbiote. Harry founds W.E.B. and Lonnie becomes leader of the 110th Street gang.",
+    },
   },
   jeff: {
     syn: {
