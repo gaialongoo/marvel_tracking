@@ -1,16 +1,25 @@
 <!doctype html>
 <!--
   ============================================================================
-  MARVEL TRACKER — PROTOTIPO GRAFICO (stile HUD tech, ispirato a Iron Man)
+  MARVEL TRACKER — PROTOTIPO v3 (stile "Stark Industries": grafite, oro, rosso)
   ----------------------------------------------------------------------------
   File unico e autonomo: si apre con un doppio clic, non serve Node.js.
-  Serve SOLO per approvare il design: dati, testi e date sono segnaposto.
+  È un prototipo FUNZIONANTE ma con dati SEGNAPOSTO (non ancora verificati
+  sulle fonti ufficiali): serve per approvare design e funzionamento.
 
-  Struttura del file:
-    1. <head>   → font e CSS (variabili colore, layout, componenti HUD, Gemme)
-    2. <header> → barra in alto: logo reattore, navigazione, lingua
-    3. <main>   → tre schermate: Elenco (#home), Scheda (#detail), Preparazione (#prep)
-    4. <script> → dati di esempio, traduzioni IT/EN, rendering e interazioni
+  Come è organizzato:
+    1. CSS        → variabili colore, layout a 3 colonne, componenti
+    2. HTML       → solo lo scheletro: menu laterale + area principale
+    3. JavaScript →
+       - DATA       : UNICO elenco dei titoli, usato da TUTTE le schermate
+       - state      : cosa hai visto e i voti (salvati nel browser)
+       - ui         : stato dell'interfaccia (schermata, ordine, titolo aperto…)
+       - render*()  : disegnano le varie parti a partire da DATA + state + ui
+       - eventi     : un solo gestore di clic che legge l'attributo data-act
+
+  Layout:
+    PC       → [menu] [lista titoli] [scheda del titolo selezionato]
+    Telefono → lista a tutto schermo, la scheda si apre sopra; menu in basso
   ============================================================================
 -->
 <html lang="it">
@@ -19,658 +28,979 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Marvel Tracker — Prototipo</title>
 
-<!-- Font: Orbitron (titoli futuristici), Rajdhani (etichette HUD), Inter (testo) -->
+<!-- Font: Inter (testo e titoli), IBM Plex Mono (numeri e dati tecnici) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 /* ==========================================================================
-   1. VARIABILI — tutti i colori sono qui, così si cambiano in un punto solo
+   1. VARIABILI — palette Stark Industries
+   Oro = accento principale. Rosso = SOLO avvisi e spoiler.
    ========================================================================== */
 :root{
-  /* Sfondi e superfici */
-  --bg:#05080f;                 /* sfondo pagina, quasi nero-blu */
-  --glass:rgba(14,26,46,.62);   /* pannelli "vetro" semitrasparenti */
-  --glass2:rgba(22,40,68,.55);  /* righe/elementi interni ai pannelli */
-  /* Testo */
-  --text:#dbe8ff; --muted:#7f94b8;
-  /* Colori HUD (Iron Man: ciano del reattore, rosso e oro dell'armatura) */
-  --cyan:#4fd8ff; --cyan-dim:rgba(79,216,255,.22);
-  --red:#e3263f; --gold:#f5b942;
-  /* Colori delle 6 Gemme dell'Infinito */
-  --space:#3d8bff; --mind:#ffd23d; --reality:#ff3b4e;
-  --power:#b05cff; --time:#2ee38a; --soul:#ff8a2b;
+  --bg:#0b0c0f;        /* sfondo pagina */
+  --surface:#121418;   /* colonne e pannelli */
+  --surface2:#181b21;  /* elementi interni, hover */
+  --line:#24282f;      /* bordi sottili */
+  --text:#e6e8ec;      /* testo principale */
+  --muted:#868d99;     /* testo secondario */
+  --gold:#c9a24b;      /* accento principale */
+  --gold-soft:rgba(201,162,75,.12);
+  --red:#c0313f;       /* avvisi / spoiler */
+  --red-soft:rgba(192,49,63,.12);
+  --ok:#5fae7d;        /* "visto" */
+  --off:#3a3f48;       /* gemme spente */
+  /* Colori delle 6 Gemme */
+  --space:#3e7bfa; --mind:#f2c230; --reality:#d8323f;
+  --power:#9b51e0; --time:#2fbf71; --soul:#f07c22;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
 }
 
 /* ==========================================================================
-   2. BASE — reset, sfondo con griglia HUD e linee di scansione
+   2. BASE
    ========================================================================== */
 *{box-sizing:border-box}
-body{
-  margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;
-  background:
-    radial-gradient(ellipse at 50% -10%,rgba(79,216,255,.16),transparent 60%), /* alone dall'alto */
-    linear-gradient(rgba(79,216,255,.05) 1px,transparent 1px) 0 0/40px 40px,  /* griglia orizzontale */
-    linear-gradient(90deg,rgba(79,216,255,.05) 1px,transparent 1px) 0 0/40px 40px, /* griglia verticale */
-    var(--bg);
-}
-/* Linee di scansione sottili sopra tutto (effetto monitor), non bloccano i clic */
-body::after{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:100;
-  background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);
-}
-h1,h2,h3{font-family:Orbitron,sans-serif;font-weight:700;margin:0;letter-spacing:.06em}
-.hud{font-family:Rajdhani,sans-serif;text-transform:uppercase;letter-spacing:.18em;font-weight:600}
-button{font:inherit;cursor:pointer}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,sans-serif}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none;padding:0}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+.mono{font-family:var(--mono)}
+/* Etichetta piccola maiuscola (stile documentazione tecnica) */
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.placeholder{color:var(--muted);font-style:italic}
+/* Barre di scorrimento discrete */
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
 
 /* ==========================================================================
-   3. HEADER — barra superiore con reattore animato
+   3. LAYOUT — barra in alto fissa + pagina centrale
+   Barra: [logo] [selettore Home | Preparazione] [ricerca + lingua]
+   Le schede dei titoli NON sono nel selettore: si aprono solo cliccando un
+   titolo o dalla ricerca, e hanno un pulsante "Home" per tornare.
    ========================================================================== */
-header{
-  position:sticky;top:0;z-index:20;
-  background:rgba(5,8,15,.85);backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--cyan-dim);
-}
-/* Linea luminosa rosso→oro→ciano sotto l'header */
-header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--red),var(--gold),var(--cyan),transparent)}
-.bar{max-width:1120px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
-.logo{display:flex;align-items:center;gap:12px}
-.logo h1{font-size:18px;font-weight:900;letter-spacing:.22em}
-.logo h1 span{color:var(--cyan)}
+.top{position:sticky;top:0;z-index:20;height:60px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
+  padding:0 24px;background:rgba(11,12,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;justify-self:start}
+/* Logo: anello oro sottile con nucleo (richiamo discreto al reattore) */
+.brand-mark{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;flex:none}
+.brand-mark::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.brand b{font-size:12.5px;letter-spacing:.16em}
+.brand small{display:block;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.14em}
 
-/* Reattore ad arco: nucleo luminoso + anello tratteggiato che ruota */
-.reactor{position:relative;width:34px;height:34px;border-radius:50%;
-  background:radial-gradient(circle,#fff 0 14%,var(--cyan) 26%,rgba(79,216,255,.15) 58%,transparent 62%);
-  box-shadow:0 0 18px var(--cyan),inset 0 0 8px var(--cyan)}
-.reactor::before{content:"";position:absolute;inset:2px;border-radius:50%;
-  border:2px dashed rgba(79,216,255,.7);animation:spin 8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Selettore centrale "delicato": pillola sottile, la voce attiva ha solo un filo d'oro */
+.switch{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.switch button{padding:6px 18px;border-radius:999px;font-size:13px;color:var(--muted);font-weight:500;transition:.15s}
+.switch button:hover{color:var(--text)}
+.switch button.on{background:var(--surface2);color:var(--text);box-shadow:inset 0 0 0 1px rgba(201,162,75,.4)}
 
-/* Navigazione tra le schermate e selettore lingua */
-nav{display:flex;gap:4px;margin-left:auto}
-nav button,.lang button{
-  background:transparent;color:var(--muted);border:1px solid transparent;
-  padding:7px 14px;font-family:Rajdhani;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); /* angoli tagliati */
-}
-nav button:hover{color:var(--text)}
-nav button.on{color:var(--cyan);background:var(--cyan-dim);border-color:var(--cyan)}
-.lang{display:flex;gap:2px}
-.lang button{padding:7px 9px}
-.lang button.on{color:var(--gold)}
+.top-right{display:flex;justify-content:flex-end;align-items:center;gap:10px;min-width:0}
+
+/* Ricerca con tendina dei risultati */
+.search{position:relative;width:min(250px,100%)}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px 7px 30px;
+  color:var(--text);font:inherit;font-size:13px;outline:none}
+.search input:focus{border-color:var(--gold)}
+.search > svg{position:absolute;left:9px;top:50%;width:14px;height:14px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.results{position:absolute;top:calc(100% + 6px);right:0;width:340px;max-width:calc(100vw - 32px);max-height:380px;overflow:auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:4px;display:none}
+.results.on{display:block}
+.results button{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;width:100%;text-align:left;padding:6px 8px;border-radius:6px}
+.results button:hover,.results button.hi{background:var(--surface2)}
+.results .thumb{width:32px;height:44px;padding:3px}.results .thumb span{font-size:8px}.results .thumb .type{display:none}
+.results b{font-weight:500;font-size:13px;display:block}
+.results small{color:var(--muted);font-size:11.5px;font-family:var(--mono)}
+
+/* Selettore lingua a due segmenti */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:none}
+.seg button{padding:5px 9px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.seg button.on{background:var(--surface2);color:var(--gold)}
+
+/* Contenitore centrale di ogni pagina */
+.page{max-width:1120px;margin:0 auto;padding:24px 24px 60px}
+.page-enter{animation:enter .2s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(4px)}}
 
 /* ==========================================================================
-   4. LAYOUT GENERALE
+   4. COLONNA LISTA
    ========================================================================== */
-main{max-width:1120px;margin:auto;padding:22px 16px 70px}
-.screen{display:none}            /* tutte le schermate nascoste... */
-.screen.on{display:block;animation:boot .4s ease-out} /* ...tranne quella attiva, che "si accende" */
-@keyframes boot{from{opacity:0;transform:translateY(6px)}}
+/* Riquadro che contiene l'elenco */
+.list-wrap{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;margin-top:14px}
+.list-head{padding:18px 0 0}
+.list-head h1{font-size:20px}
+.list-head .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+/* Pulsanti dell'ordine di visione (gruppo segmentato) */
+.tabs-seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:2px}
+.tabs-seg button{padding:6px 11px;border-radius:5px;color:var(--muted);font-size:12.5px;font-weight:500}
+.tabs-seg button.on{background:var(--surface2);color:var(--text);box-shadow:inset 0 -1.5px 0 var(--gold)}
+select.input{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:12.5px}
+/* Filtro per tipo (chip) */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.chip.on{border-color:var(--gold);color:var(--gold)}
 
-/* Avviso "prototipo" in cima */
-.note{font-size:12px;color:var(--muted);border:1px dashed var(--cyan-dim);padding:8px 12px;margin-bottom:18px;font-family:Rajdhani;letter-spacing:.08em}
-.note b{color:var(--gold)}
+/* Intestazione di gruppo (Fase, percorso…) */
+.group{padding:16px 20px 6px;display:flex;justify-content:space-between;align-items:baseline}
+.group h2{font-size:12px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:500}
+
+/* Riga di un titolo: numero | miniatura | testo | voto | visto */
+.row{display:grid;grid-template-columns:28px 44px 1fr auto 34px;gap:12px;align-items:center;
+  padding:10px 20px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+.list-wrap .row:last-child{border-bottom:none}
+.row:hover{background:var(--surface2)}
+/* Filo d'oro a sinistra quando passi sopra: indica che la riga apre la scheda */
+.row:hover::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.row .n{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+.row .t{min-width:0}
+.row .t b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t small{color:var(--muted);font-size:12px;font-family:var(--mono)}
+.row.is-seen .t b{color:var(--text)}
+.row:not(.is-seen) .thumb{opacity:.75}
+
+/* Miniatura generata (in futuro qui andrà la locandina: campo "poster" nei dati) */
+.thumb{width:44px;height:60px;border-radius:4px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,var(--c) 0%,#0b0c0f 120%);border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:flex-end;padding:4px}
+.thumb::before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 60%,rgba(0,0,0,.5)),
+  repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 1px,transparent 1px 6px)}
+.thumb span{position:relative;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fff}
+.thumb .type{position:absolute;top:3px;right:3px;font-size:8px;padding:0 3px;border-radius:2px;background:rgba(0,0,0,.55);color:var(--gold)}
+.thumb.lg{width:96px;height:132px;padding:8px}
+.thumb.lg span{font-size:15px}
+.thumb.lg .type{font-size:10px;top:6px;right:6px;padding:1px 5px}
+
+/* Pulsante "visto" (cerchio con spunta) */
+.seen-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--off);display:grid;place-items:center;transition:.15s}
+.seen-btn svg{width:13px;height:13px;stroke:transparent}
+.seen-btn:hover{border-color:var(--ok)}
+.seen-btn.on{background:var(--ok);border-color:var(--ok)}
+.seen-btn.on svg{stroke:#0b0c0f}
 
 /* ==========================================================================
-   5. PANNELLO HUD — vetro scuro con staffe luminose negli angoli
+   5. GEMME DELL'INFINITO — forme ispirate ai film
+   Spazio=cubo (Tesseract) · Mente=goccia · Realtà=forma fluida (Aether)
+   Potere=sfera con anelli (Orb) · Tempo=occhio (Occhio di Agamotto) · Anima=ovale
+   Accesa  → colore pieno + riflessi (.hl) + leggero alone
+   Spenta  → solo contorno grigio
    ========================================================================== */
-.panel{
-  position:relative;padding:18px;background:var(--glass);backdrop-filter:blur(6px);
-  border:1px solid rgba(79,216,255,.14);
-}
-/* Le "staffe" negli angoli: 4 piccoli angoli ciano disegnati con gradienti */
-.panel::before{
-  content:"";position:absolute;inset:-1px;pointer-events:none;
-  --b:linear-gradient(var(--cyan),var(--cyan));
-  background:
-    var(--b) top left/14px 2px, var(--b) top left/2px 14px,
-    var(--b) top right/14px 2px, var(--b) top right/2px 14px,
-    var(--b) bottom left/14px 2px, var(--b) bottom left/2px 14px,
-    var(--b) bottom right/14px 2px, var(--b) bottom right/2px 14px;
-  background-repeat:no-repeat;
-}
-.label{font-size:11px;color:var(--cyan)}
-.section-title{font-size:15px;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:10px}
-/* Trattino ciano prima dei titoli di sezione */
-.section-title::before{content:"";width:16px;height:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+.gems{display:inline-flex;gap:3px;align-items:center}
+.gem{width:15px;height:15px;display:block;overflow:visible}
+.gem .f{fill:var(--c);stroke:var(--c);stroke-width:.6;stroke-linejoin:round;transition:.2s}
+.gem .hl{transition:.2s}
+.gem.on{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--c) 60%,transparent))}
+.gem:not(.on) .f{fill:transparent;stroke:var(--off);stroke-width:1.3}
+.gem:not(.on) .hl{opacity:0}
+.gems.none{color:var(--muted);font-family:var(--mono);font-size:11px}
+
+/* Versione grande cliccabile nella scheda */
+.rate{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}
+.rate button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 4px 10px;border:1px solid var(--line);border-radius:8px;transition:.15s}
+.rate button:hover{border-color:var(--muted);background:var(--surface2)}
+.rate button.on{border-color:color-mix(in srgb,var(--c) 55%,var(--line));background:color-mix(in srgb,var(--c) 8%,transparent)}
+.rate .gem{width:34px;height:34px}
+.rate small{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.rate button.on small{color:var(--text)}
+.rate-head{display:flex;justify-content:space-between;align-items:baseline}
+.rate-head .score{font-family:var(--mono);font-size:22px;font-weight:600}
+.rate-head .score small{font-size:13px;color:var(--muted)}
+/* Riga "Guanto completo" per 6/6 */
+.gauntlet{margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--gold);
+  border-top:1px solid var(--gold-soft);padding-top:8px;display:flex;gap:8px;align-items:center}
+.gauntlet::before{content:"";width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
 
 /* ==========================================================================
-   6. STATISTICHE (schermata Elenco)
+   6. PAGINA SCHEDA — due colonne su PC: [info, voto, testi] [collegamenti, mappa]
    ========================================================================== */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.stat .num{font-family:Orbitron;font-weight:700;font-size:26px;color:var(--text);margin-top:6px;text-shadow:0 0 12px rgba(79,216,255,.35)}
-.stat .num small{font-size:13px;color:var(--muted)}
-/* Anello di completamento: conic-gradient con la percentuale in --p */
-.ring{--p:25;width:62px;height:62px;border-radius:50%;float:right;display:grid;place-items:center;
-  background:conic-gradient(var(--cyan) calc(var(--p)*1%),rgba(79,216,255,.1) 0);
-  filter:drop-shadow(0 0 6px rgba(79,216,255,.5))}
-.ring span{width:50px;height:50px;border-radius:50%;background:#08111f;display:grid;place-items:center;font-family:Rajdhani;font-weight:700}
+.detail-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}
+.detail-grid > div > .block:first-child{margin-top:0}
+/* Pulsante "Home" in cima alla scheda */
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;color:var(--muted);font-size:13px;
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.back:hover{color:var(--text);border-color:var(--muted)}
+.d-head{display:grid;grid-template-columns:96px 1fr;gap:18px}
+.d-head h1{font-size:24px;line-height:1.2}
+.d-head .orig{color:var(--muted);font-size:13px;margin-top:2px}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:500}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#16130b}
+.btn.done{border-color:var(--ok);color:var(--ok)}
+.btn svg{width:14px;height:14px}
+a.btn{color:var(--text);text-decoration:none}
 
-/* ==========================================================================
-   7. SELETTORE ORDINE DI VISIONE
-   ========================================================================== */
-.orders{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 18px}
-.orders button{
-  background:var(--glass2);color:var(--muted);border:1px solid rgba(79,216,255,.15);
-  padding:9px 16px;font-family:Rajdhani;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%); /* forma a parallelogramma */
-}
-.orders button.on{color:#04121c;background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+.block{margin-top:26px}
+.block > .eyebrow{display:block;margin-bottom:10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg)}
+.inner-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.inner-tabs button{padding:0 0 8px;margin-bottom:-1px;border-bottom:1.5px solid transparent;color:var(--muted);font-size:13px;font-weight:500}
+.inner-tabs button.on{color:var(--text);border-color:var(--gold)}
+.card p{margin:0;line-height:1.65}
+.src{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
 
-/* ==========================================================================
-   8. CARD DEI TITOLI — copertina generata (niente locandine ufficiali)
-   ========================================================================== */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
-.card{position:relative;background:var(--glass);border:1px solid rgba(79,216,255,.14);cursor:pointer;transition:.2s}
-.card:hover{border-color:var(--cyan);box-shadow:0 0 22px rgba(79,216,255,.25);transform:translateY(-2px)}
-/* Copertina: gradiente col colore del titolo + griglia + linea di scansione animata */
-.cover{position:relative;height:132px;padding:12px;display:flex;align-items:flex-end;overflow:hidden;
-  background:
-    linear-gradient(0deg,rgba(5,8,15,.95),transparent 70%),
-    linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px) 0 0/16px 16px,
-    linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px) 0 0/16px 16px,
-    linear-gradient(135deg,var(--c1),var(--c2));}
-.cover::after{content:"";position:absolute;left:0;right:0;height:30%;top:-30%;
-  background:linear-gradient(transparent,rgba(255,255,255,.12),transparent);animation:scan 4s linear infinite}
-@keyframes scan{to{top:130%}}
-.cover h3{position:relative;z-index:1;font-size:17px;line-height:1.2;text-shadow:0 0 10px rgba(0,0,0,.8)}
-/* Etichetta Fase/anno in alto a sinistra */
-.badge{position:absolute;top:10px;left:10px;z-index:1;font-family:Rajdhani;font-weight:700;font-size:11px;letter-spacing:.15em;
-  color:var(--cyan);background:rgba(5,8,15,.7);border:1px solid var(--cyan-dim);padding:2px 8px}
-/* Indicatore "visto" in alto a destra */
-.seen{position:absolute;top:10px;right:10px;z-index:1;font-family:Rajdhani;font-weight:700;font-size:11px;letter-spacing:.15em;
-  color:var(--time);border:1px solid var(--time);padding:2px 8px;background:rgba(5,8,15,.7);box-shadow:0 0 8px rgba(46,227,138,.4)}
-.meta{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-family:Rajdhani;color:var(--muted);font-size:14px}
-.group-title{margin:22px 0 12px;font-size:14px;color:var(--gold);letter-spacing:.2em}
-
-/* ==========================================================================
-   9. GEMME DELL'INFINITO — il sistema di voto da 1 a 6
-   Ogni gemma è un SVG sfaccettato: colore base + facce chiare/scure che
-   simulano il taglio, alone luminoso, pulsazione e riflesso che scorre.
-   Spenta = solo il "castone" vuoto tratteggiato.
-   ========================================================================== */
-.gems{display:flex;gap:5px;align-items:center}
-.gem{width:18px;height:18px;display:block;overflow:visible;transition:transform .2s}
-.gem .body{fill:transparent;stroke:rgba(127,148,184,.45);stroke-width:1.5;stroke-dasharray:3 2;transition:.3s}
-.gem .facets{opacity:0;transition:.3s}
-.gem .shine{opacity:0}
-/* Gemma accesa: si riempie del suo colore e si illumina */
-.gem.on .body{fill:var(--g);stroke:var(--g);stroke-dasharray:none}
-.gem.on .facets{opacity:1}
-.gem.on{filter:drop-shadow(0 0 4px var(--g)) drop-shadow(0 0 10px var(--g));animation:pulse 2.6s ease-in-out infinite}
-/* Sfaso la pulsazione di ogni gemma per un effetto "vivo" */
-.gem:nth-child(2){animation-delay:.2s}.gem:nth-child(3){animation-delay:.4s}
-.gem:nth-child(4){animation-delay:.6s}.gem:nth-child(5){animation-delay:.8s}.gem:nth-child(6){animation-delay:1s}
-@keyframes pulse{50%{filter:drop-shadow(0 0 2px var(--g)) drop-shadow(0 0 5px var(--g))}}
-
-/* Versione grande (voto nella Scheda): cliccabile, con nome della gemma sotto */
-.gems.big{gap:18px;flex-wrap:wrap}
-.gem-slot{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;color:var(--muted);padding:0}
-.gems.big .gem{width:46px;height:46px}
-.gem-slot:hover .gem{transform:scale(1.12) translateY(-2px)}
-.gem-slot small{font-family:Rajdhani;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
-.gem-slot.on small{color:var(--text)}
-/* Riflesso che attraversa la gemma accesa */
-.gems.big .gem.on .shine{opacity:1;animation:shine 3s ease-in-out infinite}
-@keyframes shine{0%,60%{transform:translateX(-30px)}100%{transform:translateX(30px)}}
-/* "Esplosione" quando selezioni una gemma */
-.gem.pop{animation:pop .45s ease-out}
-@keyframes pop{40%{transform:scale(1.35)}}
-
-/* Banner "Guanto completo" con 6/6 */
-.gauntlet{display:flex;align-items:center;gap:12px;margin-top:16px;padding:10px 14px;
-  border:1px solid var(--gold);background:linear-gradient(90deg,rgba(245,185,66,.18),transparent);
-  font-family:Orbitron;font-weight:900;letter-spacing:.2em;color:var(--gold);font-size:13px;
-  text-shadow:0 0 12px var(--gold);opacity:0;transform:translateY(4px);transition:.4s;pointer-events:none}
-.gauntlet.on{opacity:1;transform:none}
-.gauntlet i{width:10px;height:10px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 10px var(--gold)}
-/* Lettura numerica del voto (es. 4/6) */
-.score{font-family:Orbitron;font-size:30px;font-weight:900;margin-left:auto;text-shadow:0 0 14px rgba(79,216,255,.5)}
-.score small{font-size:14px;color:var(--muted)}
-
-/* ==========================================================================
-   10. SCHERMATA SCHEDA — dettaglio del titolo
-   ========================================================================== */
-.detail{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
-.hero{grid-column:1/-1}
-.hero .cover{height:190px;margin:-18px -18px 0}
-.hero .cover h3{font-size:40px;font-weight:900}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
-.chip{font-family:Rajdhani;font-weight:600;letter-spacing:.1em;font-size:13px;border:1px solid rgba(79,216,255,.2);padding:4px 10px;color:var(--muted)}
-a.official{color:var(--cyan);font-family:Rajdhani;font-weight:700;letter-spacing:.12em;text-decoration:none;margin-left:auto}
-a.official:hover{text-shadow:0 0 8px var(--cyan)}
-.rating-head{display:flex;align-items:center;margin:22px 0 12px}
-
-/* Schede (tab) Sinossi / Riassunto completo */
-.tabs{display:flex;gap:16px;margin-bottom:14px;border-bottom:1px solid rgba(79,216,255,.14)}
-.tabs button{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--muted);padding:8px 0;font-family:Rajdhani;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
-.tabs button.on{color:var(--cyan);border-color:var(--cyan)}
-.panel p{line-height:1.6;margin:0}
-
-/* Spoiler: testo sfocato + pulsante "dati classificati" finché non lo sblocchi */
+/* Spoiler: testo sfocato + avviso rosso finché non lo sblocchi */
 .spoiler{position:relative}
-.spoiler p{filter:blur(7px);user-select:none;transition:.4s}
-.spoiler.open p{filter:none;user-select:auto}
-.spoiler .reveal{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;
-  background:rgba(227,38,63,.15);color:var(--red);border:1px solid var(--red);padding:8px 16px;
-  font-family:Rajdhani;font-weight:700;letter-spacing:.2em;box-shadow:0 0 16px rgba(227,38,63,.4)}
-.spoiler.open .reveal{display:none}
-.src{font-size:11px;color:var(--muted);margin-top:8px;font-family:Rajdhani;letter-spacing:.1em}
+.spoiler.locked p{filter:blur(6px);user-select:none}
+.spoiler .unlock{display:none}
+.spoiler.locked .unlock{display:inline-flex;position:absolute;inset:0;margin:auto;width:max-content;height:max-content;
+  align-items:center;gap:8px;background:var(--red-soft);border:1px solid var(--red);color:#f2a7ae;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:500}
 
-/* Liste dei collegamenti prima/dopo */
-.link-list{list-style:none;padding:0;margin:0;display:grid;gap:6px}
-.link-list li{display:flex;gap:10px;align-items:center;background:var(--glass2);padding:9px 12px;border-left:2px solid var(--c,var(--cyan))}
-.link-list small{color:var(--muted);display:block;font-size:12px}
-/* Scena post-credits numerata */
-.pc{display:flex;gap:12px;align-items:center;margin-top:10px}
-.pc .n{flex:none;font-family:Orbitron;font-weight:700;width:34px;height:34px;display:grid;place-items:center;color:var(--gold);border:1px solid var(--gold);box-shadow:0 0 10px rgba(245,185,66,.3)}
-/* Testi dentro la mappa SVG */
-svg text{font-family:Rajdhani;font-weight:700;font-size:11px;fill:var(--text);letter-spacing:.08em}
+/* Collegamenti prima/dopo */
+.links{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.link{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:6px;text-align:left;width:100%}
+.link:hover{background:var(--surface2)}
+.link .thumb{width:32px;height:44px;padding:3px}.link .thumb span{font-size:8px}.link .thumb .type{display:none}
+.link b{font-weight:500;font-size:13px;display:block}
+.link small{color:var(--muted);font-size:11.5px}
+.link .dot{width:8px;height:8px;border-radius:50%;background:var(--off)}
+.link .dot.on{background:var(--ok)}
+.empty{color:var(--muted);font-size:12.5px;padding:8px 0}
 
-/* ==========================================================================
-   11. SCHERMATA PREPARAZIONE — countdown, watchlist, ripasso
-   ========================================================================== */
-.countdown{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
-.countdown div{min-width:72px;padding:10px;text-align:center;border:1px solid var(--cyan-dim);background:rgba(79,216,255,.05)}
-.countdown b{display:block;font-family:Orbitron;font-size:30px;color:var(--cyan);text-shadow:0 0 14px var(--cyan)}
-.countdown span{font-size:10px;color:var(--muted);font-family:Rajdhani;letter-spacing:.2em;text-transform:uppercase}
-/* Barra di avanzamento a segmenti */
-.bar-wrap{height:10px;background:rgba(79,216,255,.08);border:1px solid var(--cyan-dim)}
-.bar-fill{height:100%;width:var(--w);transition:width .4s;
-  background:repeating-linear-gradient(90deg,var(--cyan) 0 10px,transparent 10px 13px);box-shadow:0 0 10px var(--cyan)}
-/* Righe della watchlist con casella */
-.check{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(79,216,255,.08);cursor:pointer}
-.check input{width:18px;height:18px;accent-color:var(--cyan)}
-.check .t{flex:1}
-.check small{color:var(--muted);font-family:Rajdhani}
-.recap{background:var(--glass2);border-left:2px solid var(--gold);padding:10px 12px;margin-top:8px;font-size:14px}
+/* Scene post-credits */
+.pc-item{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line)}
+.pc-item:first-child{border-top:none}
+.pc-item .n{font-family:var(--mono);font-size:11px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:4px;text-align:center;padding:2px 0}
+
+/* Mappa dei collegamenti (SVG generato) */
+.map svg{width:100%;height:auto;display:block}
+.map .node{cursor:pointer}
+.map .node rect{fill:var(--surface2);stroke:var(--line)}
+.map .node:hover rect{stroke:var(--gold)}
+.map .node.cur rect{fill:var(--gold-soft);stroke:var(--gold)}
+.map .node text{fill:var(--text);font-family:var(--mono);font-size:10px}
+.map .node .seen-dot{fill:var(--ok)}
+.map path{fill:none;stroke:#3a3f48;stroke-width:1}
 
 /* ==========================================================================
-   12. RESPONSIVE — su telefono le colonne diventano una sola
+   7. VISTE A PAGINA INTERA (Preparazione, Statistiche)
    ========================================================================== */
+.page-head h1{font-size:22px}
+.page-head p{color:var(--muted);margin:4px 0 0}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.panel h2{font-size:14px;margin-bottom:12px}
+
+/* Hero della prossima uscita */
+.release{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
+.release h2{font-size:22px;margin:4px 0 2px}
+.countdown{display:flex;gap:8px}
+.countdown div{min-width:62px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:8px 6px;background:var(--bg)}
+.countdown b{display:block;font-family:var(--mono);font-size:22px;font-weight:500;color:var(--gold)}
+.countdown span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.upcoming{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.upcoming button{border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--muted);text-align:left}
+.upcoming button.on{border-color:var(--gold);color:var(--text)}
+.upcoming small{display:block;font-family:var(--mono);font-size:10.5px}
+
+/* Barra di avanzamento */
+.progress{height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--gold);width:var(--w);transition:width .3s}
+.progress-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:14px 0 6px}
+.progress-row b{color:var(--text);font-weight:500}
+
+/* Righe della watchlist (riusano .row ma più semplici) */
+.wl .row{padding:9px 0;grid-template-columns:44px 1fr auto 34px}
+.wl .row:hover{background:none}
+.wl .row .t b{cursor:pointer}
+.wl .row .t b:hover{color:var(--gold)}
+.recap{border-left:2px solid var(--gold);padding:6px 0 6px 12px;margin-bottom:10px}
+.recap b{display:block;font-size:13px;font-weight:500}
+.recap span{color:var(--muted);font-size:12.5px}
+
+/* Statistiche */
+.kpi .eyebrow{display:block}
+.kpi b{display:block;font-family:var(--mono);font-size:26px;font-weight:500;margin-top:6px}
+.kpi b small{font-size:13px;color:var(--muted)}
+.bars .bar{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;margin-bottom:10px;font-size:12.5px}
+.bars .bar span:last-child{font-family:var(--mono);color:var(--muted);text-align:right;font-size:11.5px}
+
+/* Striscia "prototipo" sotto la barra in alto */
+.proto-note{padding:6px 24px;font-family:var(--mono);font-size:10.5px;color:var(--muted);border-bottom:1px solid var(--line);background:var(--surface);text-align:center}
+.proto-note b{color:var(--red)}
+
+/* ==========================================================================
+   8. RESPONSIVE — tablet e telefono
+   ========================================================================== */
+@media (max-width:1000px){
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .detail-grid{grid-template-columns:1fr}
+}
 @media (max-width:760px){
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .detail{grid-template-columns:1fr}
-  .hero .cover h3{font-size:26px}
-  nav{margin-left:0;order:3;width:100%}
-  .lang{margin-left:auto}
-  .gems.big{gap:10px}
-  .gems.big .gem{width:36px;height:36px}
+  /* Barra in alto su due righe: logo + ricerca/lingua sopra, selettore sotto */
+  .top{height:auto;grid-template-columns:auto 1fr;padding:10px 16px;row-gap:10px}
+  .brand b{font-size:11px}.brand small{display:none}
+  .switch{grid-column:1/-1;grid-row:2;justify-self:center}
+  .search{width:100%}
+  .page{padding:18px 16px 40px}
+  .grid2{grid-template-columns:1fr}
+  .release{grid-template-columns:1fr}
+  .links{grid-template-columns:1fr}
+  .row{padding:10px 12px;gap:10px;grid-template-columns:22px 40px 1fr auto 30px}
+  .row .gems .gem{width:11px;height:11px}
+  .row .gems{gap:2px}
+  .d-head{grid-template-columns:76px 1fr}
+  .thumb.lg{width:76px;height:104px}
+  .rate{grid-template-columns:repeat(3,1fr)}
+  .proto-note{padding:6px 16px}
+}
+@media (max-width:420px){
+  /* Su schermi molto stretti la fila di gemme nelle righe sparisce: il voto resta nella scheda */
+  .row{grid-template-columns:22px 40px 1fr 30px}
+  .row > .gems{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- ===================== HEADER ===================== -->
-<header>
-  <div class="bar">
-    <div class="logo"><div class="reactor"></div><h1>MARVEL <span>TRACKER</span></h1></div>
-    <!-- data-go = id della schermata da mostrare; data-i18n = chiave di traduzione -->
-    <nav>
-      <button class="on" data-go="home" data-i18n="nav_home">Elenco</button>
-      <button data-go="detail" data-i18n="nav_detail">Scheda</button>
-      <button data-go="prep" data-i18n="nav_prep">Preparazione</button>
-    </nav>
-    <div class="lang"><button class="on" data-lang="it">IT</button><button data-lang="en">EN</button></div>
+<!-- ===================== SCHELETRO =====================
+     La barra in alto è fissa; la ricerca NON viene ridisegnata a ogni clic
+     (così non perde il testo scritto). Il resto lo disegna JavaScript.  -->
+<header class="top">
+  <div class="brand" data-act="view" data-v="home">
+    <div class="brand-mark"></div><div><b>MARVEL TRACKER</b><small>PROTOTYPE · v3</small></div>
+  </div>
+  <div class="switch" id="switch"><!-- Home | Preparazione: renderTop() --></div>
+  <div class="top-right">
+    <div class="search">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg>
+      <input id="q" type="search" autocomplete="off">
+      <div class="results" id="results"></div>
+    </div>
+    <div class="seg" id="lang"><!-- IT | EN: renderTop() --></div>
   </div>
 </header>
-
-<main>
-  <div class="note" data-i18n="proto_note"><b>PROTOTIPO</b> · titoli, testi e date sono solo di esempio e non ancora verificati sulle fonti ufficiali.</div>
-
-  <!-- ===================== SCHERMATA 1: ELENCO ===================== -->
-  <section id="home" class="screen on">
-    <!-- Statistiche personali -->
-    <div class="stats">
-      <div class="panel stat"><div class="ring" style="--p:50"><span>50%</span></div><div class="label hud" data-i18n="st_done">Completato</div><div class="num">2<small>/4</small></div></div>
-      <div class="panel stat"><div class="label hud" data-i18n="st_hours">Ore viste</div><div class="num">4<small>h</small> 10<small>m</small></div></div>
-      <div class="panel stat"><div class="label hud" data-i18n="st_avg">Media voto</div><div class="num">5.0<small>/6</small></div><div id="avgGems" style="margin-top:6px"></div></div>
-      <div class="panel stat"><div class="label hud" data-i18n="st_fav">Preferito Fase 1</div><div class="num" style="font-size:18px">IRON MAN</div></div>
-    </div>
-
-    <h2 class="section-title" data-i18n="order_title">Ordine di visione</h2>
-    <!-- data-order = modalità di ordinamento usata da renderList() -->
-    <div class="orders">
-      <button class="on" data-order="release" data-i18n="o_release">Uscita</button>
-      <button data-order="chrono" data-i18n="o_chrono">Cronologico</button>
-      <button data-order="phase" data-i18n="o_phase">Fase / Saga</button>
-      <button data-order="char" data-i18n="o_char">Personaggio</button>
-    </div>
-    <div id="list"><!-- riempito da renderList() --></div>
-  </section>
-
-  <!-- ===================== SCHERMATA 2: SCHEDA TITOLO ===================== -->
-  <section id="detail" class="screen">
-    <div class="detail">
-      <!-- Testata: copertina, info, link ufficiale, voto a Gemme -->
-      <div class="panel hero">
-        <div class="cover" style="--c1:#b3122a;--c2:#e8a531">
-          <span class="badge">FASE 1 · 2008</span>
-          <h3>IRON MAN</h3>
-        </div>
-        <div class="row">
-          <span class="chip" data-i18n="film">FILM</span>
-          <span class="chip">126 MIN</span>
-          <span class="chip">INFINITY SAGA</span>
-          <a class="official" href="https://www.marvel.com/movies" target="_blank" rel="noopener" data-i18n="official">PAGINA UFFICIALE ↗</a>
-        </div>
-        <div class="rating-head">
-          <h3 class="section-title" style="margin:0" data-i18n="your_rating">Il tuo voto</h3>
-          <div class="score" id="score"></div>
-        </div>
-        <div id="rateGems"><!-- riempito da renderRating() --></div>
-        <div class="gauntlet" id="gauntlet"><i></i><span data-i18n="gauntlet">GUANTO COMPLETO</span><i></i></div>
-      </div>
-
-      <!-- Sinossi / riassunto con spoiler / post-credits -->
-      <div class="panel">
-        <div class="tabs">
-          <button class="on" data-tab="syn" data-i18n="t_syn">Sinossi · no spoiler</button>
-          <button data-tab="full" data-i18n="t_full">Riassunto completo</button>
-        </div>
-        <div data-pane="syn">
-          <p data-i18n="syn_text">[Qui andrà la sinossi ufficiale, citata dalla fonte.] Testo segnaposto: un geniale inventore costruisce un'armatura ad alta tecnologia e decide di usarla per proteggere il mondo.</p>
-          <div class="src" data-i18n="syn_src">FONTE: MARVEL.COM (DA INSERIRE)</div>
-        </div>
-        <div data-pane="full" hidden>
-          <div class="spoiler">
-            <p data-i18n="full_text">Testo segnaposto del riassunto completo con spoiler, scritto da Claude. Qui verrà raccontata tutta la trama, compreso il finale e le rivelazioni principali, in modo da poterlo rileggere prima di un nuovo film.</p>
-            <button class="reveal" data-i18n="reveal">⚠ SBLOCCA SPOILER</button>
-          </div>
-          <div class="src" data-i18n="full_src">SCRITTO DA CLAUDE · FONTI SECONDARIE</div>
-        </div>
-
-        <h3 class="section-title" style="margin-top:24px" data-i18n="postcredits">Scene post-credits</h3>
-        <div class="pc"><div class="n">01</div>
-          <div class="spoiler" style="flex:1"><p data-i18n="pc_text">Introduce un personaggio chiave e anticipa la squadra degli Avengers.</p><button class="reveal" style="padding:4px 10px">⚠</button></div>
-        </div>
-      </div>
-
-      <!-- Collegamenti prima/dopo e mappa -->
-      <div class="panel">
-        <h3 class="section-title" data-i18n="links">Collegamenti</h3>
-        <div class="label hud" style="margin:4px 0 8px" data-i18n="before">Da vedere prima</div>
-        <ul class="link-list"><li style="--c:var(--muted)"><span data-i18n="none_before">Nessuno: è il primo film MCU</span></li></ul>
-        <div class="label hud" style="margin:16px 0 8px" data-i18n="after">Cosa viene dopo</div>
-        <ul class="link-list">
-          <li style="--c:var(--red)"><div>Iron Man 2<small data-i18n="why1">Continua la storia di Tony Stark</small></div></li>
-          <li style="--c:var(--gold)"><div>The Avengers<small data-i18n="why2">Tony entra nella squadra</small></div></li>
-        </ul>
-        <div class="label hud" style="margin:16px 0 8px" data-i18n="map">Mappa dei collegamenti</div>
-        <!-- Mappa: nodi = titoli, linee = collegamenti. Il nodo rosso è il titolo aperto. -->
-        <svg viewBox="0 0 300 170" width="100%" role="img" aria-label="Mappa dei collegamenti">
-          <defs>
-            <!-- Filtro bagliore per linee e nodo attivo -->
-            <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-          <g stroke="#4fd8ff" stroke-width="1.2" opacity=".6" filter="url(#glow)" stroke-dasharray="4 3">
-            <line x1="60" y1="85" x2="150" y2="35"/><line x1="60" y1="85" x2="150" y2="135"/>
-            <line x1="150" y1="35" x2="245" y2="85"/><line x1="150" y1="135" x2="245" y2="85"/>
-          </g>
-          <g fill="#08111f" stroke="#4fd8ff" stroke-width="1.2">
-            <circle cx="60" cy="85" r="22" fill="rgba(227,38,63,.25)" stroke="#e3263f" filter="url(#glow)"/>
-            <circle cx="150" cy="35" r="17"/><circle cx="150" cy="135" r="17"/><circle cx="245" cy="85" r="20"/>
-          </g>
-          <text x="60" y="89" text-anchor="middle">IM</text>
-          <text x="150" y="39" text-anchor="middle">IM2</text>
-          <text x="150" y="139" text-anchor="middle">CA</text>
-          <text x="245" y="89" text-anchor="middle">AVG</text>
-        </svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== SCHERMATA 3: PREPARAZIONE ===================== -->
-  <section id="prep" class="screen">
-    <div class="panel" style="margin-bottom:16px">
-      <div class="label hud" data-i18n="next_release">Prossima uscita</div>
-      <h2 style="font-size:clamp(22px,5vw,38px);font-weight:900;margin-top:6px;text-shadow:0 0 18px rgba(79,216,255,.4)">AVENGERS: DOOMSDAY</h2>
-      <div class="countdown" id="countdown"><!-- riempito da countdown() --></div>
-      <div class="src" data-i18n="date_note">DATA DI ESEMPIO: 18 DICEMBRE 2026 (DA VERIFICARE SU MARVEL.COM)</div>
-      <div class="label hud" style="margin-top:18px" data-i18n="prep_progress">Avanzamento preparazione</div>
-      <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
-        <div class="bar-wrap" style="flex:1"><div class="bar-fill" id="prepBar" style="--w:40%"></div></div>
-        <b class="hud" id="prepTxt">2/5</b>
-      </div>
-    </div>
-
-    <div class="detail">
-      <!-- Watchlist minima / estesa -->
-      <div class="panel">
-        <div class="tabs">
-          <button class="on" data-wl="min" data-i18n="wl_min">Lista minima</button>
-          <button data-wl="ext" data-i18n="wl_ext">Lista estesa</button>
-        </div>
-        <div id="watchlist"><!-- riempito da renderWL() --></div>
-        <div class="src" id="wlTime"></div>
-      </div>
-      <!-- Ripasso veloce -->
-      <div class="panel">
-        <h3 class="section-title" data-i18n="recap_title">Ripasso veloce</h3>
-        <p style="color:var(--muted);font-size:13px" data-i18n="recap_sub">Cosa devi ricordare se non hai tempo di rivedere tutto:</p>
-        <div class="recap" data-i18n="recap1">01 · Testo segnaposto: punto chiave dalla Saga dell'Infinito.</div>
-        <div class="recap" data-i18n="recap2">02 · Testo segnaposto: cosa è successo al Multiverso.</div>
-        <div class="recap" data-i18n="recap3">03 · Testo segnaposto: i personaggi da tenere d'occhio.</div>
-      </div>
-    </div>
-  </section>
-</main>
+<div class="proto-note" id="proto"></div>
+<main id="content"></main>
 
 <script>
 /* ============================================================================
-   DATI DI ESEMPIO (segnaposto, NON verificati: nell'app vera arriveranno
-   da file dati con fonti ufficiali)
-   ============================================================================ */
+   DATI — UNICO elenco dei titoli, usato da Elenco, Scheda, Preparazione e
+   Statistiche. ATTENZIONE: anni, durate, ordine cronologico e collegamenti
+   sono SEGNAPOSTO da verificare sulle fonti ufficiali.
 
-/* Le 6 Gemme in ordine di voto: [variabile colore, nome IT, nome EN] */
+   Campi:
+     id      identificativo
+     type    "film" | "serie" | "anim" (animazione)
+     t       titolo per lingua { it, en }
+     y       anno di uscita
+     min     durata in minuti (per le serie: durata totale approssimativa)
+     eps     numero episodi (solo serie)
+     phase   Fase MCU · saga: "inf" (Infinito) | "multi" (Multiverso)
+     chrono  posizione nell'ordine cronologico
+     c       colore della miniatura · abbr: sigla nella miniatura
+     poster  null per ora → in futuro URL della locandina
+     chars   personaggi (per i percorsi) · themes: percorsi tematici
+     before/after  collegamenti: [id, motivo IT, motivo EN]
+     pc      scene post-credits (numero)
+   ============================================================================ */
+const DATA = [
+  {id:"im",type:"film",t:{it:"Iron Man",en:"Iron Man"},y:2008,min:126,phase:1,saga:"inf",chrono:2,c:"#8c1d26",abbr:"IM",poster:null,
+   chars:["ironman"],themes:[],before:[],after:[["im2","Continua la storia di Tony","Continues Tony's story"],["avg","Tony entra negli Avengers","Tony joins the Avengers"]],pc:1},
+  {id:"hulk",type:"film",t:{it:"L'incredibile Hulk",en:"The Incredible Hulk"},y:2008,min:112,phase:1,saga:"inf",chrono:4,c:"#2f5d3a",abbr:"HK",poster:null,
+   chars:["hulk"],themes:[],before:[],after:[["avg","Bruce Banner torna in squadra","Bruce Banner joins the team"]],pc:0},
+  {id:"im2",type:"film",t:{it:"Iron Man 2",en:"Iron Man 2"},y:2010,min:124,phase:1,saga:"inf",chrono:3,c:"#7a2a1f",abbr:"IM2",poster:null,
+   chars:["ironman"],themes:[],before:[["im","Il primo capitolo di Tony","Tony's first chapter"]],after:[["avg","Prepara la squadra","Sets up the team"]],pc:1},
+  {id:"thor",type:"film",t:{it:"Thor",en:"Thor"},y:2011,min:115,phase:1,saga:"inf",chrono:5,c:"#2b4a78",abbr:"THR",poster:null,
+   chars:["thor","loki"],themes:[],before:[],after:[["avg","Loki diventa il nemico","Loki becomes the villain"]],pc:1},
+  {id:"ca",type:"film",t:{it:"Captain America: Il primo vendicatore",en:"Captain America: The First Avenger"},y:2011,min:124,phase:1,saga:"inf",chrono:1,c:"#24406b",abbr:"CA",poster:null,
+   chars:["cap"],themes:[],before:[],after:[["avg","Steve si risveglia nel presente","Steve wakes up in the present"]],pc:1},
+  {id:"avg",type:"film",t:{it:"The Avengers",en:"The Avengers"},y:2012,min:143,phase:1,saga:"inf",chrono:6,c:"#3d3569",abbr:"AVG",poster:null,
+   chars:["ironman","cap","thor","hulk","loki"],themes:["avengers"],
+   before:[["im","Presenta Tony Stark","Introduces Tony Stark"],["hulk","Presenta Bruce Banner","Introduces Bruce Banner"],["thor","Presenta Thor e Loki","Introduces Thor and Loki"],["ca","Presenta Steve Rogers","Introduces Steve Rogers"]],
+   after:[["iw","Arriva Thanos","Thanos arrives"]],pc:2},
+  {id:"iw",type:"film",t:{it:"Avengers: Infinity War",en:"Avengers: Infinity War"},y:2018,min:149,phase:3,saga:"inf",chrono:7,c:"#4b2c6b",abbr:"IW",poster:null,
+   chars:["ironman","cap","thor","hulk","loki","strange"],themes:["avengers"],before:[["avg","La squadra si forma","The team forms"]],after:[["eg","Il seguito diretto","The direct sequel"]],pc:1},
+  {id:"eg",type:"film",t:{it:"Avengers: Endgame",en:"Avengers: Endgame"},y:2019,min:181,phase:3,saga:"inf",chrono:8,c:"#5a3a1c",abbr:"EG",poster:null,
+   chars:["ironman","cap","thor","hulk","loki","strange"],themes:["avengers"],before:[["iw","Il seguito diretto","The direct sequel"]],
+   after:[["loki","Una variante di Loki fugge","A Loki variant escapes"],["dsmom","Strange dopo il Blip","Strange after the Blip"]],pc:0},
+  {id:"loki",type:"serie",t:{it:"Loki (Stagione 1)",en:"Loki (Season 1)"},y:2021,min:300,eps:6,phase:4,saga:"multi",chrono:9,c:"#3b5a2a",abbr:"LOK",poster:null,
+   chars:["loki"],themes:["multi"],before:[["avg","Il Loki del 2012","The 2012 Loki"],["eg","Da dove fugge Loki","Where Loki escapes from"]],
+   after:[["whatif","Il Multiverso si apre","The Multiverse opens"],["dsmom","Conseguenze sul Multiverso","Multiverse consequences"]],pc:0},
+  {id:"whatif",type:"anim",t:{it:"What If...? (Stagione 1)",en:"What If...? (Season 1)"},y:2021,min:300,eps:9,phase:4,saga:"multi",chrono:10,c:"#5c4a1e",abbr:"WI",poster:null,
+   chars:["strange"],themes:["multi"],before:[["loki","Il Multiverso si apre","The Multiverse opens"]],after:[],pc:0},
+  {id:"dsmom",type:"film",t:{it:"Doctor Strange nel Multiverso della Follia",en:"Doctor Strange in the Multiverse of Madness"},y:2022,min:126,phase:4,saga:"multi",chrono:11,c:"#5a1f4a",abbr:"DS2",poster:null,
+   chars:["strange"],themes:["multi"],before:[["eg","Strange dopo il Blip","Strange after the Blip"],["loki","Il Multiverso si apre","The Multiverse opens"]],after:[],pc:2},
+];
+/* Accesso rapido per id */
+const BY_ID = Object.fromEntries(DATA.map(d => [d.id, d]));
+
+/* Percorsi (ordine "Percorsi"): personaggi e temi. key = valore in chars/themes */
+const PATHS = [
+  {key:"ironman",kind:"chars",it:"Iron Man",en:"Iron Man"},
+  {key:"cap",kind:"chars",it:"Captain America",en:"Captain America"},
+  {key:"thor",kind:"chars",it:"Thor",en:"Thor"},
+  {key:"hulk",kind:"chars",it:"Hulk",en:"Hulk"},
+  {key:"loki",kind:"chars",it:"Loki",en:"Loki"},
+  {key:"strange",kind:"chars",it:"Doctor Strange",en:"Doctor Strange"},
+  {key:"avengers",kind:"themes",it:"Tema · Avengers",en:"Theme · Avengers"},
+  {key:"multi",kind:"themes",it:"Tema · Multiverso",en:"Theme · Multiverse"},
+];
+
+/* Prossime uscite + liste di preparazione (id presi da DATA, così sono
+   gli STESSI titoli dell'elenco). Date di esempio da verificare. */
+const UPCOMING = [
+  {id:"doomsday",t:"Avengers: Doomsday",date:"2026-12-18",
+   min:["eg","loki","dsmom"], ext:["avg","iw","eg","loki","whatif","dsmom"],
+   recap:[
+     ["Fine della Saga dell'Infinito","End of the Infinity Saga","Testo segnaposto: cosa è successo in Endgame.","Placeholder: what happened in Endgame."],
+     ["Il Multiverso è aperto","The Multiverse is open","Testo segnaposto: le conseguenze di Loki.","Placeholder: consequences of Loki."],
+     ["Chi tenere d'occhio","Who to watch","Testo segnaposto: i personaggi chiave.","Placeholder: key characters."]]},
+  {id:"secretwars",t:"Avengers: Secret Wars",date:"2027-12-17",
+   min:["eg","dsmom"], ext:["iw","eg","loki","whatif","dsmom"],
+   recap:[["Testo segnaposto","Placeholder","Da scrivere.","To be written."]]},
+];
+
+/* Le 6 Gemme in ordine di voto: chiave colore + nome IT/EN */
 const GEMS = [
-  ["space","Spazio","Space"], ["mind","Mente","Mind"], ["reality","Realtà","Reality"],
-  ["power","Potere","Power"], ["time","Tempo","Time"], ["soul","Anima","Soul"]
+  {k:"space",it:"Spazio",en:"Space"},{k:"mind",it:"Mente",en:"Mind"},{k:"reality",it:"Realtà",en:"Reality"},
+  {k:"power",it:"Potere",en:"Power"},{k:"time",it:"Tempo",en:"Time"},{k:"soul",it:"Anima",en:"Soul"}
 ];
 
-/* Titoli di esempio.
-   t = titolo per lingua, y = anno, min = durata, phase = Fase,
-   chrono = posizione in ordine cronologico, c = colori copertina,
-   seen = visto, r = voto 0–6, chars = personaggi (per i percorsi) */
-const T = [
-  {id:"im",  t:{it:"Iron Man",en:"Iron Man"}, y:2008,min:126,phase:1,chrono:2,c:["#b3122a","#e8a531"],seen:true, r:6,chars:["Iron Man"]},
-  {id:"hulk",t:{it:"L'incredibile Hulk",en:"The Incredible Hulk"}, y:2008,min:112,phase:1,chrono:3,c:["#0f5132","#2ee38a"],seen:true, r:4,chars:["Hulk"]},
-  {id:"ca",  t:{it:"Captain America: Il primo vendicatore",en:"Captain America: The First Avenger"}, y:2011,min:124,phase:1,chrono:1,c:["#13306b","#3d8bff"],seen:false,r:0,chars:["Captain America"]},
-  {id:"avg", t:{it:"The Avengers",en:"The Avengers"}, y:2012,min:143,phase:1,chrono:4,c:["#2a1a5e","#b05cff"],seen:false,r:0,chars:["Iron Man","Captain America","Hulk"]},
-];
+/* ============================================================================
+   TRADUZIONI — tr("chiave") restituisce il testo nella lingua attiva
+   ============================================================================ */
+const STR = {
+  it:{home:"Home",list:"Elenco",prep:"Preparazione",stats:"Statistiche",seenOf:"visti",
+      searchPh:"Cerca un titolo…",noResults:"Nessun risultato",moreStats:"Statistiche dettagliate",
+      listSub:"Tutto l'universo Marvel",release:"Uscita",chrono:"Cronologico",phase:"Fase",paths:"Percorsi",
+      all:"Tutti",film:"Film",serie:"Serie",anim:"Animazione",
+      phaseN:"Fase",inf:"Saga dell'Infinito",multi:"Saga del Multiverso",
+      markSeen:"Segna come visto",isSeen:"Visto",official:"Pagina ufficiale",
+      rating:"Il tuo voto",gauntlet:"GUANTO COMPLETO",noRating:"non votato",
+      synopsis:"Sinossi · senza spoiler",full:"Riassunto completo",unlock:"Mostra spoiler",
+      synText:"[Sinossi ufficiale da inserire, con citazione della fonte.]",
+      synSrc:"FONTE: MARVEL.COM / DISNEY+ · DA INSERIRE",
+      fullText:"[Riassunto completo con spoiler, scritto da Claude, da inserire. Racconterà tutta la trama, il finale e le rivelazioni principali.]",
+      fullSrc:"SCRITTO DA CLAUDE · FONTI SECONDARIE",
+      postcredits:"Scene post-credits",noPc:"Nessuna scena post-credits.",pcText:"[Descrizione della scena e a cosa si collega — da inserire.]",
+      links:"Collegamenti",before:"Da vedere prima",after:"Cosa viene dopo",none:"Nessuno",map:"Mappa dei collegamenti",
+      back:"← Home",min:"min",eps:"ep.",year:"Anno",duration:"Durata",
+      prepSub:"Cosa vedere prima delle prossime uscite",next:"Prossima uscita",dateNote:"Data di esempio · da verificare su marvel.com",
+      d:"giorni",h:"ore",m:"min",s:"sec",minList:"Lista minima",extList:"Lista estesa",
+      progress:"Avanzamento",total:"Tempo totale",left:"Ti mancano",recap:"Ripasso veloce",recapSub:"Se non hai tempo di rivedere tutto",
+      statsSub:"I tuoi numeri",done:"Completato",hours:"Ore viste",avg:"Media voto",fav:"Preferito",byPhase:"Per Fase",byRating:"Distribuzione voti",byType:"Per tipo",
+      proto:"<b>PROTOTIPO</b> · dati segnaposto, non ancora verificati sulle fonti ufficiali. Visti e voti si salvano in questo browser."},
+  en:{home:"Home",list:"List",prep:"Prep",stats:"Stats",seenOf:"seen",
+      searchPh:"Search a title…",noResults:"No results",moreStats:"Detailed stats",
+      listSub:"The whole Marvel universe",release:"Release",chrono:"Chronological",phase:"Phase",paths:"Paths",
+      all:"All",film:"Movies",serie:"Series",anim:"Animation",
+      phaseN:"Phase",inf:"Infinity Saga",multi:"Multiverse Saga",
+      markSeen:"Mark as seen",isSeen:"Seen",official:"Official page",
+      rating:"Your rating",gauntlet:"GAUNTLET COMPLETE",noRating:"not rated",
+      synopsis:"Synopsis · no spoilers",full:"Full recap",unlock:"Show spoilers",
+      synText:"[Official synopsis to add, with source quoted.]",
+      synSrc:"SOURCE: MARVEL.COM / DISNEY+ · TO ADD",
+      fullText:"[Full spoiler recap written by Claude, to add. It will cover the whole plot, the ending and key reveals.]",
+      fullSrc:"WRITTEN BY CLAUDE · SECONDARY SOURCES",
+      postcredits:"Post-credits scenes",noPc:"No post-credits scenes.",pcText:"[Scene description and what it connects to — to add.]",
+      links:"Connections",before:"Watch before",after:"What comes next",none:"None",map:"Connection map",
+      back:"← Home",min:"min",eps:"ep.",year:"Year",duration:"Runtime",
+      prepSub:"What to watch before upcoming releases",next:"Next release",dateNote:"Example date · to verify on marvel.com",
+      d:"days",h:"hours",m:"min",s:"sec",minList:"Essential list",extList:"Extended list",
+      progress:"Progress",total:"Total time",left:"Left to watch",recap:"Quick recap",recapSub:"If you don't have time to rewatch",
+      statsSub:"Your numbers",done:"Completed",hours:"Hours watched",avg:"Avg rating",fav:"Favourite",byPhase:"By Phase",byRating:"Rating distribution",byType:"By type",
+      proto:"<b>PROTOTYPE</b> · placeholder data, not yet checked against official sources. Seen and ratings are saved in this browser."}
+};
+const tr = k => STR[ui.lang][k] ?? k;
+const title = d => d.t[ui.lang];
 
-/* Watchlist di preparazione: [titolo, minuti (0 = serie), già visto] */
-const WL = {
-  min:[["Avengers: Endgame",181,true],["Loki",0,true],["Doctor Strange nel Multiverso della Follia",126,false]],
-  ext:[["Avengers: Infinity War",149,true],["Avengers: Endgame",181,true],["Loki",0,false],["What If...?",0,false],["Doctor Strange nel Multiverso della Follia",126,false]]
+/* ============================================================================
+   STATO SALVATO (nel browser) — cosa hai visto e i voti
+   In un'anteprima privata o con i dati bloccati il salvataggio può fallire:
+   in quel caso l'app funziona lo stesso, solo che non ricorda.
+   ============================================================================ */
+const KEY = "marvel-tracker-proto-v3";
+let state = {seen:{im:true, hulk:true, avg:true}, rating:{im:6, hulk:4, avg:5}};
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.seen) state = s; } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+/* ============================================================================
+   STATO DELL'INTERFACCIA (non salvato, tranne la lingua)
+   ============================================================================ */
+const ui = {
+  lang:"it",
+  view:"home",        // "home" | "prep" (dal selettore) | "detail" (solo da titolo o ricerca)
+  statsOpen:false,    // sezione "statistiche dettagliate" aperta in Home
+  order:"release",    // "release" | "chrono" | "phase" | "paths"
+  path:"ironman",     // percorso scelto quando order = "paths"
+  type:"all",         // filtro tipo
+  sel:null,           // titolo aperto nella scheda
+  tab:"syn",          // "syn" | "full" nella scheda
+  unlocked:{},        // spoiler sbloccati per il titolo aperto
+  hi:0,               // risultato evidenziato nella ricerca (frecce su/giù)
+  up:"doomsday",      // uscita selezionata in Preparazione
+  wl:"min",           // "min" | "ext"
+};
+try { ui.lang = localStorage.getItem(KEY + "-lang") || "it"; } catch (e) {}
+
+/* ============================================================================
+   ICONE E GEMME (SVG)
+   ============================================================================ */
+const ICON = {
+  list:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 4h9M5 8h9M5 12h9M2 4h.01M2 8h.01M2 12h.01"/></svg>',
+  prep:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="11" rx="1.5"/><path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3"/></svg>',
+  stats:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14h12M4 11V7M8 11V3M12 11V8"/></svg>',
+  check:'<svg viewBox="0 0 16 16" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>',
+  ext:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2h5v5M14 2L7 9M12 9.5V14H2V4h4.5"/></svg>',
+  lock:'<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2"/></svg>',
 };
 
-/* ============================================================================
-   TRADUZIONI
-   - I testi italiani sono già nell'HTML: li leggo all'avvio (IT).
-   - Le versioni inglesi stanno in I18N.en, con la stessa chiave data-i18n.
-   ============================================================================ */
-const I18N = {en:{
-  nav_home:"List",nav_detail:"Title",nav_prep:"Prep",
-  proto_note:"<b>PROTOTYPE</b> · titles, texts and dates are examples only and not yet checked against official sources.",
-  st_done:"Completed",st_hours:"Hours watched",st_avg:"Avg rating",st_fav:"Phase 1 favourite",
-  order_title:"Viewing order",o_release:"Release",o_chrono:"Chronological",o_phase:"Phase / Saga",o_char:"Character",
-  film:"MOVIE",official:"OFFICIAL PAGE ↗",your_rating:"Your rating",gauntlet:"GAUNTLET COMPLETE",
-  t_syn:"Synopsis · no spoilers",t_full:"Full recap",
-  syn_text:"[The official synopsis will go here, quoted with its source.] Placeholder: a brilliant inventor builds a high-tech suit of armour and decides to use it to protect the world.",
-  syn_src:"SOURCE: MARVEL.COM (TO ADD)",
-  full_text:"Placeholder for the full spoiler recap written by Claude. It will cover the whole plot, including the ending and key reveals, so you can reread it before a new movie.",
-  reveal:"⚠ UNLOCK SPOILERS",full_src:"WRITTEN BY CLAUDE · SECONDARY SOURCES",
-  postcredits:"Post-credits scenes",pc_text:"Introduces a key character and teases the Avengers team.",
-  links:"Connections",before:"Watch before",none_before:"None: it's the first MCU movie",after:"What comes next",
-  why1:"Continues Tony Stark's story",why2:"Tony joins the team",map:"Connection map",
-  next_release:"Next release",date_note:"EXAMPLE DATE: 18 DECEMBER 2026 (TO VERIFY ON MARVEL.COM)",
-  prep_progress:"Prep progress",wl_min:"Essential list",wl_ext:"Extended list",
-  recap_title:"Quick recap",recap_sub:"What to remember if you don't have time to rewatch:",
-  recap1:"01 · Placeholder: key point from the Infinity Saga.",recap2:"02 · Placeholder: what happened to the Multiverse.",recap3:"03 · Placeholder: characters to watch."
-}};
-const IT = {};
-document.querySelectorAll("[data-i18n]").forEach(e => IT[e.dataset.i18n] = e.innerHTML);
-I18N.it = IT;
-
-/* Piccole etichette usate dentro il codice generato */
-const L = {
-  it:{phase:"Fase",seen:"VISTO",d:"giorni",h:"ore",m:"min",s:"sec",total:"Tempo totale",series:"serie",example:"esempio"},
-  en:{phase:"Phase",seen:"SEEN",d:"days",h:"hours",m:"min",s:"sec",total:"Total time",series:"series",example:"example"}
+/* Forme delle Gemme (viewBox 24x24).
+   .f  = forma principale (colorata se accesa, contorno se spenta)
+   .hl = riflessi e dettagli (visibili solo se accesa) */
+const GEM_SHAPES = {
+  // Spazio: cubo isometrico (il Tesseract) — 3 facce con luminosità diverse
+  space:`<path class="f" d="M12 2.5l8.5 4.8v9.4L12 21.5l-8.5-4.8V7.3z"/>
+         <path class="hl" d="M12 2.5l8.5 4.8L12 12 3.5 7.3z" fill="#fff" opacity=".35"/>
+         <path class="hl" d="M12 12l8.5-4.7v9.4L12 21.5z" fill="#000" opacity=".25"/>
+         <path class="hl" d="M12 12v9.5M12 12L3.5 7.3M12 12l8.5-4.7" stroke="#fff" stroke-opacity=".4" stroke-width=".6" fill="none"/>`,
+  // Mente: goccia sfaccettata (la gemma dello scettro)
+  mind:`<path class="f" d="M12 2c3.5 4.6 7 8.4 7 12.3a7 7 0 01-14 0C5 10.4 8.5 6.6 12 2z"/>
+        <path class="hl" d="M12 2c-2 4-3.4 7.6-3.4 11.4 0 3 1.5 5.6 3.4 7.6" stroke="#fff" stroke-opacity=".45" stroke-width=".7" fill="none"/>
+        <ellipse class="hl" cx="9.3" cy="13" rx="1.6" ry="3" fill="#fff" opacity=".45"/>`,
+  // Realtà: forma fluida irregolare (l'Aether)
+  reality:`<path class="f" d="M12 2.8c2.6 2.4 6.8 2.9 7.2 7.4.3 3.2 2.3 5.6-.6 8.6-2.5 2.6-5.1.6-7.6 2-2.7 1.4-6.4-.4-6.9-3.8-.4-2.5 1-3.6.8-6.4C4.7 7.4 9.4 5.2 12 2.8z"/>
+           <path class="hl" d="M8 10.5c2-1.6 4.6-1.4 6.2.2 1.2 1.2 3 1 4-.2M7.5 15.5c1.8 1 3.6.4 5-.8" stroke="#fff" stroke-opacity=".45" stroke-width=".8" fill="none" stroke-linecap="round"/>
+           <circle class="hl" cx="9" cy="7.5" r="1.3" fill="#fff" opacity=".5"/>`,
+  // Potere: sfera con anelli (l'Orb)
+  power:`<circle class="f" cx="12" cy="12" r="8.8"/>
+         <ellipse class="hl" cx="12" cy="12" rx="8.8" ry="3" stroke="#000" stroke-opacity=".35" stroke-width="1" fill="none"/>
+         <ellipse class="hl" cx="12" cy="12" rx="3" ry="8.8" stroke="#000" stroke-opacity=".25" stroke-width="1" fill="none"/>
+         <circle class="hl" cx="8.8" cy="8.6" r="2.4" fill="#fff" opacity=".35"/>`,
+  // Tempo: occhio (Occhio di Agamotto) con iride e pupilla
+  time:`<path class="f" d="M1.8 12C5 6.2 9 4.8 12 4.8S19 6.2 22.2 12C19 17.8 15 19.2 12 19.2S5 17.8 1.8 12z"/>
+        <circle class="hl" cx="12" cy="12" r="4.3" fill="#0f3d24" opacity=".7"/>
+        <circle class="hl" cx="12" cy="12" r="1.8" fill="#000" opacity=".6"/>
+        <circle class="hl" cx="10.4" cy="10.4" r="1" fill="#fff" opacity=".7"/>`,
+  // Anima: ovale liscio e lucido
+  soul:`<ellipse class="f" cx="12" cy="12" rx="6.6" ry="9.2"/>
+        <ellipse class="hl" cx="9.6" cy="8.6" rx="2" ry="3.4" fill="#fff" opacity=".4" transform="rotate(-15 9.6 8.6)"/>
+        <ellipse class="hl" cx="13.5" cy="16" rx="3" ry="2" fill="#000" opacity=".18"/>`,
 };
-
-/* Stato corrente dell'interfaccia */
-let lang = "it";       // lingua attiva
-let order = "release"; // ordine di visione attivo
-let wl = "min";        // watchlist attiva (minima/estesa)
-let rating = 6;        // voto della scheda di esempio
-
-/* ============================================================================
-   GEMMA SVG
-   Esagono sfaccettato (viewBox 40x40):
-   - .body   = sagoma esterna (colore della gemma o castone vuoto)
-   - .facets = 6 facce chiare/scure + "tavola" centrale che simulano il taglio
-   - .shine  = riflesso bianco che scorre (solo versione grande)
-   ============================================================================ */
-function gemSVG(i, on) {
-  const g = GEMS[i][0];
-  return `<svg class="gem${on ? " on" : ""}" viewBox="0 0 40 40" style="--g:var(--${g})" aria-hidden="true">
-    <polygon class="body" points="20,2 36,11 36,29 20,38 4,29 4,11"/>
-    <g class="facets">
-      <polygon points="20,2 36,11 28,15 20,10" fill="#fff" opacity=".55"/>
-      <polygon points="36,11 36,29 28,25 28,15" fill="#fff" opacity=".18"/>
-      <polygon points="36,29 20,38 20,30 28,25" fill="#000" opacity=".25"/>
-      <polygon points="20,38 4,29 12,25 20,30" fill="#000" opacity=".4"/>
-      <polygon points="4,29 4,11 12,15 12,25" fill="#000" opacity=".15"/>
-      <polygon points="4,11 20,2 20,10 12,15" fill="#fff" opacity=".3"/>
-      <polygon points="20,10 28,15 28,25 20,30 12,25 12,15" fill="#fff" opacity=".12"/>
-      <circle cx="16" cy="14" r="2" fill="#fff" opacity=".9"/>
-    </g>
-    <rect class="shine" x="8" y="0" width="6" height="40" fill="#fff" opacity=".35" transform="skewX(-20)"
-          style="clip-path:polygon(50% 5%,90% 27.5%,90% 72.5%,50% 95%,10% 72.5%,10% 27.5%)"/>
-  </svg>`;
+function gemSVG(i, on){
+  const g = GEMS[i];
+  return `<svg class="gem${on ? " on" : ""}" viewBox="0 0 24 24" style="--c:var(--${g.k})" aria-hidden="true">${GEM_SHAPES[g.k]}</svg>`;
 }
-/* Fila di 6 gemme piccole (per card e statistiche): accese le prime n */
-function gemsRow(n) {
-  return `<div class="gems">${GEMS.map((_, i) => gemSVG(i, i < n)).join("")}</div>`;
+/* Fila di 6 gemme piccole; con voto 0 mostra un trattino */
+function gemsRow(n){
+  if (!n) return `<span class="gems none">—</span>`;
+  return `<span class="gems" title="${n}/6">${GEMS.map((_, i) => gemSVG(i, i < n)).join("")}</span>`;
 }
 
 /* ============================================================================
-   ELENCO: card e ordinamenti
+   UTILITÀ
    ============================================================================ */
-function card(x) {
-  return `<div class="card" data-open="detail">
-    <div class="cover" style="--c1:${x.c[0]};--c2:${x.c[1]}">
-      <span class="badge">${L[lang].phase.toUpperCase()} ${x.phase} · ${x.y}</span>
-      ${x.seen ? `<span class="seen">✓ ${L[lang].seen}</span>` : ""}
-      <h3>${x.t[lang]}</h3>
+const isSeen = id => !!state.seen[id];
+const fmtMin = m => `${Math.floor(m/60)}h ${String(m%60).padStart(2,"0")}m`;
+/* Riga informativa sotto il titolo: anno · tipo · durata/episodi */
+const metaLine = d => `${d.y} · ${tr(d.type)} · ${d.type === "film" ? d.min + " " + tr("min") : d.eps + " " + tr("eps")}`;
+/* Miniatura generata (sostituibile dalla locandina quando d.poster esiste) */
+const thumb = (d, cls = "") =>
+  `<div class="thumb ${cls}" style="--c:${d.c}">${d.type !== "film" ? `<i class="type">${d.type === "serie" ? "TV" : "ANI"}</i>` : ""}<span>${d.abbr}</span></div>`;
+const seenBtn = d =>
+  `<button class="seen-btn${isSeen(d.id) ? " on" : ""}" data-act="seen" data-id="${d.id}" title="${tr("markSeen")}" aria-pressed="${isSeen(d.id)}">${ICON.check}</button>`;
+
+/* ============================================================================
+   BARRA IN ALTO — selettore Home | Preparazione, lingua, testo ricerca.
+   Nella scheda nessuna voce del selettore è attiva (non è una sezione).
+   ============================================================================ */
+function renderTop(){
+  document.getElementById("switch").innerHTML = ["home","prep"]
+    .map(v => `<button class="${ui.view === v ? "on" : ""}" data-act="view" data-v="${v}">${tr(v)}</button>`).join("");
+  document.getElementById("lang").innerHTML = ["it","en"]
+    .map(l => `<button class="${ui.lang === l ? "on" : ""}" data-act="lang" data-v="${l}">${l.toUpperCase()}</button>`).join("");
+  document.getElementById("q").placeholder = tr("searchPh");
+  document.getElementById("proto").innerHTML = tr("proto");
+}
+
+/* ============================================================================
+   RICERCA — cerca nel titolo italiano, inglese e nella sigla.
+   Aggiorna SOLO la tendina dei risultati (non tutta la pagina).
+   ============================================================================ */
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, ""); // ignora accenti e maiuscole
+function searchHits(){
+  const q = norm(document.getElementById("q").value.trim());
+  if (!q) return [];
+  return DATA.filter(d => norm(d.t.it + " " + d.t.en + " " + d.abbr).includes(q)).slice(0, 8);
+}
+function renderResults(){
+  const box = document.getElementById("results");
+  const q = document.getElementById("q").value.trim();
+  const hits = searchHits();
+  if (!q){ box.classList.remove("on"); return; }
+  ui.hi = Math.min(ui.hi, Math.max(hits.length - 1, 0));
+  box.innerHTML = hits.length
+    ? hits.map((d, i) => `<button class="${i === ui.hi ? "hi" : ""}" data-act="open" data-id="${d.id}">${thumb(d)}<div><b>${title(d)}</b><small>${metaLine(d)}</small></div></button>`).join("")
+    : `<div class="empty" style="padding:10px 12px">${tr("noResults")}</div>`;
+  box.classList.add("on");
+}
+function closeSearch(){
+  const q = document.getElementById("q");
+  q.value = ""; q.blur(); ui.hi = 0;
+  document.getElementById("results").classList.remove("on");
+}
+
+/* ============================================================================
+   HOME — statistiche rapide + elenco
+   groups() restituisce i gruppi [{titolo gruppo, titoli}] secondo ordine e filtri.
+   Restituisce i gruppi [{titolo gruppo, titoli}] secondo ordine e filtri.
+   ============================================================================ */
+function groups(){
+  const items = DATA.filter(d => ui.type === "all" || d.type === ui.type);
+  if (ui.order === "release") return [{h:null, items}];                       // ordine dei dati = ordine di uscita
+  if (ui.order === "chrono")  return [{h:null, items:[...items].sort((a,b) => a.chrono - b.chrono)}];
+  if (ui.order === "phase"){                                                   // un gruppo per Fase
+    const phases = [...new Set(items.map(d => d.phase))];
+    return phases.map(p => {
+      const its = items.filter(d => d.phase === p);
+      return {h:`${tr("phaseN")} ${p} · ${tr(its[0].saga)}`, items:its};
+    });
+  }
+  // Percorsi: solo i titoli del percorso scelto, in ordine cronologico
+  const p = PATHS.find(x => x.key === ui.path);
+  return [{h:p[ui.lang], items:items.filter(d => d[p.kind].includes(p.key)).sort((a,b) => a.chrono - b.chrono)}];
+}
+
+function renderHome(){
+  let n = 0;
+  // Ogni gruppo (Fase, percorso…) è un riquadro con intestazione e righe
+  const body = groups().map(g => {
+    const seen = g.items.filter(d => isSeen(d.id)).length;
+    return (g.h ? `<div class="group" style="padding:20px 2px 0"><h2>${g.h}</h2><span class="mono" style="font-size:11px;color:var(--muted)">${seen}/${g.items.length}</span></div>` : "") +
+      `<div class="list-wrap">${g.items.length ? g.items.map(d => `
+        <div class="row${isSeen(d.id) ? " is-seen" : ""}" data-act="open" data-id="${d.id}">
+          <span class="n">${String(++n).padStart(2,"0")}</span>
+          ${thumb(d)}
+          <div class="t"><b>${title(d)}</b><small>${metaLine(d)}</small></div>
+          ${gemsRow(state.rating[d.id] || 0)}
+          ${seenBtn(d)}
+        </div>`).join("") : `<div class="empty" style="padding:16px 20px">${tr("none")}</div>`}</div>`;
+  }).join("");
+
+  return `<div class="page page-enter">
+    ${kpis()}
+    <div class="list-head">
+      <h1>${tr("list")}</h1>
+      <div class="sub">${tr("listSub")} · ${DATA.length} ${ui.lang === "it" ? "titoli" : "titles"}</div>
+      <div class="controls">
+        <div class="tabs-seg">${["release","chrono","phase","paths"].map(o => `<button class="${ui.order === o ? "on" : ""}" data-act="order" data-v="${o}">${tr(o)}</button>`).join("")}</div>
+        ${ui.order === "paths" ? `<select class="input" data-act="path">${PATHS.map(p => `<option value="${p.key}"${p.key === ui.path ? " selected" : ""}>${p[ui.lang]}</option>`).join("")}</select>` : ""}
+        <div class="chips" style="margin-left:auto">${["all","film","serie","anim"].map(t => `<button class="chip${ui.type === t ? " on" : ""}" data-act="type" data-v="${t}">${tr(t)}</button>`).join("")}</div>
+      </div>
     </div>
-    <div class="meta"><span>${x.min} MIN</span>${gemsRow(x.r)}</div>
+    ${body}
+    <!-- Statistiche dettagliate, chiuse di default -->
+    <details class="block" data-stats ${ui.statsOpen ? "open" : ""}><summary class="eyebrow" style="cursor:pointer">${tr("moreStats")}</summary>${statsDetail()}</details>
   </div>`;
 }
-const grid = arr => `<div class="grid">${arr.map(card).join("")}</div>`;
 
-function renderList() {
-  const el = document.getElementById("list");
-  let html = "";
-  if (order === "release") html = grid(T);                                        // ordine di uscita (già così nei dati)
-  else if (order === "chrono") html = grid([...T].sort((a,b) => a.chrono - b.chrono)); // ordine degli eventi
-  else if (order === "phase") html = `<h3 class="group-title">INFINITY SAGA · ${L[lang].phase.toUpperCase()} 1</h3>` + grid(T); // raggruppato per Fase
-  else ["Iron Man","Captain America","Hulk"].forEach(c => {                       // un gruppo per personaggio
-    html += `<h3 class="group-title">${c.toUpperCase()}</h3>` + grid(T.filter(x => x.chars.includes(c)));
-  });
-  el.innerHTML = html;
-  el.querySelectorAll("[data-open]").forEach(c => c.onclick = () => go("detail")); // clic su card → Scheda
+/* ============================================================================
+   SCHEDA DEL TITOLO (ui.sel) — pagina a sé, con pulsante Home
+   ============================================================================ */
+function renderDetail(){
+  const d = BY_ID[ui.sel];
+  const r = state.rating[d.id] || 0;
+
+  // Elenco collegamenti (prima/dopo): cliccabili, con pallino "visto"
+  const linkList = arr => arr.length ? arr.map(([id, it, en]) => {
+    const x = BY_ID[id];
+    return `<button class="link" data-act="open" data-id="${id}">${thumb(x)}<div><b>${title(x)}</b><small>${ui.lang === "it" ? it : en}</small></div><i class="dot${isSeen(id) ? " on" : ""}"></i></button>`;
+  }).join("") : `<div class="empty">${tr("none")}</div>`;
+
+  // Spoiler: bloccato finché non è in ui.unlocked
+  const spoiler = (key, html) => `<div class="spoiler${ui.unlocked[key] ? "" : " locked"}">${html}<button class="unlock" data-act="unlock" data-v="${key}">${ICON.lock} ${tr("unlock")}</button></div>`;
+
+  return `<div class="page page-enter">
+    <button class="back" data-act="back">${tr("back")}</button>
+
+    <!-- Testata -->
+    <div class="d-head">
+      ${thumb(d, "lg")}
+      <div>
+        <div class="eyebrow">${tr("phaseN")} ${d.phase} · ${tr(d.saga)}</div>
+        <h1>${title(d)}</h1>
+        ${ui.lang === "it" && d.t.en !== d.t.it ? `<div class="orig">${d.t.en}</div>` : ""}
+        <div class="facts">
+          <span>${tr("year")} <b>${d.y}</b></span>
+          <span>${tr("duration")} <b>${d.type === "film" ? d.min + " " + tr("min") : d.eps + " " + tr("eps")}</b></span>
+          <span><b>${tr(d.type)}</b></span>
+        </div>
+        <div class="actions">
+          <button class="btn ${isSeen(d.id) ? "done" : "primary"}" data-act="seen" data-id="${d.id}">${ICON.check.replace('fill="none"','fill="none" stroke="currentColor"')} ${isSeen(d.id) ? tr("isSeen") : tr("markSeen")}</button>
+          <a class="btn" href="https://www.marvel.com/" target="_blank" rel="noopener">${tr("official")} ${ICON.ext}</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Due colonne: sinistra = voto e testi, destra = collegamenti e mappa -->
+    <div class="detail-grid" style="margin-top:26px"><div>
+
+    <!-- Voto a Gemme: clic = voto; riclic sulla stessa gemma = azzera -->
+    <div class="block">
+      <div class="rate-head"><span class="eyebrow">${tr("rating")}</span><span class="score">${r ? r : "–"}<small>/6</small></span></div>
+      <div class="rate">${GEMS.map((g, i) => `<button class="${i < r ? "on" : ""}" style="--c:var(--${g.k})" data-act="rate" data-v="${i+1}" title="${g[ui.lang]}">${gemSVG(i, i < r)}<small>${g[ui.lang]}</small></button>`).join("")}</div>
+      ${r === 6 ? `<div class="gauntlet">${tr("gauntlet")}</div>` : ""}
+    </div>
+
+    <!-- Sinossi / riassunto completo -->
+    <div class="block card">
+      <div class="inner-tabs">
+        <button class="${ui.tab === "syn" ? "on" : ""}" data-act="tab" data-v="syn">${tr("synopsis")}</button>
+        <button class="${ui.tab === "full" ? "on" : ""}" data-act="tab" data-v="full">${tr("full")}</button>
+      </div>
+      ${ui.tab === "syn"
+        ? `<p class="placeholder">${tr("synText")}</p><div class="src">${tr("synSrc")}</div>`
+        : spoiler("full", `<p class="placeholder">${tr("fullText")}</p>`) + `<div class="src">${tr("fullSrc")}</div>`}
+    </div>
+
+    <!-- Post-credits -->
+    <div class="block">
+      <span class="eyebrow">${tr("postcredits")} · ${d.pc}</span>
+      <div class="card">${d.pc
+        ? Array.from({length:d.pc}, (_, i) => `<div class="pc-item"><span class="n">${i+1}</span>${spoiler("pc"+i, `<p class="placeholder">${tr("pcText")}</p>`)}</div>`).join("")
+        : `<div class="empty">${tr("noPc")}</div>`}</div>
+    </div>
+
+    </div><div>
+
+    <!-- Collegamenti -->
+    <div class="block">
+      <span class="eyebrow">${tr("links")}</span>
+      <div class="links">
+        <div><div class="eyebrow" style="margin-bottom:8px">${tr("before")}</div>${linkList(d.before)}</div>
+        <div><div class="eyebrow" style="margin-bottom:8px">${tr("after")}</div>${linkList(d.after)}</div>
+      </div>
+    </div>
+
+    <!-- Mappa -->
+    <div class="block">
+      <span class="eyebrow">${tr("map")}</span>
+      <div class="card map">${mapSVG(d)}</div>
+    </div>
+
+    </div></div><!-- fine detail-grid -->
+  </div>`;
+}
+
+/* Mappa: colonna sinistra = prima, centro = titolo aperto, destra = dopo.
+   Linee curve tra i nodi; ogni nodo è cliccabile e apre quel titolo. */
+function mapSVG(d){
+  const W = 360, NW = 74, NH = 26;
+  const L = d.before.map(x => x[0]), R = d.after.map(x => x[0]);
+  const H = Math.max(L.length, R.length, 1) * 38 + 20;
+  const ys = n => Array.from({length:n}, (_, i) => (H / (n + 1)) * (i + 1));
+  const cx = W / 2, cy = H / 2, lx = 50, rx = W - 50;
+  const node = (id, x, y, cur) => `<g class="node${cur ? " cur" : ""}" data-act="open" data-id="${id}">
+      <rect x="${x - NW/2}" y="${y - NH/2}" width="${NW}" height="${NH}" rx="5"/>
+      <text x="${x}" y="${y + 3.5}" text-anchor="middle">${BY_ID[id].abbr}</text>
+      ${isSeen(id) ? `<circle class="seen-dot" cx="${x + NW/2 - 7}" cy="${y - NH/2 + 7}" r="2.5"/>` : ""}</g>`;
+  const curve = (x1, y1, x2, y2) => `<path d="M${x1} ${y1} C${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}"/>`;
+  let s = "";
+  ys(L.length).forEach((y, i) => { s += curve(lx + NW/2, y, cx - NW/2, cy); });
+  ys(R.length).forEach((y, i) => { s += curve(cx + NW/2, cy, rx - NW/2, y); });
+  ys(L.length).forEach((y, i) => { s += node(L[i], lx, y); });
+  ys(R.length).forEach((y, i) => { s += node(R[i], rx, y); });
+  s += node(d.id, cx, cy, true);
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${tr("map")}">${s}</svg>`;
 }
 
 /* ============================================================================
-   SCHEDA: voto a Gemme cliccabile
+   VISTA PREPARAZIONE — usa gli stessi titoli e lo stesso stato "visto"
    ============================================================================ */
-function renderRating(popIndex) {
-  const box = document.getElementById("rateGems");
-  box.innerHTML = `<div class="gems big">${GEMS.map((g, i) =>
-    `<button class="gem-slot${i < rating ? " on" : ""}" data-v="${i+1}" title="${g[lang === "it" ? 1 : 2]}">
-       ${gemSVG(i, i < rating)}<small>${g[lang === "it" ? 1 : 2]}</small>
-     </button>`).join("")}</div>`;
-  // Clic su una gemma = voto pari alla sua posizione; ricliccare la stessa azzera
-  box.querySelectorAll(".gem-slot").forEach(b => b.onclick = () => {
-    const v = +b.dataset.v;
-    rating = (v === rating) ? 0 : v;
-    renderRating(v - 1);
-  });
-  // Piccola animazione "pop" sulla gemma appena cliccata
-  if (popIndex !== undefined) box.querySelectorAll(".gem")[popIndex]?.classList.add("pop");
-  document.getElementById("score").innerHTML = `${rating}<small>/6</small>`;
-  document.getElementById("gauntlet").classList.toggle("on", rating === 6); // banner con 6/6
+function renderPrep(){
+  const u = UPCOMING.find(x => x.id === ui.up);
+  const ids = u[ui.wl];
+  const done = ids.filter(isSeen).length;
+  const tot = ids.reduce((a, id) => a + BY_ID[id].min, 0);
+  const left = ids.filter(id => !isSeen(id)).reduce((a, id) => a + BY_ID[id].min, 0);
+  const dateStr = new Date(u.date + "T00:00:00").toLocaleDateString(ui.lang === "it" ? "it-IT" : "en-GB", {day:"numeric", month:"long", year:"numeric"});
+
+  return `<div class="page page-enter">
+    <div class="page-head"><h1>${tr("prep")}</h1><p>${tr("prepSub")}</p></div>
+
+    <!-- Prossima uscita + countdown + calendario -->
+    <div class="panel" style="margin-top:18px">
+      <div class="release">
+        <div><span class="eyebrow">${tr("next")}</span><h2>${u.t}</h2><div class="mono" style="color:var(--muted);font-size:12px">${dateStr} · ${tr("dateNote")}</div></div>
+        <div class="countdown" id="countdown"></div>
+      </div>
+      <div class="upcoming">${UPCOMING.map(x => `<button class="${x.id === ui.up ? "on" : ""}" data-act="up" data-v="${x.id}">${x.t}<small>${x.date}</small></button>`).join("")}</div>
+    </div>
+
+    <div class="grid2">
+      <!-- Watchlist: le caselle segnano "visto" sullo stesso titolo dell'elenco -->
+      <div class="panel">
+        <div class="tabs-seg">${["min","ext"].map(w => `<button class="${ui.wl === w ? "on" : ""}" data-act="wl" data-v="${w}">${tr(w + "List")}</button>`).join("")}</div>
+        <div class="progress-row"><span>${tr("progress")} <b>${done}/${ids.length}</b></span><span>${tr("left")} <b>${fmtMin(left)}</b> / ${fmtMin(tot)}</span></div>
+        <div class="progress" style="--w:${done / ids.length * 100}%"><i></i></div>
+        <div class="wl" style="margin-top:8px">
+          ${ids.map(id => { const d = BY_ID[id]; return `
+            <div class="row${isSeen(id) ? " is-seen" : ""}">
+              ${thumb(d)}
+              <div class="t"><b data-act="goto" data-id="${id}">${title(d)}</b><small>${metaLine(d)}</small></div>
+              ${gemsRow(state.rating[id] || 0)}
+              ${seenBtn(d)}
+            </div>`; }).join("")}
+        </div>
+      </div>
+      <!-- Ripasso veloce -->
+      <div class="panel">
+        <h2>${tr("recap")}</h2>
+        <div class="eyebrow" style="margin:-6px 0 14px">${tr("recapSub")}</div>
+        ${u.recap.map(r => `<div class="recap"><b>${ui.lang === "it" ? r[0] : r[1]}</b><span class="placeholder">${ui.lang === "it" ? r[2] : r[3]}</span></div>`).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* Countdown aggiornato ogni secondo (solo se la vista Preparazione è aperta) */
+function tick(){
+  const el = document.getElementById("countdown");
+  if (!el) return;
+  const u = UPCOMING.find(x => x.id === ui.up);
+  const s = Math.max(0, (new Date(u.date + "T00:00:00") - new Date()) / 1000);
+  const v = [Math.floor(s/86400), Math.floor(s%86400/3600), Math.floor(s%3600/60), Math.floor(s%60)];
+  el.innerHTML = ["d","h","m","s"].map((k, i) => `<div><b>${String(v[i]).padStart(2,"0")}</b><span>${tr(k)}</span></div>`).join("");
 }
 
 /* ============================================================================
-   PREPARAZIONE: watchlist, avanzamento, countdown
+   STATISTICHE (nella Home) — tutto calcolato dallo stato reale
+   kpis()        = 4 riquadri in cima alla Home
+   statsDetail() = grafici per Fase, tipo e voti (sezione richiudibile)
    ============================================================================ */
-function renderWL() {
-  const items = WL[wl];
-  document.getElementById("watchlist").innerHTML = items.map(i =>
-    `<label class="check"><input type="checkbox" ${i[2] ? "checked" : ""}><span class="t">${i[0]}</span><small>${i[1] ? i[1] + " MIN" : L[lang].series.toUpperCase()}</small></label>`).join("");
-  // Tempo totale della lista (solo film, le serie hanno 0 nei dati di esempio)
-  const tot = items.reduce((a, i) => a + i[1], 0);
-  document.getElementById("wlTime").textContent = `${L[lang].total.toUpperCase()}: ${Math.floor(tot/60)}H ${tot%60}M (${L[lang].example})`;
-  // Aggiorna barra e contatore quando spunti una casella
-  const upd = () => {
-    const boxes = [...document.querySelectorAll("#watchlist input")];
-    const done = boxes.filter(x => x.checked).length;
-    document.getElementById("prepTxt").textContent = `${done}/${boxes.length}`;
-    document.getElementById("prepBar").style.setProperty("--w", done / boxes.length * 100 + "%");
-  };
-  document.querySelectorAll("#watchlist input").forEach(i => i.onchange = upd);
-  upd();
+function statsData(){
+  const seen = DATA.filter(d => isSeen(d.id));
+  const rated = DATA.filter(d => state.rating[d.id]);
+  const avg = rated.length ? rated.reduce((a, d) => a + state.rating[d.id], 0) / rated.length : 0;
+  const fav = [...rated].sort((a, b) => state.rating[b.id] - state.rating[a.id] || a.chrono - b.chrono)[0];
+  return {seen, rated, avg, fav};
 }
-
-/* Countdown fino alla data di esempio, aggiornato ogni secondo */
-function countdown() {
-  const secs = Math.max(0, (new Date("2026-12-18T00:00:00") - new Date()) / 1000);
-  const v = [Math.floor(secs/86400), Math.floor(secs%86400/3600), Math.floor(secs%3600/60), Math.floor(secs%60)];
-  document.getElementById("countdown").innerHTML = ["d","h","m","s"]
-    .map((k, i) => `<div><b>${String(v[i]).padStart(2,"0")}</b><span>${L[lang][k]}</span></div>`).join("");
+function kpis(){
+  const {seen, avg, fav} = statsData();
+  return `<div class="grid4" style="margin-top:0">
+      <div class="panel kpi"><span class="eyebrow">${tr("done")}</span><b>${Math.round(seen.length / DATA.length * 100)}<small>% · ${seen.length}/${DATA.length}</small></b><div class="progress" style="--w:${seen.length / DATA.length * 100}%;margin-top:10px"><i></i></div></div>
+      <div class="panel kpi"><span class="eyebrow">${tr("hours")}</span><b>${fmtMin(seen.reduce((a, d) => a + d.min, 0))}</b></div>
+      <div class="panel kpi"><span class="eyebrow">${tr("avg")}</span><b>${avg ? avg.toFixed(1) : "–"}<small>/6</small></b><div style="margin-top:6px">${gemsRow(Math.round(avg))}</div></div>
+      <div class="panel kpi" ${fav ? `data-act="open" data-id="${fav.id}" style="cursor:pointer"` : ""}><span class="eyebrow">${tr("fav")}</span><b style="font-family:Inter;font-size:16px;font-weight:600">${fav ? title(fav) : "–"}</b></div>
+    </div>`;
+}
+function statsDetail(){
+  const {rated} = statsData();
+  const bar = (label, val, max, txt) => `<div class="bar"><span>${label}</span><div class="progress" style="--w:${max ? val / max * 100 : 0}%"><i></i></div><span>${txt}</span></div>`;
+  const phases = [...new Set(DATA.map(d => d.phase))];
+  return `
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h2>${tr("byPhase")}</h2>
+        ${phases.map(p => { const all = DATA.filter(d => d.phase === p), s = all.filter(d => isSeen(d.id)).length; return bar(`${tr("phaseN")} ${p}`, s, all.length, `${s}/${all.length}`); }).join("")}
+        <h2 style="margin-top:20px">${tr("byType")}</h2>
+        ${["film","serie","anim"].map(t => { const all = DATA.filter(d => d.type === t), s = all.filter(d => isSeen(d.id)).length; return bar(tr(t), s, all.length, `${s}/${all.length}`); }).join("")}
+      </div>
+      <div class="panel"><h2>${tr("byRating")}</h2>
+        ${[6,5,4,3,2,1].map(n => { const c = rated.filter(d => state.rating[d.id] === n).length; return `<div class="bar" style="grid-template-columns:120px 1fr 52px">${gemsRow(n)}<div class="progress" style="--w:${rated.length ? c / rated.length * 100 : 0}%"><i></i></div><span>${c}</span></div>`; }).join("")}
+      </div>
+    </div>`;
 }
 
 /* ============================================================================
-   NAVIGAZIONE E INTERAZIONI
+   RENDER PRINCIPALE — ridisegna barra e pagina attiva.
+   La posizione di scorrimento resta uguale quando aggiorni la stessa pagina
+   (es. segni un titolo come visto); torna in cima solo cambiando pagina.
    ============================================================================ */
-/* Mostra la schermata con id s e evidenzia il pulsante corrispondente */
-function go(s) {
-  document.querySelectorAll(".screen").forEach(e => e.classList.toggle("on", e.id === s));
-  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.go === s));
-  scrollTo(0, 0);
+let lastView = null;
+function render(){
+  document.documentElement.lang = ui.lang;
+  renderTop();
+  const y = window.scrollY;
+  const c = document.getElementById("content");
+  c.innerHTML = ui.view === "prep" ? renderPrep() : ui.view === "detail" ? renderDetail() : renderHome();
+  // Animazione d'ingresso solo quando cambi pagina, non a ogni aggiornamento
+  const page = c.querySelector(".page-enter");
+  if (page && lastView === ui.view + ui.sel) page.classList.remove("page-enter");
+  // Mantieni lo scorrimento se la pagina è la stessa, altrimenti torna in cima
+  window.scrollTo(0, lastView === ui.view + ui.sel ? y : 0);
+  lastView = ui.view + ui.sel;
+  // Se la tendina di ricerca è aperta, aggiorna anche lei (es. cambio lingua)
+  if (document.getElementById("results").classList.contains("on")) renderResults();
+  tick();
 }
-/* Attiva un solo pulsante in un gruppo */
-const activate = (sel, btn) => document.querySelectorAll(sel).forEach(x => x.classList.toggle("on", x === btn));
 
-document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.go));
-document.querySelectorAll(".orders button").forEach(b => b.onclick = () => { order = b.dataset.order; activate(".orders button", b); renderList(); });
-document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => {
-  activate("[data-tab]", b);
-  document.querySelectorAll("[data-pane]").forEach(p => p.hidden = p.dataset.pane !== b.dataset.tab);
+/* Apre la scheda di un titolo (da riga, collegamento, mappa o ricerca) */
+function openTitle(id){
+  if (ui.sel !== id){ ui.sel = id; ui.tab = "syn"; ui.unlocked = {}; }
+  ui.view = "detail";
+  closeSearch();
+  render();
+}
+
+/* ============================================================================
+   EVENTI — un solo gestore: ogni elemento cliccabile ha data-act="azione".
+   closest() prende l'elemento più interno, così il pulsante "visto" dentro
+   una riga non apre anche la scheda.
+   ============================================================================ */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el || el.tagName === "SELECT") return;
+  const {act, id, v} = el.dataset;
+  switch (act){
+    case "open":   openTitle(id); return;
+    case "goto":   openTitle(id); return;                           // da Preparazione → scheda
+    case "seen":   state.seen[id] = !state.seen[id]; save(); break;  // segna/togli "visto"
+    case "rate": {                                                   // voto: riclic sullo stesso = azzera
+      const n = +v; state.rating[ui.sel] = state.rating[ui.sel] === n ? 0 : n;
+      if (n && !state.seen[ui.sel]) state.seen[ui.sel] = true;       // votare implica averlo visto
+      save(); break;
+    }
+    case "view":   ui.view = v; break;                               // Home | Preparazione
+    case "order":  ui.order = v; break;
+    case "type":   ui.type = v; break;
+    case "tab":    ui.tab = v; break;
+    case "unlock": ui.unlocked[v] = true; break;
+    case "back":   ui.view = "home"; break;                          // pulsante Home nella scheda
+    case "up":     ui.up = v; break;
+    case "wl":     ui.wl = v; break;
+    case "lang":   ui.lang = v; try { localStorage.setItem(KEY + "-lang", v); } catch (err) {} break;
+    default: return;
+  }
+  render();
 });
-document.querySelectorAll("[data-wl]").forEach(b => b.onclick = () => { wl = b.dataset.wl; activate("[data-wl]", b); renderWL(); });
-/* Sblocco spoiler: aggiunge .open al contenitore */
-document.querySelectorAll(".spoiler .reveal").forEach(b => b.onclick = () => b.parentElement.classList.add("open"));
+/* Menu a tendina dei percorsi */
+document.addEventListener("change", e => {
+  if (e.target.dataset.act === "path"){ ui.path = e.target.value; render(); }
+});
 
-/* Cambio lingua: sostituisce i testi con data-i18n e ridisegna le parti generate */
-document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => {
-  lang = b.dataset.lang;
-  document.documentElement.lang = lang;
-  activate("[data-lang]", b);
-  document.querySelectorAll("[data-i18n]").forEach(e => { const v = I18N[lang][e.dataset.i18n]; if (v) e.innerHTML = v; });
-  renderList(); renderWL(); renderRating(); countdown();
+/* Ricerca: scrivendo si aggiorna la tendina; frecce per scegliere,
+   Invio apre il risultato evidenziato, Esc chiude */
+const q = document.getElementById("q");
+q.addEventListener("input", () => { ui.hi = 0; renderResults(); });
+q.addEventListener("focus", renderResults);
+q.addEventListener("keydown", e => {
+  const hits = searchHits();
+  if (e.key === "ArrowDown"){ ui.hi = Math.min(ui.hi + 1, hits.length - 1); renderResults(); e.preventDefault(); }
+  else if (e.key === "ArrowUp"){ ui.hi = Math.max(ui.hi - 1, 0); renderResults(); e.preventDefault(); }
+  else if (e.key === "Enter" && hits[ui.hi]) openTitle(hits[ui.hi].id);
+  else if (e.key === "Escape") closeSearch();
+});
+/* Clic fuori dalla ricerca = chiudi la tendina (il testo resta) */
+document.addEventListener("mousedown", e => {
+  if (!e.target.closest(".search")) document.getElementById("results").classList.remove("on");
+});
+/* Ricorda se le statistiche dettagliate sono aperte (altrimenti si
+   richiuderebbero a ogni aggiornamento della pagina) */
+document.addEventListener("toggle", e => {
+  if (e.target.matches && e.target.matches("[data-stats]")) ui.statsOpen = e.target.open;
+}, true);
+/* Scorciatoia: "/" porta il cursore nella ricerca */
+document.addEventListener("keydown", e => {
+  if (e.key === "/" && document.activeElement !== q){ e.preventDefault(); q.focus(); }
 });
 
 /* ============================================================================
    AVVIO
    ============================================================================ */
-document.getElementById("avgGems").innerHTML = gemsRow(5);
-renderList(); renderWL(); renderRating(); countdown();
-setInterval(countdown, 1000);
+render();
+setInterval(tick, 1000);
 </script>
 </body>
 </html>

@@ -17,7 +17,14 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film So
 | **Lingue** | Italiano e inglese |
 | **Immagini** | Nessuna locandina: copertine generate dall'app + link alla pagina ufficiale |
 
-**Stile:** interfaccia HUD tech ispirata a Iron Man. Funziona su telefono e su PC.
+**Stile:** "Stark Industries": grafite scura, oro come accento, rosso solo per avvisi e spoiler. Funziona su telefono e su PC.
+
+**Navigazione:**
+- Barra in alto con selettore **Home | Preparazione**, ricerca e lingua.
+- **Home**: statistiche rapide, elenco a righe (con miniatura) e ordini di visione; statistiche dettagliate richiudibili in fondo.
+- **Scheda del titolo**: pagina a sé, si apre **solo** cliccando un titolo o dalla ricerca; ha un pulsante **Home** per tornare.
+
+**Gemme del voto** (forme ispirate ai film): Spazio = cubo (Tesseract), Mente = goccia, Realtà = forma fluida (Aether), Potere = sfera (Orb), Tempo = occhio (Occhio di Agamotto), Anima = ovale.
 
 **Fonti:** date, ordini e sinossi solo da fonti ufficiali (marvel.com, Disney+, Marvel Studios). I riassunti completi sono scritti a parte e possono usare fonti secondarie.
 
@@ -33,14 +40,16 @@ Il prototipo è un file HTML unico e non richiede installazioni.
 
 Da VS Code: clic destro su `prototype/design.html` → **Reveal in File Explorer** → doppio clic.
 
-> Nel prototipo testi, date e ordine cronologico sono **segnaposto**, non ancora verificati.
+Il prototipo è **funzionante**: puoi aprire ogni scheda, segnare i titoli come visti, votare con le Gemme, cercare (scorciatoia `/`), cambiare ordine e lingua. Visti e voti restano salvati in quel browser.
+
+> Nel prototipo testi, date, durate, ordine cronologico e collegamenti sono **segnaposto**, non ancora verificati sulle fonti ufficiali. Ci sono 11 titoli di esempio.
 
 ## Struttura del progetto
 
 ```
 marvel_tracker/
 ├── prototype/
-│   └── design.html     ← prototipo grafico (HTML + CSS + JS in un file, commentato)
+│   └── design.html     ← prototipo funzionante (HTML + CSS + JS in un file, commentato)
 ├── src/                ← app React (ancora il template iniziale di Vite)
 ├── public/             ← file statici
 ├── index.html          ← pagina di ingresso dell'app Vite
