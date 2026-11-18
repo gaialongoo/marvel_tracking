@@ -17,9 +17,11 @@ import { MCU4 } from "./mcu4";
 import { NETFLIX } from "./netflix";
 import { FOX } from "./fox";
 import { FILMS } from "./films";
+import { TV } from "./tv";
+import { ANIM } from "./anim";
 import type { TitleTexts } from "./types";
 
 export type { TitleTexts };
 
 /** Tutti i testi, per id del titolo */
-export const TEXTS: Record<string, TitleTexts> = { ...MCU1, ...MCU2, ...MCU3, ...MCU4, ...NETFLIX, ...FOX, ...FILMS };
+export const TEXTS: Record<string, TitleTexts> = { ...MCU1, ...MCU2, ...MCU3, ...MCU4, ...NETFLIX, ...FOX, ...FILMS, ...TV, ...ANIM };
