@@ -89,6 +89,91 @@ const DPV: Record<string, { min?: number; eps?: boolean; y?: boolean }> = {
   defenders: { eps: true, y: true }, pun1: { eps: true, y: true }, pun2: { eps: true, y: true },
 };
 
+/* ----------------------------------------------------------------------------
+   VERIFICHE DA FONTI NON UFFICIALI MA AFFIDABILI (18/11/2026)
+   it.wikipedia.org / en.wikipedia.org (voci dei film e delle serie, "List of
+   television series based on Marvel Comics publications", "Mid-credits and
+   post-credits scenes in the Marvel Cinematic Universe").
+   Usate SOLO dove le pagine ufficiali non dicono nulla. Se Disney+ e
+   Wikipedia non coincidono (es. numero di episodi), vale Disney+.
+   it = titolo italiano (stringa = corregge il nostro) · y = anno confermato ·
+   min / eps = valore confermato · pc = numero di scene dopo i titoli
+   ---------------------------------------------------------------------------- */
+const REL: Record<string, { it?: string | true; y?: true; min?: number; eps?: number; pc?: number }> = {
+  // MCU — scene dopo i titoli (voce Wikipedia letta per intero fino a Captain Marvel)
+  im: { pc: 1 }, hulk: { pc: 0, min: 112, it: true, y: true }, im2: { pc: 1 }, thor: { pc: 1 }, ca: { pc: 1 },
+  avg: { pc: 2 }, im3: { pc: 1 }, tdw: { pc: 2 }, tws: { pc: 2 }, gotg: { pc: 2 }, aou: { pc: 1 },
+  antman: { pc: 2 }, cw: { pc: 2 }, ds: { pc: 2 }, gotg2: { pc: 5 }, homecoming: { pc: 2 }, ragnarok: { pc: 2 },
+  bp: { pc: 2 }, iw: { pc: 1 }, amw: { pc: 2 }, cm: { pc: 2 }, eg: { pc: 0 }, wbn: { pc: 0 },
+  bnd: { min: 145, it: true },
+  // Film fuori MCU (it.wikipedia + en.wikipedia)
+  sm1: { it: true, y: true, min: 121 }, sm2: { it: true, y: true, min: 127 }, sm3: { it: true, y: true, min: 139 },
+  venom: { it: true, y: true, min: 112 }, venom2: { it: true, y: true, min: 97 }, morbius: { it: true, y: true, min: 104 },
+  madameweb: { it: true, y: true, min: 116 }, venom3: { it: true, y: true, min: 109 }, kraven: { it: true, y: true, min: 127 },
+  newmutants: { it: true, y: true, min: 94 }, atsv: { it: true, y: true, min: 140 },
+  // Serie live-action fuori MCU
+  hulk77: { it: "L'incredibile Hulk (1977)", y: true, eps: 80 }, asm77: { it: "The Amazing Spider-Man (1977)", y: true, eps: 13 },
+  aos: { y: true, eps: 136 }, legion: { it: true, y: true, eps: 27 }, gifted: { it: true, y: true, eps: 29 },
+  runaways: { it: true, y: true, eps: 33 }, cloakdagger: { it: true, y: true, eps: 20 },
+  // Animazione fuori MCU (episodi e anni dalla lista Wikipedia; titoli italiani dalle voci it.wikipedia)
+  f467: { it: "I Fantastici Quattro (1967)", y: true, eps: 20 }, sm67: { it: "L'Uomo Ragno (1967)", y: true, eps: 52 },
+  f478: { it: "I Fantastici Quattro (1978)", y: true, eps: 13 }, spiderwoman79: { it: "Donna Ragno", y: true, eps: 16 }, sm81: { it: "L'Uomo Ragno (1981)", y: true, eps: 26 },
+  smaf: { it: true, y: true, eps: 24 },
+  sm94: { it: "Spider-Man - L'Uomo Ragno", y: true, eps: 65 },
+  smtnas: { it: true, y: true, eps: 13 },
+  "anime-im": { y: true, eps: 12 }, "anime-wolv": { eps: 12 }, "anime-xmen": { eps: 12 }, "anime-blade": { eps: 12 },
+  assemble: { eps: 127 },
+};
+
+/* Secondo giro di verifiche (stesse fonti): si FONDE con REL campo per campo */
+const REL2: typeof REL = {
+  // MCU: scene dopo i titoli dei One-Shot (voce "Mid-credits and post-credits scenes…")
+  "os-item47": { pc: 1 }, "os-carter": { pc: 1 }, "os-king": { pc: 1 },
+  // Film fuori MCU: scene dopo i titoli lette nelle trame delle voci en.wikipedia
+  xmen: { pc: 0 }, x2: { pc: 0 }, x3: { pc: 1 }, xow: { pc: 3 }, xfc: { pc: 0 }, wolv13: { pc: 1 }, dofp: { pc: 1 },
+  deadpool: { pc: 1 }, apocalypse: { pc: 1 }, logan: { pc: 0 }, darkphoenix: { pc: 0 }, newmutants: { pc: 0 },
+  ff2005: { pc: 0 }, ff2007: { pc: 1 }, fant4stic: { pc: 0 }, tasm: { pc: 1 },
+  sm1: { pc: 0 }, sm2: { pc: 0 }, sm3: { pc: 0 }, venom: { pc: 2 }, venom2: { pc: 1 }, morbius: { pc: 2 },
+  madameweb: { pc: 0 }, venom3: { pc: 2 }, kraven: { pc: 0 },
+  // Film fuori MCU: titolo italiano, anno, durata (it.wikipedia; animati dalla tabella "Marvel Animated Features")
+  howard: { it: true, y: true, min: 111 }, punisher89: { it: "Il vendicatore (1989)", y: true, min: 89 },
+  capamerica90: { it: "Capitan America (1990)", y: true, min: 97 }, blade: { it: true, y: true, min: 120 },
+  blade2: { it: true, y: true, min: 117 }, hulk03: { it: true, min: 138 },
+  ultavengers: { it: true, y: true, min: 72 }, ultavengers2: { it: true, y: true, min: 73 },
+  invincibleim: { it: "L'invincibile Iron Man", y: true, min: 83 }, drstrange07: { it: "Dottor Strange - Il mago supremo", y: true, min: 76 },
+  nextavengers: { it: "Next Avengers - Gli eroi di domani", y: true, min: 78 }, hulkvs: { it: "Hulk Vs.", y: true, min: 78 },
+  planethulk: { it: true, y: true, min: 81 }, thortales: { it: true, y: true, min: 77 },
+  // Serie: titoli italiani e anni (it.wikipedia)
+  f494: { it: "I Fantastici Quattro (1994)", y: true, eps: 26 }, spectacular: { it: "The Spectacular Spider-Man", y: true, eps: 26 },
+  wolvxmen: { it: true, y: true, eps: 26 }, imaa: { it: true, y: true, eps: 52 }, xmenevo: { it: true, y: true, eps: 52 },
+  silversurfer: { it: true, y: true, eps: 13 },
+  hulk96: { it: true, y: true, eps: 21 }, ironman94: { it: true, y: true, eps: 26 }, hulk82: { it: true, y: true, eps: 13 },
+  msh66: { it: true, y: true, eps: 65 },
+  helstrom: { it: true, y: true, eps: 10 }, modok: { it: true, y: true, eps: 10 }, hitmonkey: { it: true, y: true, eps: 20 },
+  moongirl: { it: "Moon Girl e Devil Dinosaur", y: true, eps: 41 }, xmen92: { it: "Insuperabili X-Men", y: true, eps: 76 },
+  dd2: { y: true }, jj2: { y: true }, whatif2: { y: true }, wonderman: { it: true, y: true, eps: 8 },
+};
+
+/** Fasi MCU confermate (en.wikipedia: "Marvel Cinematic Universe: Phase Four/Five/Six",
+    titoli di sezione della voce sulle scene dopo i titoli per Fase 1–3) */
+const PHASE_OK = new Set([
+  "wv", "fatws", "loki1", "loki2", "whatif1", "whatif2", "whatif3", "hawkeye", "moonknight", "msmarvel", "shehulk",
+  "groot1", "groot2", "wbn", "holiday", "si", "echo", "agatha", "ddba1", "ddba2", "ironheart", "eow", "zombies",
+  "wonderman", "punolk", "visionquest", "homecoming", "ffh", "nwh", "bnd", "os-item47", "os-carter", "os-king",
+]);
+
+/** Verifiche unite: per ogni titolo i campi di REL e REL2 insieme */
+const VER: typeof REL = { ...REL };
+for (const [id, f] of Object.entries(REL2)) VER[id] = { ...VER[id], ...f };
+
+/* Valori aggiornati da un riassunto delle fonti affidabili, NON ancora
+   confermati parola per parola: si usano ma restano "da verificare". */
+const SOFT: Record<string, { pc?: number }> = {
+  holiday: { pc: 1 }, bnd: { pc: 1 }, ffh: { pc: 2 }, deadpool2: { pc: 1 }, tasm2: { pc: 1 }, spiderverse: { pc: 1 }, atsv: { pc: 0 },
+  shangchi: { pc: 2 }, eternals: { pc: 2 }, nwh: { pc: 2 }, dsmom: { pc: 2 }, lat: { pc: 2 }, wf: { pc: 1 },
+  quantumania: { pc: 2 }, gotg3: { pc: 2 }, marvels: { pc: 1 }, dpw: { pc: 1 }, bnw: { pc: 1 }, thunderbolts: { pc: 2 }, ff: { pc: 2 },
+};
+
 function mk(s: Spec): Title {
   const uni = s.uni ?? "mcu";
   const pos = uni === "mcu" ? TIMELINE.indexOf(s.id) : -1;
@@ -99,6 +184,23 @@ function mk(s: Spec): Title {
   if (v?.eps) ok.add("eps");
   if (v?.y || v?.min) ok.add("y");
   if (v) ok.add("it");
+  // Applica le verifiche delle fonti affidabili (Wikipedia)
+  const r = VER[s.id];
+  if (r) {
+    if (typeof r.it === "string") s = { ...s, it: r.it };
+    if (r.it) ok.add("it");
+    if (r.y) ok.add("y");
+    if (r.min) { s = { ...s, min: r.min }; ok.add("min"); }
+    if (r.eps && !v?.eps) { s = { ...s, eps: r.eps }; ok.add("eps"); } // Disney+ ha la precedenza
+    if (r.pc !== undefined) { s = { ...s, pc: r.pc }; ok.add("pc"); }
+  }
+  if (PHASE_OK.has(s.id)) ok.add("phase");
+  const soft = SOFT[s.id];
+  if (soft?.pc !== undefined) s = { ...s, pc: soft.pc };
+  // Serie: la durata totale è sempre una stima (episodi × durata media) → non si segnala.
+  // Fuori MCU l'ordine "cronologico" è per definizione l'anno di uscita → non si segnala.
+  if (s.eps) { ok.add("min"); ok.add("pc"); } // serie: niente conteggio unico delle scene dopo i titoli
+  if (uni !== "mcu") ok.add("chrono");
   if (pos >= 0) ok.add("chrono");                          // in [T] → ordine confermato
   const relevant: Field[] = ["it", "y", "min", "pc", "chrono"];
   if (s.eps) relevant.push("eps");
@@ -282,9 +384,9 @@ const MCU: Title[] = [
     b: [L("bw", "Yelena", "Yelena"), L("fatws", "John Walker", "John Walker"), L("bnw", "Valentina", "Valentina")] }),
   mk({ id: "ironheart", type: "serie", it: "Ironheart", en: "Ironheart", y: 2025, min: 280, eps: 6, ph: 5, c: "#7a2a1a", ab: "IH", ok: IT,
     b: [L("wf", "Il debutto di Riri", "Riri's debut")] }),
-  mk({ id: "eow", type: "anim", it: "Eyes of Wakanda", en: "Eyes of Wakanda", y: 2025, min: 120, eps: 4, ph: 5, c: "#4a2a6b", ab: "EOW", ch: ["blackpanther"], ok: IT,
+  mk({ id: "eow", type: "anim", it: "Eyes of Wakanda", en: "Eyes of Wakanda", y: 2025, min: 120, eps: 4, ph: 6, c: "#4a2a6b", ab: "EOW", ch: ["blackpanther"], ok: IT,
     a: [L("bp", "Il Wakanda di T'Challa", "T'Challa's Wakanda")] }),
-  mk({ id: "zombies", type: "anim", it: "Marvel Zombies", en: "Marvel Zombies", y: 2025, min: 160, eps: 4, ph: 5, c: "#3a4a2a", ab: "MZ", th: ["multi"], ok: IT,
+  mk({ id: "zombies", type: "anim", it: "Marvel Zombies", en: "Marvel Zombies", y: 2025, min: 160, eps: 4, ph: 6, c: "#3a4a2a", ab: "MZ", th: ["multi"], ok: IT,
     b: [L("whatif1", "Nasce dall'episodio zombie", "Spun off from the zombie episode")] }),
 
   /* ===== FASE 6 ===== */
