@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+/* ============================================================================
+   APP — struttura generale: barra in alto + pagina attiva + messaggi.
+   La pagina dipende dall'indirizzo (vedi router.ts).
+   ============================================================================ */
+import { useEffect, useState } from "react";
+import { Detail } from "./components/Detail";
+import { Home } from "./components/Home";
+import { defaultHome, type HomeState } from "./homeState";
+import { Prep } from "./components/Prep";
+import { TopBar } from "./components/TopBar";
+import { useT } from "./i18n";
+import { useRoute } from "./router";
+import { useToast } from "./toast";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const route = useRoute();
+  const { lang } = useT();
+  // Scelte della Home tenute qui, così restano uguali tornando da una scheda
+  const [home, setHome] = useState<HomeState>(defaultHome);
+  const setHomePart = (p: Partial<HomeState>) => setHome((h) => ({ ...h, ...p }));
+
+  // Lingua del documento (per lettori di schermo e sillabazione)
+  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+
+  // Scheda e Preparazione partono dall'alto (la Home ripristina da sola la sua posizione)
+  const key = route.page === "title" ? `t-${route.id}` : route.page;
+  useEffect(() => { if (route.page !== "home") window.scrollTo(0, 0); }, [key, route.page]);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <TopBar route={route} />
+      <main>
+        {route.page === "home" && <Home s={home} set={setHomePart} />}
+        {route.page === "prep" && <Prep />}
+        {/* key: cambiando titolo la scheda riparte pulita (tab, spoiler chiusi) */}
+        {route.page === "title" && <Detail key={route.id} id={route.id} />}
+      </main>
+      <Toast />
     </>
-  )
+  );
 }
 
-export default App
+/** Messaggio temporaneo in basso */
+function Toast() {
+  const msg = useToast();
+  return <div className={`toast${msg ? " on" : ""}${msg?.error ? " err" : ""}`}>{msg?.text}</div>;
+}

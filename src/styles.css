@@ -1,0 +1,396 @@
+/* ==========================================================================
+   MARVEL TRACKER — STILI GLOBALI (stile "Stark Industries")
+   Portati dal prototipo (prototype/design.html). Le classi qui sotto sono
+   usate dai componenti React in src/components.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. VARIABILI — palette Stark Industries
+   Oro = accento principale. Rosso = SOLO avvisi e spoiler.
+   ========================================================================== */
+:root{
+  --bg:#0b0c0f;        /* sfondo pagina */
+  --surface:#121418;   /* colonne e pannelli */
+  --surface2:#181b21;  /* elementi interni, hover */
+  --line:#24282f;      /* bordi sottili */
+  --text:#e6e8ec;      /* testo principale */
+  --muted:#868d99;     /* testo secondario */
+  --gold:#c9a24b;      /* accento principale */
+  --gold-soft:rgba(201,162,75,.12);
+  --red:#c0313f;       /* avvisi / spoiler */
+  --red-soft:rgba(192,49,63,.12);
+  --ok:#5fae7d;        /* "visto" */
+  --off:#3a3f48;       /* gemme spente */
+  /* Colori delle 6 Gemme */
+  --space:#3e7bfa; --mind:#f2c230; --reality:#d8323f;
+  --power:#9b51e0; --time:#2fbf71; --soul:#f07c22;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+
+/* ==========================================================================
+   2. BASE
+   ========================================================================== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,sans-serif}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:none;padding:0}
+h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
+.mono{font-family:var(--mono)}
+/* Etichetta piccola maiuscola (stile documentazione tecnica) */
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.placeholder{color:var(--muted);font-style:italic}
+/* Barre di scorrimento discrete */
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+
+/* ==========================================================================
+   3. LAYOUT — barra in alto fissa + pagina centrale
+   Barra: [logo] [selettore Home | Preparazione] [ricerca + lingua]
+   Le schede dei titoli NON sono nel selettore: si aprono solo cliccando un
+   titolo o dalla ricerca, e hanno un pulsante "Home" per tornare.
+   ========================================================================== */
+.top{position:sticky;top:0;z-index:20;height:60px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
+  padding:0 24px;background:rgba(11,12,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;justify-self:start}
+/* Logo: anello oro sottile con nucleo (richiamo discreto al reattore) */
+.brand-mark{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;flex:none}
+.brand-mark::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.brand b{font-size:12.5px;letter-spacing:.16em}
+.brand small{display:block;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.14em}
+
+/* Selettore centrale "delicato": pillola sottile, la voce attiva ha solo un filo d'oro */
+.switch{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.switch button{padding:6px 18px;border-radius:999px;font-size:13px;color:var(--muted);font-weight:500;transition:.15s}
+.switch button:hover{color:var(--text)}
+.switch button.on{background:var(--surface2);color:var(--text);box-shadow:inset 0 0 0 1px rgba(201,162,75,.4)}
+
+.top-right{display:flex;justify-content:flex-end;align-items:center;gap:10px;min-width:0}
+
+/* Ricerca con tendina dei risultati */
+.search{position:relative;width:min(250px,100%)}
+.search input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px 7px 30px;
+  color:var(--text);font:inherit;font-size:13px;outline:none}
+.search input:focus{border-color:var(--gold)}
+.search > svg{position:absolute;left:9px;top:50%;width:14px;height:14px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.results{position:absolute;top:calc(100% + 6px);right:0;width:340px;max-width:calc(100vw - 32px);max-height:380px;overflow:auto;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:4px;display:none}
+.results.on{display:block}
+.results button{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;width:100%;text-align:left;padding:6px 8px;border-radius:6px}
+.results button:hover,.results button.hi{background:var(--surface2)}
+.results .thumb{width:32px;height:44px;padding:3px}.results .thumb span{font-size:8px}.results .thumb .type{display:none}
+.results b{font-weight:500;font-size:13px;display:block}
+.results small{color:var(--muted);font-size:11.5px;font-family:var(--mono)}
+
+/* Selettore lingua a due segmenti */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:none}
+.seg button{padding:5px 9px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.seg button.on{background:var(--surface2);color:var(--gold)}
+
+/* Contenitore centrale di ogni pagina */
+.page{max-width:1120px;margin:0 auto;padding:24px 24px 60px}
+.page-enter{animation:enter .2s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(4px)}}
+
+/* ==========================================================================
+   4. COLONNA LISTA
+   ========================================================================== */
+/* Riquadro che contiene l'elenco */
+.list-wrap{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;margin-top:14px}
+.list-head{padding:18px 0 0}
+.list-head h1{font-size:20px}
+.list-head .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+/* Pulsanti dell'ordine di visione (gruppo segmentato) */
+.tabs-seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:2px}
+.tabs-seg button{padding:6px 11px;border-radius:5px;color:var(--muted);font-size:12.5px;font-weight:500}
+.tabs-seg button.on{background:var(--surface2);color:var(--text);box-shadow:inset 0 -1.5px 0 var(--gold)}
+select.input{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:12.5px}
+/* Filtro per tipo (chip) */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;color:var(--muted)}
+.chip.on{border-color:var(--gold);color:var(--gold)}
+
+/* Schede dell'universo (stile collezioni Disney+): testo + conteggio, filo d'oro sotto l'attiva */
+.uni-tabs{display:flex;gap:22px;margin-top:16px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.uni-tabs::-webkit-scrollbar{display:none}
+.uni-tabs button{padding:0 0 10px;margin-bottom:-1px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500;white-space:nowrap;display:flex;gap:6px;align-items:baseline}
+.uni-tabs button small{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.uni-tabs button:hover{color:var(--text)}
+.uni-tabs button.on{color:var(--text);border-color:var(--gold)}
+
+/* Intestazione di gruppo (Fase, percorso…) */
+.group{padding:16px 20px 6px;display:flex;justify-content:space-between;align-items:baseline}
+.group h2{font-size:12px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:500}
+
+/* Riga di un titolo: numero | miniatura | testo | voto | visto */
+.row{display:grid;grid-template-columns:28px 44px 1fr auto 34px;gap:12px;align-items:center;
+  padding:10px 20px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+.list-wrap .row:last-child{border-bottom:none}
+.row:hover{background:var(--surface2)}
+/* Filo d'oro a sinistra quando passi sopra: indica che la riga apre la scheda */
+.row:hover::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.row .n{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+.row .t{min-width:0}
+.row .t b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t small{color:var(--muted);font-size:12px;font-family:var(--mono)}
+.row.is-seen .t b{color:var(--text)}
+.row:not(.is-seen) .thumb{opacity:.75}
+
+/* Miniatura generata (in futuro qui andrà la locandina: campo "poster" nei dati) */
+.thumb{width:44px;height:60px;border-radius:4px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,var(--c) 0%,#0b0c0f 120%);border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:flex-end;padding:4px}
+.thumb::before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 60%,rgba(0,0,0,.5)),
+  repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 1px,transparent 1px 6px)}
+.thumb span{position:relative;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fff}
+.thumb .type{position:absolute;top:3px;right:3px;font-size:8px;padding:0 3px;border-radius:2px;background:rgba(0,0,0,.55);color:var(--gold)}
+.thumb.lg{width:96px;height:132px;padding:8px}
+.thumb.lg span{font-size:15px}
+.thumb.lg .type{font-size:10px;top:6px;right:6px;padding:1px 5px}
+
+/* Pulsante "visto" (cerchio con spunta) */
+.seen-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--off);display:grid;place-items:center;transition:.15s}
+.seen-btn svg{width:13px;height:13px;stroke:transparent}
+.seen-btn:hover{border-color:var(--ok)}
+.seen-btn.on{background:var(--ok);border-color:var(--ok)}
+.seen-btn.on svg{stroke:#0b0c0f}
+/* Serie a metà: anello che si riempie in base agli episodi visti (--p = percentuale) */
+.seen-btn.partial{border:none;background:conic-gradient(var(--ok) calc(var(--p) * 1%),var(--off) 0);position:relative}
+.seen-btn.partial::before{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--surface)}
+.row:hover .seen-btn.partial::before{background:var(--surface2)}
+.seen-btn.partial span{position:relative;font-family:var(--mono);font-size:8.5px;color:var(--ok);letter-spacing:-.02em}
+
+/* ==========================================================================
+   5. GEMME DELL'INFINITO — forme ispirate ai film
+   Spazio=cubo (Tesseract) · Mente=goccia · Realtà=forma fluida (Aether)
+   Potere=sfera con anelli (Orb) · Tempo=occhio (Occhio di Agamotto) · Anima=ovale
+   Accesa  → colore pieno + riflessi (.hl) + leggero alone
+   Spenta  → solo contorno grigio
+   ========================================================================== */
+.gems{display:inline-flex;gap:3px;align-items:center}
+.gem{width:15px;height:15px;display:block;overflow:visible}
+.gem .f{fill:var(--c);stroke:var(--c);stroke-width:.6;stroke-linejoin:round;transition:.2s}
+.gem .hl{transition:.2s}
+.gem.on{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--c) 60%,transparent))}
+.gem:not(.on) .f{fill:transparent;stroke:var(--off);stroke-width:1.3}
+.gem:not(.on) .hl{opacity:0}
+.gems.none{color:var(--muted);font-family:var(--mono);font-size:11px}
+
+/* Versione grande cliccabile nella scheda */
+.rate{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:10px}
+.rate button{display:grid;place-items:center;padding:14px 4px;border:1px solid var(--line);border-radius:8px;transition:.15s}
+.rate button:hover{border-color:var(--muted);background:var(--surface2)}
+.rate button:hover .gem{transform:scale(1.08)}
+.rate button.on{border-color:color-mix(in srgb,var(--c) 55%,var(--line));background:color-mix(in srgb,var(--c) 8%,transparent)}
+.rate .gem{width:36px;height:36px;transition:transform .15s}
+.rate-head{display:flex;justify-content:space-between;align-items:baseline}
+.rate-head .score{font-family:var(--mono);font-size:22px;font-weight:600}
+.rate-head .score small{font-size:13px;color:var(--muted)}
+/* Riga "Guanto completo" per 6/6 */
+.gauntlet{margin-top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--gold);
+  border-top:1px solid var(--gold-soft);padding-top:8px;display:flex;gap:8px;align-items:center}
+.gauntlet::before{content:"";width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
+
+/* ==========================================================================
+   6. PAGINA SCHEDA — due colonne su PC: [info, voto, testi] [collegamenti, mappa]
+   ========================================================================== */
+.detail-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}
+.detail-grid > div > .block:first-child{margin-top:0}
+/* Pulsante "Home" in cima alla scheda */
+.back{display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;color:var(--muted);font-size:13px;
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.back:hover{color:var(--text);border-color:var(--muted)}
+.d-head{display:grid;grid-template-columns:96px 1fr;gap:18px}
+.d-head h1{font-size:24px;line-height:1.2}
+.d-head .orig{color:var(--muted);font-size:13px;margin-top:2px}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:500}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#16130b}
+.btn.done{border-color:var(--ok);color:var(--ok)}
+.btn svg{width:14px;height:14px}
+a.btn{color:var(--text);text-decoration:none}
+
+.block{margin-top:26px}
+.block > .eyebrow{display:block;margin-bottom:10px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg)}
+.inner-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.inner-tabs button{padding:0 0 8px;margin-bottom:-1px;border-bottom:1.5px solid transparent;color:var(--muted);font-size:13px;font-weight:500}
+.inner-tabs button.on{color:var(--text);border-color:var(--gold)}
+.card p{margin:0;line-height:1.65}
+.src{margin-top:10px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+
+/* Spoiler: testo sfocato + avviso rosso finché non lo sblocchi */
+.spoiler{position:relative}
+.spoiler.locked p{filter:blur(6px);user-select:none}
+.spoiler .unlock{display:none}
+.spoiler.locked .unlock{display:inline-flex;position:absolute;inset:0;margin:auto;width:max-content;height:max-content;
+  align-items:center;gap:8px;background:var(--red-soft);border:1px solid var(--red);color:#f2a7ae;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:500}
+
+/* Episodi: griglia di caselle con spunta */
+.eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px}
+.eps button{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;font-size:12px;color:var(--muted);transition:.15s}
+.eps button svg{width:13px;height:13px;flex:none;opacity:.25}
+.eps button:hover{border-color:var(--muted);color:var(--text)}
+.eps button.on{border-color:rgba(95,174,125,.5);color:var(--text);background:rgba(95,174,125,.08)}
+.eps button.on svg{opacity:1;color:var(--ok)}
+.eps-tools{display:flex;gap:14px;margin-top:8px}
+.eps-tools button{font-size:12px;color:var(--muted)}
+.eps-tools button:hover{color:var(--gold)}
+
+/* Collegamenti prima/dopo */
+.links{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.link{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;cursor:pointer;margin-bottom:6px;text-align:left;width:100%}
+.link:hover{background:var(--surface2)}
+.link .thumb{width:32px;height:44px;padding:3px}.link .thumb span{font-size:8px}.link .thumb .type{display:none}
+.link b{font-weight:500;font-size:13px;display:block}
+.link small{color:var(--muted);font-size:11.5px}
+.link .dot{width:8px;height:8px;border-radius:50%;background:var(--off)}
+.link .dot.on{background:var(--ok)}
+.empty{color:var(--muted);font-size:12.5px;padding:8px 0}
+
+/* Scene post-credits */
+.pc-item{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line)}
+.pc-item:first-child{border-top:none}
+.pc-item .n{font-family:var(--mono);font-size:11px;color:var(--gold);border:1px solid var(--gold-soft);border-radius:4px;text-align:center;padding:2px 0}
+
+/* Mappa dei collegamenti
+   Tre colonne HTML [Prima | Questo titolo | Dopo]; le linee sono un SVG
+   disegnato SOPRA misurando la posizione reale dei riquadri (drawMap()),
+   così la mappa si adatta a qualsiasi larghezza.
+   Su schermi stretti le colonne diventano righe e le linee verticali. */
+.map2{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:34px;align-items:center}
+.map-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.map-lines path{fill:none;stroke:#4a505a;stroke-width:1.3}
+.map-lines path.todo{stroke-dasharray:4 4}         /* verso un titolo non ancora visto */
+.map-lines path.hot{stroke:var(--gold)}            /* evidenziata al passaggio del mouse */
+.mcol{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
+/* Intestazione colonna: sfondo pieno così le linee non ci passano sopra */
+.mh{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  align-self:center;background:var(--bg);padding:2px 8px;margin-bottom:2px}
+/* Riquadro di un titolo nella mappa */
+.mnode{position:relative;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center;text-align:left;width:100%;
+  padding:8px 10px 8px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);transition:.15s;overflow:hidden}
+.mnode::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}  /* striscia col colore del titolo */
+.mnode:hover{border-color:var(--gold)}
+.mnode b{font-size:12px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mnode small{grid-column:1;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.mnode .ms{grid-row:1/3;grid-column:2;width:9px;height:9px;border-radius:50%;border:1.5px solid var(--off)}
+.mnode.seen .ms{background:var(--ok);border-color:var(--ok)}
+/* Titolo aperto: al centro, bordo oro */
+.mnode.cur{border-color:var(--gold);background:linear-gradient(var(--gold-soft),var(--gold-soft)),var(--surface2);box-shadow:0 0 0 3px rgba(201,162,75,.08);cursor:default}
+.mnode.cur b{font-size:13px;font-weight:600}
+.mempty{font-size:12px;color:var(--muted);text-align:center;padding:10px;border:1px dashed var(--line);border-radius:8px}
+.map-legend{display:flex;gap:16px;justify-content:flex-end;margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.map-legend span{display:inline-flex;align-items:center;gap:6px}
+.map-legend i{display:inline-block;width:18px;border-top:1.3px solid #4a505a}
+.map-legend i.todo{border-top-style:dashed}
+@media (max-width:560px){
+  .map2{grid-template-columns:1fr;gap:30px}
+  .mcol{flex-direction:row;flex-wrap:wrap;justify-content:center}
+  .mh{width:100%;text-align:center}   /* striscia piena: le linee "passano sotto" l'intestazione */
+  .mnode{width:calc(50% - 4px)}
+  .mnode.cur{width:70%}
+}
+
+/* ==========================================================================
+   7. VISTE A PAGINA INTERA (Preparazione, Statistiche)
+   ========================================================================== */
+.page-head h1{font-size:22px}
+.page-head p{color:var(--muted);margin:4px 0 0}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.panel h2{font-size:14px;margin-bottom:12px}
+
+/* Hero della prossima uscita */
+.release{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
+.release h2{font-size:22px;margin:4px 0 2px}
+.countdown{display:flex;gap:8px}
+.countdown div{min-width:62px;text-align:center;border:1px solid var(--line);border-radius:8px;padding:8px 6px;background:var(--bg)}
+.countdown b{display:block;font-family:var(--mono);font-size:22px;font-weight:500;color:var(--gold)}
+.countdown span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.upcoming{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.upcoming button{border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-size:12px;color:var(--muted);text-align:left}
+.upcoming button.on{border-color:var(--gold);color:var(--text)}
+.upcoming small{display:block;font-family:var(--mono);font-size:10.5px}
+
+/* Barra di avanzamento */
+.progress{height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--gold);width:var(--w);transition:width .3s}
+.progress-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:14px 0 6px}
+.progress-row b{color:var(--text);font-weight:500}
+
+/* Righe della watchlist (riusano .row ma più semplici) */
+.wl .row{padding:9px 0;grid-template-columns:44px 1fr auto 34px}
+.wl .row:hover{background:none}
+.wl .row .t b{cursor:pointer}
+.wl .row .t b:hover{color:var(--gold)}
+.recap{border-left:2px solid var(--gold);padding:6px 0 6px 12px;margin-bottom:10px}
+.recap b{display:block;font-size:13px;font-weight:500}
+.recap span{color:var(--muted);font-size:12.5px}
+
+/* Statistiche */
+.kpi .eyebrow{display:block}
+.kpi b{display:block;font-family:var(--mono);font-size:26px;font-weight:500;margin-top:6px}
+.kpi b small{font-size:13px;color:var(--muted)}
+.bars .bar{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;margin-bottom:10px;font-size:12.5px}
+.bars .bar span:last-child{font-family:var(--mono);color:var(--muted);text-align:right;font-size:11.5px}
+
+/* Riquadro backup in fondo alla Home */
+.backup{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.backup p{margin:0;color:var(--muted);font-size:12.5px;max-width:560px}
+label.btn{cursor:pointer}
+
+/* Messaggio temporaneo (toast) in basso al centro */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:50;
+  background:var(--surface2);border:1px solid var(--gold);color:var(--text);padding:9px 16px;border-radius:8px;font-size:13px;transition:.25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{border-color:var(--red)}
+
+/* Striscia "prototipo" sotto la barra in alto */
+.proto-note{padding:6px 24px;font-family:var(--mono);font-size:10.5px;color:var(--muted);border-bottom:1px solid var(--line);background:var(--surface);text-align:center}
+.proto-note b{color:var(--red)}
+
+/* ==========================================================================
+   8. RESPONSIVE — tablet e telefono
+   ========================================================================== */
+@media (max-width:1000px){
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .detail-grid{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  /* Barra in alto su due righe: logo + ricerca/lingua sopra, selettore sotto */
+  .top{height:auto;grid-template-columns:auto 1fr;padding:10px 16px;row-gap:10px}
+  .brand b{font-size:11px}.brand small{display:none}
+  .switch{grid-column:1/-1;grid-row:2;justify-self:center}
+  .search{width:100%}
+  .page{padding:18px 16px 40px}
+  .grid2{grid-template-columns:1fr}
+  .release{grid-template-columns:1fr}
+  .links{grid-template-columns:1fr}
+  .row{padding:10px 12px;gap:10px;grid-template-columns:22px 40px 1fr auto 30px}
+  .row .gems .gem{width:11px;height:11px}
+  .row .gems{gap:2px}
+  .d-head{grid-template-columns:76px 1fr}
+  .thumb.lg{width:76px;height:104px}
+  .rate{grid-template-columns:repeat(3,1fr)}
+  .proto-note{padding:6px 16px}
+}
+@media (max-width:420px){
+  /* Su schermi molto stretti la fila di gemme nelle righe sparisce: il voto resta nella scheda */
+  .row{grid-template-columns:22px 40px 1fr 30px}
+  .row > .gems{display:none}
+}
+
+/* ==========================================================================
+   AGGIUNTE PER L'APP REACT
+   ========================================================================== */
+/* Righe senza numero (lista della Preparazione) */
+.row.no-n{grid-template-columns:44px 1fr auto 34px}
+@media (max-width:760px){ .row.no-n{grid-template-columns:40px 1fr auto 30px} }
+@media (max-width:420px){ .row.no-n{grid-template-columns:40px 1fr 30px} }
+/* Contenitore principale */
+main{display:block}

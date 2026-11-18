@@ -1,77 +1,69 @@
 # Marvel Tracker
 
-Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Sony e Fox, animazione e speciali.
+Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fox e Sony, serie live-action non MCU e animazione.
 
-> **Stato attuale:** fase di **design**. C'è solo un prototipo grafico da approvare; l'app React vera non è ancora stata scritta.
+> **Stato attuale:** l'**app React** è pronta e funzionante, ma usa ancora **16 titoli di esempio** (non verificati). Prossimo passo: inserire i dati veri, verificati sulle fonti ufficiali, a blocchi.
 
-## Funzionalità previste
+## Funzionalità
 
 | Area | Cosa fa |
-|---|---|
+| --- | --- |
 | **Universi** | Come le collezioni di Disney+: Tutto, MCU, X-Men, Spider-Man (Sony)… Si combinano con qualsiasi ordine |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
-| **Episodi** | Per serie e animazione si spuntano i singoli episodi; la serie è "vista" quando li hai visti tutti |
-| **Backup** | Esporta/importa un file `.json` con visti, voti ed episodi (per non perderli o spostarli su un altro dispositivo) |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
+| **Episodi** | Per serie e animazione si spuntano i singoli episodi; nell'elenco un anello mostra la % vista, al 100% diventa la spunta |
 | **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
-| **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva |
-| **Preparazione ai nuovi film** | Calendario e conto alla rovescia, watchlist minima/estesa con tempo totale, ripasso veloce, avanzamento |
-| **Statistiche** | Ore viste, percentuale completata, media voti, preferito per Fase |
+| **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
+| **Preparazione** | Prossime uscite con conto alla rovescia, lista minima/estesa con tempo mancante, ripasso veloce |
+| **Statistiche** | Completamento, ore viste, media voti, preferito; dettaglio per universo, Fase, tipo e voti |
+| **Salvataggio** | Automatico, **solo su questo PC** (nel browser). Niente account. Backup esportabile/importabile in `.json` |
 | **Lingue** | Italiano e inglese |
-| **Immagini** | Nessuna locandina: copertine generate dall'app + link alla pagina ufficiale |
 
 **Stile:** "Stark Industries": grafite scura, oro come accento, rosso solo per avvisi e spoiler. Funziona su telefono e su PC.
 
-**Navigazione:**
-- Barra in alto con selettore **Home | Preparazione**, ricerca e lingua.
-- **Home**: statistiche rapide, elenco a righe (con miniatura) e ordini di visione; statistiche dettagliate richiudibili in fondo.
-- **Scheda del titolo**: pagina a sé, si apre **solo** cliccando un titolo o dalla ricerca; ha un pulsante **Home** per tornare.
-
-**Mappa dei collegamenti** (nella scheda): tre colonne Prima → Questo titolo → Dopo, con frecce; linea continua = già visto, tratteggiata = da vedere. Su telefono diventa verticale.
-
-**Gemme del voto** (forme ispirate ai film, senza nomi sotto: il nome appare passando sopra): Spazio = cubo (Tesseract), Mente = goccia, Realtà = forma fluida (Aether), Potere = sfera (Orb), Tempo = occhio (Occhio di Agamotto), Anima = ovale.
+**Navigazione:** barra in alto con **Home | Preparazione**, ricerca (scorciatoia `/`) e lingua. La **scheda** di un titolo si apre solo cliccando un titolo o dalla ricerca, e ha il pulsante **Home**. Indirizzi: `#/` Home, `#/prep` Preparazione, `#/t/<id>` scheda.
 
 **Fonti:** date, ordini e sinossi solo da fonti ufficiali (marvel.com, Disney+, Marvel Studios). I riassunti completi sono scritti a parte e possono usare fonti secondarie.
 
-**Salvataggio dati:** inizialmente nel browser; la sincronizzazione tra dispositivi verrà decisa più avanti.
+## Come avviare l'app
 
-## Come aprire il prototipo
+Serve [Node.js](https://nodejs.org/) (versione LTS). Su Windows: `winget install OpenJS.NodeJS.LTS`, poi riavvia VS Code e verifica con `node -v`.
 
-Il prototipo è un file HTML unico e non richiede installazioni.
+```bash
+npm install     # installa le dipendenze (solo la prima volta)
+npm run dev     # avvia l'app: apri l'indirizzo che compare (di solito http://localhost:5173)
+npm run build   # crea la versione pronta da pubblicare nella cartella dist/
+npm run lint    # controlla il codice
+```
 
-1. Apri la cartella `marvel_tracker/prototype` in Esplora file.
-2. Fai doppio clic su `design.html`: si apre nel browser.
-3. Per vederlo come su un telefono: premi `F12`, poi `Ctrl+Shift+M`.
-
-Da VS Code: clic destro su `prototype/design.html` → **Reveal in File Explorer** → doppio clic.
-
-Il prototipo è **funzionante**: puoi aprire ogni scheda, segnare i titoli come visti, spuntare gli episodi, votare con le Gemme, cercare (scorciatoia `/`), cambiare universo, ordine e lingua, esportare/importare un backup. I dati restano salvati in quel browser.
-
-> Nel prototipo testi, date, durate, ordine cronologico e collegamenti sono **segnaposto**, non ancora verificati sulle fonti ufficiali. Ci sono 16 titoli di esempio (MCU, X-Men, Spider-Man Sony).
+I tuoi dati (visti, voti, episodi) restano nel browser con cui usi l'app. Se cancelli i dati di navigazione si perdono: usa **Esporta backup** in fondo alla Home.
 
 ## Struttura del progetto
 
-```
+```text
 marvel_tracker/
-├── prototype/
-│   └── design.html     ← prototipo funzionante (HTML + CSS + JS in un file, commentato)
-├── src/                ← app React (ancora il template iniziale di Vite)
-├── public/             ← file statici
-├── index.html          ← pagina di ingresso dell'app Vite
-├── package.json        ← dipendenze e comandi
-└── vite.config.ts      ← configurazione di Vite
+├── src/
+│   ├── main.tsx            ← punto di ingresso
+│   ├── App.tsx             ← barra + pagina attiva
+│   ├── styles.css          ← tutti gli stili
+│   ├── types.ts            ← forma dei dati (Title, SavedData…)
+│   ├── store.ts            ← dati personali salvati su questo PC + azioni
+│   ├── router.ts           ← navigazione con #/…
+│   ├── i18n.ts             ← testi IT/EN
+│   ├── homeState.ts        ← scelte dell'elenco (universo, ordine…)
+│   ├── hooks.ts, utils.ts, toast.ts
+│   ├── data/
+│   │   ├── titles.ts       ← CATALOGO dei titoli (ora: esempio)
+│   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
+│   └── components/         ← TopBar, Home, Detail, Prep, ConnectionMap, Gem…
+├── prototype/design.html   ← prototipo HTML (riferimento del design)
+├── index.html              ← pagina di ingresso
+└── vite.config.ts          ← configurazione (base relativa per GitHub Pages)
 ```
 
-## Sviluppo dell'app (in arrivo)
+## Prototipo
 
-L'app è basata su **React 19 + TypeScript + Vite**. Serve [Node.js](https://nodejs.org/) (versione LTS). Per installarlo su Windows: `winget install OpenJS.NodeJS.LTS`, poi riavvia VS Code e verifica con `node -v`.
-
-```bash
-npm install     # installa le dipendenze
-npm run dev     # avvia l'app in locale
-npm run build   # crea la versione pronta da pubblicare
-npm run lint    # controlla il codice
-```
+`prototype/design.html` è il prototipo da cui è nata l'app: si apre con doppio clic, senza installare niente. Resta come riferimento del design.
 
 ## Convenzioni
 
