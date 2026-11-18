@@ -183,6 +183,11 @@ select.input{background:var(--surface);border:1px solid var(--line);border-radiu
 .seen-btn:hover{border-color:var(--ok)}
 .seen-btn.on{background:var(--ok);border-color:var(--ok)}
 .seen-btn.on svg{stroke:#0b0c0f}
+/* Serie a metà: anello che si riempie in base agli episodi visti (--p = percentuale) */
+.seen-btn.partial{border:none;background:conic-gradient(var(--ok) calc(var(--p) * 1%),var(--off) 0);position:relative}
+.seen-btn.partial::before{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--surface)}
+.row:hover .seen-btn.partial::before{background:var(--surface2)}
+.seen-btn.partial span{position:relative;font-family:var(--mono);font-size:8.5px;color:var(--ok);letter-spacing:-.02em}
 
 /* ==========================================================================
    5. GEMME DELL'INFINITO — forme ispirate ai film
@@ -764,8 +769,16 @@ const ctxLabel = d => d.uni === "mcu" ? `${tr("phaseN")} ${d.phase} · ${tr(d.sa
 /* Miniatura generata (sostituibile dalla locandina quando d.poster esiste) */
 const thumb = (d, cls = "") =>
   `<div class="thumb ${cls}" style="--c:${d.c}">${d.type !== "film" ? `<i class="type">${d.type === "serie" ? "TV" : "ANI"}</i>` : ""}<span>${d.abbr}</span></div>`;
-const seenBtn = d =>
-  `<button class="seen-btn${isSeen(d.id) ? " on" : ""}" data-act="seen" data-id="${d.id}" title="${tr("markSeen")}" aria-pressed="${isSeen(d.id)}">${ICON.check}</button>`;
+/* Pulsante "visto":
+   - film, o serie non iniziata → cerchio vuoto
+   - serie iniziata (1–99%)     → anello di avanzamento con la percentuale
+   - visto / serie al 100%      → spunta verde
+   Cliccando una serie a metà la si segna come vista tutta. */
+const seenBtn = d => {
+  const pct = hasEps(d) && !isSeen(d.id) ? Math.round(epsSeen(d.id) / d.eps * 100) : 0;
+  if (pct > 0) return `<button class="seen-btn partial" style="--p:${pct}" data-act="seen" data-id="${d.id}" title="${tr("markSeen")} · ${epsSeen(d.id)}/${d.eps} ${tr("eps")}" aria-pressed="mixed"><span>${pct}</span></button>`;
+  return `<button class="seen-btn${isSeen(d.id) ? " on" : ""}" data-act="seen" data-id="${d.id}" title="${tr("markSeen")}" aria-pressed="${isSeen(d.id)}">${ICON.check}</button>`;
+};
 
 /* ============================================================================
    BARRA IN ALTO — selettore Home | Preparazione, lingua, testo ricerca.
