@@ -8,7 +8,10 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film So
 
 | Area | Cosa fa |
 |---|---|
-| **Ordini di visione** | Uscita, cronologico ufficiale, per Fase/Saga, per personaggio e percorsi tematici (Multiverso, X-Men, Spider-Man…) |
+| **Universi** | Come le collezioni di Disney+: Tutto, MCU, X-Men, Spider-Man (Sony)… Si combinano con qualsiasi ordine |
+| **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
+| **Episodi** | Per serie e animazione si spuntano i singoli episodi; la serie è "vista" quando li hai visti tutti |
+| **Backup** | Esporta/importa un file `.json` con visti, voti ed episodi (per non perderli o spostarli su un altro dispositivo) |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
 | **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva |
@@ -42,9 +45,9 @@ Il prototipo è un file HTML unico e non richiede installazioni.
 
 Da VS Code: clic destro su `prototype/design.html` → **Reveal in File Explorer** → doppio clic.
 
-Il prototipo è **funzionante**: puoi aprire ogni scheda, segnare i titoli come visti, votare con le Gemme, cercare (scorciatoia `/`), cambiare ordine e lingua. Visti e voti restano salvati in quel browser.
+Il prototipo è **funzionante**: puoi aprire ogni scheda, segnare i titoli come visti, spuntare gli episodi, votare con le Gemme, cercare (scorciatoia `/`), cambiare universo, ordine e lingua, esportare/importare un backup. I dati restano salvati in quel browser.
 
-> Nel prototipo testi, date, durate, ordine cronologico e collegamenti sono **segnaposto**, non ancora verificati sulle fonti ufficiali. Ci sono 11 titoli di esempio.
+> Nel prototipo testi, date, durate, ordine cronologico e collegamenti sono **segnaposto**, non ancora verificati sulle fonti ufficiali. Ci sono 16 titoli di esempio (MCU, X-Men, Spider-Man Sony).
 
 ## Struttura del progetto
 
@@ -61,7 +64,7 @@ marvel_tracker/
 
 ## Sviluppo dell'app (in arrivo)
 
-L'app è basata su **React 19 + TypeScript + Vite**. Serve [Node.js](https://nodejs.org/) installato (non ancora presente su questo PC).
+L'app è basata su **React 19 + TypeScript + Vite**. Serve [Node.js](https://nodejs.org/) (versione LTS). Per installarlo su Windows: `winget install OpenJS.NodeJS.LTS`, poi riavvia VS Code e verifica con `node -v`.
 
 ```bash
 npm install     # installa le dipendenze
