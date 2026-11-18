@@ -12,8 +12,9 @@ import { GemsRow } from "./Gem";
 import { SeenButton } from "./SeenButton";
 import { Thumb } from "./Thumb";
 
-export function TitleRow({ d, n }: { d: Title; n?: number }) {
-  const { lang } = useT();
+/** added = titolo aggiunto da noi alla versione completa di una lista Disney+ */
+export function TitleRow({ d, n, added = false }: { d: Title; n?: number; added?: boolean }) {
+  const { lang, t } = useT();
   const { data } = useStore();
   const meta = useMetaLine();
   const seen = !!data.seen[d.id];
@@ -21,7 +22,10 @@ export function TitleRow({ d, n }: { d: Title; n?: number }) {
     <div className={`row${seen ? " is-seen" : ""}${n === undefined ? " no-n" : ""}`} onClick={() => go({ page: "title", id: d.id })}>
       {n !== undefined && <span className="n">{String(n).padStart(2, "0")}</span>}
       <Thumb d={d} />
-      <div className="t"><b>{d.t[lang]}</b><small>{meta(d)}</small></div>
+      <div className="t">
+        <b>{d.t[lang]}{added && <span className="added" title={t("addedNote")}>{t("added")}</span>}</b>
+        <small>{meta(d)}</small>
+      </div>
       <GemsRow n={data.rating[d.id] || 0} />
       <SeenButton d={d} />
     </div>

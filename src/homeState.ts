@@ -1,5 +1,5 @@
 /* ============================================================================
-   SCELTE DELL'ELENCO IN HOME (universo, ordine, percorso, tipo…)
+   SCELTE DELL'ELENCO IN HOME (collezione, versione, ordine, percorso, tipi…)
    Tenute in App, così restano uguali quando torni da una scheda.
    ============================================================================ */
 import type { TitleType } from "./types";
@@ -8,11 +8,12 @@ import type { TitleType } from "./types";
 export const ALL_TYPES: TitleType[] = ["film", "serie", "anim", "special", "short"];
 
 export interface HomeState {
-  uni: string;                                   // "all" | "mcu" | "xmen"…
-  order: "release" | "chrono" | "phase" | "paths";
-  path: string;                                  // percorso scelto (order = "paths")
-  types: TitleType[];                            // tipi mostrati (scelta multipla; vuoto = tutti)
-  statsOpen: boolean;                            // statistiche dettagliate aperte
+  coll: string;                                           // "all" | chiave di una collezione Disney+ (vedi COLLECTIONS)
+  full: boolean;                                          // false = lista come su Disney+, true = completa
+  order: "dplus" | "release" | "chrono" | "phase" | "paths"; // "dplus" = ordine della collezione
+  path: string;                                           // percorso scelto (order = "paths")
+  types: TitleType[];                                     // tipi mostrati (scelta multipla; vuoto = tutti)
+  statsOpen: boolean;                                     // statistiche dettagliate aperte
 }
 
-export const defaultHome: HomeState = { uni: "all", order: "release", path: "ironman", types: [], statsOpen: false };
+export const defaultHome: HomeState = { coll: "all", full: false, order: "release", path: "ironman", types: [], statsOpen: false };

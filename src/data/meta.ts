@@ -3,16 +3,21 @@
    ============================================================================ */
 import type { I18nText } from "../types";
 
-/** Universi (come le collezioni Marvel di Disney+). "all" = tutti. */
+/** Universi = continuità narrativa (chi ha prodotto i film). Servono per
+    l'ordine cronologico, che si calcola DENTRO ogni universo, e per le
+    statistiche. Le schede in alto nella Home sono invece le collezioni
+    Disney+ (vedi collections.ts). "all" = tutti. */
 export interface Universe extends I18nText {
   k: string;
-  short?: string; // etichetta breve per le schede
+  short?: string; // etichetta breve
 }
 export const UNIVERSES: Universe[] = [
   { k: "all", it: "Tutto", en: "All" },
   { k: "mcu", it: "Marvel Cinematic Universe", en: "Marvel Cinematic Universe", short: "MCU" },
-  { k: "xmen", it: "X-Men", en: "X-Men" },
-  { k: "spider", it: "Spider-Man (Sony)", en: "Spider-Man (Sony)" },
+  { k: "xmen", it: "X-Men (20th Century Fox)", en: "X-Men (20th Century Fox)", short: "X-Men" },
+  { k: "f4fox", it: "Fantastici 4 (20th Century Fox)", en: "Fantastic Four (20th Century Fox)", short: "F4 Fox" },
+  { k: "sony", it: "Spider-Man (Sony Pictures)", en: "Spider-Man (Sony Pictures)", short: "Sony" },
+  { k: "animation", it: "Animazione Marvel", en: "Marvel Animation", short: "Animazione" },
 ];
 
 /** Percorsi: per personaggio (campo chars) o per tema (campo themes) */
@@ -54,26 +59,31 @@ export const PATHS: Path[] = [
 
 /** Prossime uscite con liste di preparazione (id dal catalogo).
     - Avengers: Doomsday: 18/12/2026 (Disney+ "Marvel Movies in Order").
-      Lista ESTESA = riga "Avengers: Doomsday – Inizia il conto alla
-      rovescia" di Disney+ Italia (fonte ufficiale).
+      Lista DISNEY+ = riga "Avengers: Doomsday – Inizia il conto alla
+      rovescia" di Disney+ Italia (fonte ufficiale). Conversioni: il
+      riquadro "Loki" = entrambe le stagioni; "Avengers: Endgame Extra"
+      (versione Extra) = Avengers: Endgame.
+      Lista COMPLETA = Disney+ + i titoli aggiunti da noi ("add").
       Lista MINIMA = proposta, non ufficiale.
     - Avengers: Secret Wars: Disney indica solo "dicembre 2027" →
-      il giorno è provvisorio (approx = true).
+      il giorno è provvisorio (approx = true); nessuna lista Disney+.
     I ripassi sono ancora testi segnaposto. */
 export interface Upcoming {
   id: string;
   t: string;
   date: string;          // AAAA-MM-GG
   approx?: boolean;      // true = giorno esatto non ancora annunciato
-  min: string[];         // lista minima
-  ext: string[];         // lista estesa
+  min: string[];         // lista minima (proposta)
+  dp: string[];          // lista ufficiale Disney+ (vuota = non esiste)
+  add: string[];         // aggiunte per la lista completa
   recap: { title: I18nText; text: I18nText }[];
 }
 export const UPCOMING: Upcoming[] = [
   {
     id: "doomsday", t: "Avengers: Doomsday", date: "2026-12-18",
     min: ["eg", "loki1", "loki2", "dpw", "thunderbolts", "ff"],
-    ext: ["xmen", "x2", "ca", "avg", "iw", "eg", "loki1", "shangchi", "nwh"],
+    dp: ["xmen", "x2", "ca", "avg", "iw", "eg", "loki1", "loki2", "shangchi", "nwh"],
+    add: ["dsmom", "wf", "bnw", "dpw", "thunderbolts", "ff"],
     recap: [
       { title: { it: "Fine della Saga dell'Infinito", en: "End of the Infinity Saga" }, text: { it: "Testo segnaposto: cosa è successo in Endgame.", en: "Placeholder: what happened in Endgame." } },
       { title: { it: "Il Multiverso è aperto", en: "The Multiverse is open" }, text: { it: "Testo segnaposto: le conseguenze di Loki.", en: "Placeholder: consequences of Loki." } },
@@ -82,7 +92,7 @@ export const UPCOMING: Upcoming[] = [
   },
   {
     id: "secretwars", t: "Avengers: Secret Wars", date: "2027-12-17", approx: true,
-    min: ["eg", "loki2", "dsmom"], ext: ["iw", "eg", "loki1", "loki2", "whatif1", "nwh", "dsmom", "dpw", "ff"],
+    min: ["eg", "loki2", "dsmom"], dp: [], add: ["iw", "eg", "loki1", "loki2", "whatif1", "nwh", "dsmom", "dpw", "ff"],
     recap: [{ title: { it: "Testo segnaposto", en: "Placeholder" }, text: { it: "Da scrivere.", en: "To be written." } }],
   },
 ];

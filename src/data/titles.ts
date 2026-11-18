@@ -19,8 +19,8 @@
    una fonte ufficiale (durate, episodi, post-credits… non comparivano nelle
    pagine leggibili). L'app li mostra come "da verificare".
 
-   I titoli fuori dall'MCU (X-Men, Spider-Man Sony) sono ancora quelli di
-   ESEMPIO: arriveranno con i blocchi 2–4.
+   BLOCCO 2 (in fondo al file): film e animazione fuori MCU presenti su
+   Disney+ Italia. Quelli non su Disney+ arriveranno nei blocchi successivi.
    ============================================================================ */
 import type { Field, Link, Title, TitleType } from "../types";
 
@@ -53,18 +53,21 @@ interface Spec {
   eps?: number; ph?: number; c: string; ab: string;
   ch?: string[]; th?: string[]; b?: Link[]; a?: Link[]; pc?: number;
   ok?: Field[];   // campi confermati da fonte ufficiale
+  uni?: string;   // universo (predefinito "mcu")
+  cr?: number;    // posizione cronologica per i titoli fuori MCU (= ordine di uscita, da verificare)
 }
 function mk(s: Spec): Title {
-  const pos = TIMELINE.indexOf(s.id);
+  const uni = s.uni ?? "mcu";
+  const pos = uni === "mcu" ? TIMELINE.indexOf(s.id) : -1;
   const ok = new Set<Field>(s.ok ?? []);
   if (pos >= 0) ok.add("chrono");                          // in [T] → ordine confermato
   const relevant: Field[] = ["it", "y", "min", "pc", "chrono"];
   if (s.eps) relevant.push("eps");
   if (s.ph) relevant.push("phase");
   return {
-    id: s.id, uni: "mcu", type: s.type, t: { it: s.it, en: s.en }, y: s.y, min: s.min, eps: s.eps,
+    id: s.id, uni, type: s.type, t: { it: s.it, en: s.en }, y: s.y, min: s.min, eps: s.eps,
     phase: s.ph, saga: s.ph ? (s.ph <= 3 ? "inf" : "multi") : undefined,
-    chrono: pos >= 0 ? pos + 1 : TIMELINE.length + 1,
+    chrono: pos >= 0 ? pos + 1 : s.cr ?? TIMELINE.length + 1,
     c: s.c, abbr: s.ab, poster: null, chars: s.ch ?? [], themes: s.th ?? [],
     before: s.b ?? [], after: s.a ?? [], pc: s.pc ?? 0,
     unverified: relevant.filter((f) => !ok.has(f)),
@@ -257,21 +260,62 @@ const MCU: Title[] = [
 ];
 
 /* ----------------------------------------------------------------------------
-   FUORI DALL'MCU — ancora titoli di ESEMPIO (blocchi 2–4), tutto da verificare
+   BLOCCO 2 — FUORI DALL'MCU, presenti su Disney+ Italia
+   Fonte [E]: pagine dei singoli titoli su disneyplus.com/it-it (titolo
+   italiano, anno, durata, stagioni/episodi). L'ordine cronologico dentro
+   ogni universo per ora segue l'uscita → da verificare.
    ---------------------------------------------------------------------------- */
-const ALL_FIELDS: Field[] = ["it", "y", "min", "pc", "chrono"];
-const sample = (t: Omit<Title, "poster" | "themes" | "unverified" | "pc">): Title =>
-  ({ ...t, poster: null, themes: [], pc: 0, unverified: ALL_FIELDS });
+const DP: Field[] = ["it", "y", "min"];   // film: confermati dalla pagina Disney+ del titolo
+const DPS: Field[] = ["it", "y", "eps"];  // serie: anno ed episodi dalla pagina Disney+
 
 const OTHERS: Title[] = [
-  sample({ id: "xmen", uni: "xmen", type: "film", t: { it: "X-Men", en: "X-Men" }, y: 2000, min: 104, chrono: 1, c: "#3b4a5c", abbr: "XM",
-    chars: ["wolverine"], before: [], after: [L("x2", "Il seguito diretto", "The direct sequel")] }),
-  sample({ id: "x2", uni: "xmen", type: "film", t: { it: "X-Men 2", en: "X2" }, y: 2003, min: 133, chrono: 2, c: "#2e3b52", abbr: "X2",
-    chars: ["wolverine"], before: [L("xmen", "Il primo capitolo", "The first chapter")], after: [L("logan", "Il futuro di Logan", "Logan's future")] }),
-  sample({ id: "logan", uni: "xmen", type: "film", t: { it: "Logan - The Wolverine", en: "Logan" }, y: 2017, min: 137, chrono: 3, c: "#5a4630", abbr: "LGN",
-    chars: ["wolverine"], before: [L("x2", "Il passato di Logan", "Logan's past")], after: [L("dpw", "Wolverine nell'MCU", "Wolverine in the MCU")] }),
-  sample({ id: "sm02", uni: "spider", type: "film", t: { it: "Spider-Man", en: "Spider-Man" }, y: 2002, min: 121, chrono: 1, c: "#8a1c2a", abbr: "SM",
-    chars: ["spidey"], before: [], after: [] }),
+  /* ===== X-Men (20th Century Fox) ===== */
+  mk({ uni: "xmen", cr: 1, id: "xmen", type: "film", it: "X-Men", en: "X-Men", y: 2000, min: 105, c: "#3b4a5c", ab: "XM", ch: ["wolverine"], ok: DP,
+    a: [L("x2", "Il seguito diretto", "The direct sequel")] }),
+  mk({ uni: "xmen", cr: 2, id: "x2", type: "film", it: "X-Men 2", en: "X2", y: 2003, min: 134, c: "#2e3b52", ab: "X2", ch: ["wolverine"], ok: DP,
+    b: [L("xmen", "Il primo film", "The first film")], a: [L("x3", "Il terzo capitolo", "The third chapter")] }),
+  mk({ uni: "xmen", cr: 3, id: "x3", type: "film", it: "X-Men - Conflitto finale", en: "X-Men: The Last Stand", y: 2006, min: 105, c: "#3a3550", ab: "X3", ch: ["wolverine"], ok: DP,
+    b: [L("x2", "Jean e il lago Alkali", "Jean and Alkali Lake")], a: [L("wolv13", "Logan dopo Jean", "Logan after Jean")] }),
+  mk({ uni: "xmen", cr: 4, id: "xow", type: "film", it: "X-Men Le origini - Wolverine", en: "X-Men Origins: Wolverine", y: 2009, min: 108, c: "#5a3f2a", ab: "XOW", ch: ["wolverine", "deadpool"], ok: DP,
+    a: [L("xmen", "Logan incontra gli X-Men", "Logan meets the X-Men")] }),
+  mk({ uni: "xmen", cr: 5, id: "xfc", type: "film", it: "X-Men: L'Inizio", en: "X-Men: First Class", y: 2011, min: 133, c: "#2f4a6b", ab: "XFC", ok: DP,
+    a: [L("dofp", "Il seguito", "The sequel")] }),
+  mk({ uni: "xmen", cr: 6, id: "wolv13", type: "film", it: "Wolverine - L'immortale", en: "The Wolverine", y: 2013, min: 127, c: "#4a3a2a", ab: "WLV", ch: ["wolverine"], ok: DP,
+    b: [L("x3", "Logan dopo Conflitto finale", "Logan after The Last Stand")], a: [L("dofp", "La scena dopo i titoli", "The mid-credits scene")] }),
+  mk({ uni: "xmen", cr: 7, id: "dofp", type: "film", it: "X-Men: Giorni di un futuro passato", en: "X-Men: Days of Future Past", y: 2014, min: 133, c: "#3a3f5a", ab: "DFP", ch: ["wolverine"], ok: DP,
+    b: [L("xfc", "Gli X-Men giovani", "The young X-Men"), L("x3", "Gli X-Men del futuro", "The future X-Men")], a: [L("apocalypse", "Il seguito", "The sequel"), L("logan", "Il futuro di Logan", "Logan's future")] }),
+  mk({ uni: "xmen", cr: 8, id: "deadpool", type: "film", it: "Deadpool", en: "Deadpool", y: 2016, min: 110, c: "#7a1f2b", ab: "DP", ch: ["deadpool"], ok: DP,
+    a: [L("deadpool2", "Il seguito", "The sequel")] }),
+  mk({ uni: "xmen", cr: 9, id: "apocalypse", type: "film", it: "X-Men: Apocalisse", en: "X-Men: Apocalypse", y: 2016, min: 145, c: "#4a3a5e", ab: "APO", ch: ["wolverine"], ok: DP,
+    b: [L("dofp", "La nuova linea temporale", "The new timeline")], a: [L("darkphoenix", "Il seguito", "The sequel")] }),
+  mk({ uni: "xmen", cr: 10, id: "logan", type: "film", it: "Logan - The Wolverine", en: "Logan", y: 2017, min: 139, c: "#5a4630", ab: "LGN", ch: ["wolverine"], ok: DP,
+    b: [L("wolv13", "Il secondo Wolverine", "The second Wolverine")], a: [L("dpw", "Wolverine nell'MCU", "Wolverine in the MCU")] }),
+  mk({ uni: "xmen", cr: 11, id: "deadpool2", type: "film", it: "Deadpool 2", en: "Deadpool 2", y: 2018, min: 121, c: "#7a1f2b", ab: "DP2", ch: ["deadpool"], ok: DP,
+    b: [L("deadpool", "Il primo Deadpool", "The first Deadpool")], a: [L("dpw", "Deadpool nell'MCU", "Deadpool in the MCU")] }),
+  mk({ uni: "xmen", cr: 12, id: "darkphoenix", type: "film", it: "X-Men: Dark Phoenix", en: "Dark Phoenix", y: 2019, min: 116, c: "#6b2a1f", ab: "DPX", ok: DP,
+    b: [L("apocalypse", "Il film precedente", "The previous film")] }),
+
+  /* ===== Fantastici 4 (20th Century Fox) ===== */
+  mk({ uni: "f4fox", cr: 1, id: "ff2005", type: "film", it: "I Fantastici 4", en: "Fantastic Four", y: 2005, min: 106, c: "#1f4a7a", ab: "F4", ch: ["fantastic4"], ok: DP,
+    a: [L("ff2007", "Il seguito", "The sequel")] }),
+  mk({ uni: "f4fox", cr: 2, id: "ff2007", type: "film", it: "I fantastici 4 e Silver Surfer", en: "Fantastic Four: Rise of the Silver Surfer", y: 2007, min: 92, c: "#2a4a6b", ab: "F4SS", ch: ["fantastic4"], ok: DP,
+    b: [L("ff2005", "Il primo film", "The first film")] }),
+  mk({ uni: "f4fox", cr: 3, id: "fant4stic", type: "film", it: "Fantastic 4 - I fantastici quattro", en: "Fantastic Four", y: 2015, min: 102, c: "#2a3a5a", ab: "F4·15", ch: ["fantastic4"], ok: DP }),
+
+  /* ===== Spider-Man (Sony Pictures) ===== */
+  mk({ uni: "sony", cr: 1, id: "tasm", type: "film", it: "The Amazing Spider-Man", en: "The Amazing Spider-Man", y: 2012, min: 136, c: "#8a1c2a", ab: "TASM", ch: ["spidey"], ok: DP,
+    a: [L("tasm2", "Il seguito", "The sequel")] }),
+  mk({ uni: "sony", cr: 2, id: "tasm2", type: "film", it: "The Amazing Spider-Man 2", en: "The Amazing Spider-Man 2", y: 2014, min: 141, c: "#7a1c3a", ab: "TASM2", ch: ["spidey"], ok: DP,
+    b: [L("tasm", "Il primo film", "The first film")], a: [L("nwh", "Questo Peter torna", "This Peter returns")] }),
+  mk({ uni: "sony", cr: 3, id: "spiderverse", type: "anim", it: "Spider-Man: Un nuovo universo", en: "Spider-Man: Into the Spider-Verse", y: 2018, min: 116, c: "#6b1f5a", ab: "SV", ch: ["spidey"], th: ["multi"], ok: DP }),
+
+  /* ===== Animazione Marvel (fuori MCU) ===== */
+  mk({ uni: "animation", cr: 1, id: "hulkwmd", type: "anim", it: "Hulk: nella terra dei mostri", en: "Hulk: Where Monsters Dwell", y: 2016, min: 77, c: "#2f5d3a", ab: "HWMD", ch: ["hulk", "strange"], ok: DP }),
+  mk({ uni: "animation", cr: 2, id: "sm2017", type: "anim", it: "Spider-Man", en: "Marvel's Spider-Man", y: 2017, min: 1320, eps: 60, c: "#8a1c2a", ab: "SM17", ch: ["spidey"], ok: DPS }),
+  mk({ uni: "animation", cr: 3, id: "smshorts", type: "anim", it: "Spider-Man (Shorts)", en: "Spider-Man (Shorts)", y: 2017, min: 20, eps: 6, c: "#8a1c2a", ab: "SMS", ch: ["spidey"], ok: DPS }),
+  mk({ uni: "animation", cr: 4, id: "xmen97", type: "anim", it: "X-Men ’97", en: "X-Men ’97", y: 2024, min: 570, eps: 19, c: "#3b4a5c", ab: "X97", ch: ["wolverine"], ok: DPS }),
+  mk({ uni: "animation", cr: 5, id: "fnsm", type: "anim", it: "Il vostro amichevole Spider-Man di quartiere", en: "Your Friendly Neighborhood Spider-Man", y: 2025, min: 280, eps: 10, c: "#8a1c2a", ab: "FNSM", ch: ["spidey", "daredevil"], ok: DPS }),
+  mk({ uni: "animation", cr: 6, id: "jeff", type: "anim", it: "Jeff e i suoi amici supereroi", en: "Jeff and His Superhero Friends", y: 2026, min: 30, eps: 6, c: "#2a5a6b", ab: "JEFF", ok: DPS }),
 ];
 
 /** Tutti i titoli in ordine di uscita (sort stabile: a parità di anno resta l'ordine scritto) */
