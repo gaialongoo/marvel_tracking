@@ -36,6 +36,8 @@ npm run build   # crea la versione pronta da pubblicare nella cartella dist/
 npm run lint    # controlla il codice
 ```
 
+> **Errore "running scripts is disabled on this system" in PowerShell?** Usa `npm.cmd run dev`, oppure abilita gli script una volta per sempre (solo per il tuo utente) con `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, oppure usa il terminale Command Prompt o Git Bash in VS Code.
+
 I tuoi dati (visti, voti, episodi) restano nel browser con cui usi l'app. Se cancelli i dati di navigazione si perdono: usa **Esporta backup** in fondo alla Home.
 
 ## Struttura del progetto
