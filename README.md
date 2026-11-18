@@ -13,7 +13,7 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
 | **Tipi** | Film, Serie (TV), Animazione (ANI), Speciali (SPC, es. Licantropus), Corti One-Shot (ONE): la sigla compare nell'angolo della miniatura. I filtri per tipo sono a **scelta multipla** (es. Film + Serie, senza Corti) |
 | **Episodi** | Per serie e animazione si spuntano i singoli episodi; nell'elenco un anello mostra la % vista, al 100% diventa la spunta |
-| **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
+| **Riassunti** | Sinossi senza spoiler + riassunto completo con spoiler (nascosto finché non lo sblocchi) + descrizione di ogni scena dopo i titoli. Testi scritti da Claude in italiano e inglese; il pulsante «Pagina ufficiale» apre la pagina Disney+ Italia con la sinossi ufficiale. **Scritti finora:** Fase 1 e 2 MCU + corti (17 titoli); gli altri arrivano a blocchi |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
 | **Preparazione** | Prossime uscite con conto alla rovescia, lista **ufficiale** (Disney+) con tempo mancante, nessuna proposta nostra |
 | **Statistiche** | In alto: completamento, ore viste, media voti e preferito **della vista corrente** (universo, ordine/percorso, tipi scelti); dettaglio per universo, Fase, tipo e voti |
@@ -58,6 +58,8 @@ marvel_tracker/
 │   ├── data/
 │   │   ├── titles.ts       ← CATALOGO dei titoli (fonti in cima al file)
 │   │   ├── collections.ts  ← liste Disney+ (pronte, per ora NON mostrate nell'app)
+│   │   ├── disneyLinks.ts  ← indirizzi delle pagine ufficiali Disney+ Italia
+│   │   ├── texts/          ← sinossi, riassunti e scene dopo i titoli (un file per blocco)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
 │   └── components/         ← TopBar, Home, Detail, Prep, ConnectionMap, Gem…
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)

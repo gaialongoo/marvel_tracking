@@ -6,6 +6,8 @@
    ============================================================================ */
 import { useState } from "react";
 import { BY_ID } from "../data/titles";
+import { TEXTS } from "../data/texts";
+import { disneyUrl } from "../data/disneyLinks";
 import { GEMS, UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";
 import { go } from "../router";
@@ -44,7 +46,7 @@ export function Detail({ id }: { id: string }) {
         <div>
           <Rating d={d} />
           {hasEps(d) && <Episodes d={d} />}
-          <Texts />
+          <Texts d={d} />
           <PostCredits d={d} />
         </div>
         <div>
@@ -95,7 +97,7 @@ function Head({ d, ctx }: { d: Title; ctx: string }) {
           <button className={`btn ${seen ? "done" : "primary"}`} onClick={() => toggleSeen(d.id)}>
             <IconCheckText /> {seen ? t("isSeen") : t("markSeen")}
           </button>
-          <a className="btn" href={d.officialUrl || "https://www.marvel.com/"} target="_blank" rel="noopener noreferrer">
+          <a className="btn" href={disneyUrl(d.id) ?? d.officialUrl ?? "https://www.marvel.com/"} target="_blank" rel="noopener noreferrer">
             {t("official")} <IconExternal />
           </a>
         </div>
@@ -169,10 +171,14 @@ function Spoiler({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ----- Sinossi (senza spoiler) / riassunto completo ----- */
-function Texts() {
-  const { t } = useT();
+/* ----- Sinossi (senza spoiler) / riassunto completo (testi in data/texts) ----- */
+function Texts({ d }: { d: Title }) {
+  const { t, lang } = useT();
   const [tab, setTab] = useState<"syn" | "full">("syn");
+  const tx = TEXTS[d.id];
+  // Se il testo non c'è ancora, mostra il segnaposto grigio
+  const body = (txt: string | undefined) =>
+    txt ? <p>{txt}</p> : <p className="placeholder">{t("notWritten")}</p>;
   return (
     <div className="block card">
       <div className="inner-tabs">
@@ -180,9 +186,9 @@ function Texts() {
         <button className={tab === "full" ? "on" : ""} onClick={() => setTab("full")}>{t("full")}</button>
       </div>
       {tab === "syn" ? (
-        <><p className="placeholder">{t("synText")}</p><div className="src">{t("synSrc")}</div></>
+        <>{body(tx?.syn?.[lang])}<div className="src">{t("synSrc")}</div></>
       ) : (
-        <><Spoiler><p className="placeholder">{t("fullText")}</p></Spoiler><div className="src">{t("fullSrc")}</div></>
+        <><Spoiler>{body(tx?.full?.[lang])}</Spoiler><div className="src">{t("fullSrc")}</div></>
       )}
     </div>
   );
@@ -190,7 +196,8 @@ function Texts() {
 
 /* ----- Scene post-credits (ognuna nascosta come spoiler) ----- */
 function PostCredits({ d }: { d: Title }) {
-  const { t } = useT();
+  const { t, lang } = useT();
+  const pcs = TEXTS[d.id]?.pc ?? [];
   return (
     <div className="block">
       <span className="eyebrow">{t("postcredits")} · {d.pc}</span>
@@ -198,7 +205,9 @@ function PostCredits({ d }: { d: Title }) {
         {d.pc ? Array.from({ length: d.pc }, (_, i) => (
           <div key={i} className="pc-item">
             <span className="n">{i + 1}</span>
-            <Spoiler><p className="placeholder">{t("pcText")}</p></Spoiler>
+            <Spoiler>
+              {pcs[i] ? <p>{pcs[i][lang]}</p> : <p className="placeholder">{t("notWritten")}</p>}
+            </Spoiler>
           </div>
         )) : <div className="empty">{t("noPc")}</div>}
       </div>
