@@ -11,9 +11,12 @@
    la scheda rimanda alla pagina ufficiale Disney+.
    ============================================================================ */
 import { MCU1 } from "./mcu1";
+import { MCU2 } from "./mcu2";
+import { MCU3 } from "./mcu3";
+import { MCU4 } from "./mcu4";
 import type { TitleTexts } from "./types";
 
 export type { TitleTexts };
 
 /** Tutti i testi, per id del titolo */
-export const TEXTS: Record<string, TitleTexts> = { ...MCU1 };
+export const TEXTS: Record<string, TitleTexts> = { ...MCU1, ...MCU2, ...MCU3, ...MCU4 };

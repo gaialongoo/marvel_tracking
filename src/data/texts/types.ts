@@ -4,5 +4,5 @@ import type { I18nText } from "../../types";
 export interface TitleTexts {
   syn?: I18nText;   // sinossi senza spoiler
   full?: I18nText;  // riassunto completo con spoiler
-  pc?: I18nText[];  // scene dopo i titoli, in ordine
+  pc?: (I18nText | null)[];  // scene dopo i titoli, in ordine (null = non ancora confermata da una fonte)
 }
