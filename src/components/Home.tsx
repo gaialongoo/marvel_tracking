@@ -9,7 +9,7 @@ import { DATA } from "../data/titles";
 import { PATHS, UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";
 import { useStore } from "../store";
-import { ALL_TYPES, type HomeState } from "../homeState";
+import { ALL_TYPES, defaultHome, type HomeState } from "../homeState";
 import type { Title } from "../types";
 import { Backup } from "./Backup";
 import { Kpis, StatsDetail } from "./Stats";
@@ -20,7 +20,17 @@ let savedScroll = 0;
 
 interface Group { h: string | null; items: Title[] }
 
-export function Home({ s, set }: { s: HomeState; set: (p: Partial<HomeState>) => void }) {
+export function Home({ s: raw, set }: { s: HomeState; set: (p: Partial<HomeState>) => void }) {
+  // Scelte "pulite": se arrivano valori non validi (es. da una versione precedente
+  // dell'app rimasta aperta durante gli aggiornamenti) si torna ai predefiniti,
+  // altrimenti l'elenco resterebbe vuoto.
+  const s: HomeState = {
+    ...defaultHome,
+    ...raw,
+    uni: UNIVERSES.some((u) => u.k === raw.uni) ? raw.uni : "all",
+    order: (["release", "chrono", "phase", "paths"] as const).includes(raw.order) ? raw.order : "release",
+    types: Array.isArray(raw.types) ? raw.types : [],
+  };
   const { t, lang } = useT();
   const { data } = useStore();
 
