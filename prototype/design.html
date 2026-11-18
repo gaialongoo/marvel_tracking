@@ -1,0 +1,676 @@
+<!doctype html>
+<!--
+  ============================================================================
+  MARVEL TRACKER — PROTOTIPO GRAFICO (stile HUD tech, ispirato a Iron Man)
+  ----------------------------------------------------------------------------
+  File unico e autonomo: si apre con un doppio clic, non serve Node.js.
+  Serve SOLO per approvare il design: dati, testi e date sono segnaposto.
+
+  Struttura del file:
+    1. <head>   → font e CSS (variabili colore, layout, componenti HUD, Gemme)
+    2. <header> → barra in alto: logo reattore, navigazione, lingua
+    3. <main>   → tre schermate: Elenco (#home), Scheda (#detail), Preparazione (#prep)
+    4. <script> → dati di esempio, traduzioni IT/EN, rendering e interazioni
+  ============================================================================
+-->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marvel Tracker — Prototipo</title>
+
+<!-- Font: Orbitron (titoli futuristici), Rajdhani (etichette HUD), Inter (testo) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   1. VARIABILI — tutti i colori sono qui, così si cambiano in un punto solo
+   ========================================================================== */
+:root{
+  /* Sfondi e superfici */
+  --bg:#05080f;                 /* sfondo pagina, quasi nero-blu */
+  --glass:rgba(14,26,46,.62);   /* pannelli "vetro" semitrasparenti */
+  --glass2:rgba(22,40,68,.55);  /* righe/elementi interni ai pannelli */
+  /* Testo */
+  --text:#dbe8ff; --muted:#7f94b8;
+  /* Colori HUD (Iron Man: ciano del reattore, rosso e oro dell'armatura) */
+  --cyan:#4fd8ff; --cyan-dim:rgba(79,216,255,.22);
+  --red:#e3263f; --gold:#f5b942;
+  /* Colori delle 6 Gemme dell'Infinito */
+  --space:#3d8bff; --mind:#ffd23d; --reality:#ff3b4e;
+  --power:#b05cff; --time:#2ee38a; --soul:#ff8a2b;
+}
+
+/* ==========================================================================
+   2. BASE — reset, sfondo con griglia HUD e linee di scansione
+   ========================================================================== */
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;
+  background:
+    radial-gradient(ellipse at 50% -10%,rgba(79,216,255,.16),transparent 60%), /* alone dall'alto */
+    linear-gradient(rgba(79,216,255,.05) 1px,transparent 1px) 0 0/40px 40px,  /* griglia orizzontale */
+    linear-gradient(90deg,rgba(79,216,255,.05) 1px,transparent 1px) 0 0/40px 40px, /* griglia verticale */
+    var(--bg);
+}
+/* Linee di scansione sottili sopra tutto (effetto monitor), non bloccano i clic */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:100;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px);
+}
+h1,h2,h3{font-family:Orbitron,sans-serif;font-weight:700;margin:0;letter-spacing:.06em}
+.hud{font-family:Rajdhani,sans-serif;text-transform:uppercase;letter-spacing:.18em;font-weight:600}
+button{font:inherit;cursor:pointer}
+
+/* ==========================================================================
+   3. HEADER — barra superiore con reattore animato
+   ========================================================================== */
+header{
+  position:sticky;top:0;z-index:20;
+  background:rgba(5,8,15,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--cyan-dim);
+}
+/* Linea luminosa rosso→oro→ciano sotto l'header */
+header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),var(--gold),var(--cyan),transparent)}
+.bar{max-width:1120px;margin:auto;display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:12px}
+.logo h1{font-size:18px;font-weight:900;letter-spacing:.22em}
+.logo h1 span{color:var(--cyan)}
+
+/* Reattore ad arco: nucleo luminoso + anello tratteggiato che ruota */
+.reactor{position:relative;width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle,#fff 0 14%,var(--cyan) 26%,rgba(79,216,255,.15) 58%,transparent 62%);
+  box-shadow:0 0 18px var(--cyan),inset 0 0 8px var(--cyan)}
+.reactor::before{content:"";position:absolute;inset:2px;border-radius:50%;
+  border:2px dashed rgba(79,216,255,.7);animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Navigazione tra le schermate e selettore lingua */
+nav{display:flex;gap:4px;margin-left:auto}
+nav button,.lang button{
+  background:transparent;color:var(--muted);border:1px solid transparent;
+  padding:7px 14px;font-family:Rajdhani;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px); /* angoli tagliati */
+}
+nav button:hover{color:var(--text)}
+nav button.on{color:var(--cyan);background:var(--cyan-dim);border-color:var(--cyan)}
+.lang{display:flex;gap:2px}
+.lang button{padding:7px 9px}
+.lang button.on{color:var(--gold)}
+
+/* ==========================================================================
+   4. LAYOUT GENERALE
+   ========================================================================== */
+main{max-width:1120px;margin:auto;padding:22px 16px 70px}
+.screen{display:none}            /* tutte le schermate nascoste... */
+.screen.on{display:block;animation:boot .4s ease-out} /* ...tranne quella attiva, che "si accende" */
+@keyframes boot{from{opacity:0;transform:translateY(6px)}}
+
+/* Avviso "prototipo" in cima */
+.note{font-size:12px;color:var(--muted);border:1px dashed var(--cyan-dim);padding:8px 12px;margin-bottom:18px;font-family:Rajdhani;letter-spacing:.08em}
+.note b{color:var(--gold)}
+
+/* ==========================================================================
+   5. PANNELLO HUD — vetro scuro con staffe luminose negli angoli
+   ========================================================================== */
+.panel{
+  position:relative;padding:18px;background:var(--glass);backdrop-filter:blur(6px);
+  border:1px solid rgba(79,216,255,.14);
+}
+/* Le "staffe" negli angoli: 4 piccoli angoli ciano disegnati con gradienti */
+.panel::before{
+  content:"";position:absolute;inset:-1px;pointer-events:none;
+  --b:linear-gradient(var(--cyan),var(--cyan));
+  background:
+    var(--b) top left/14px 2px, var(--b) top left/2px 14px,
+    var(--b) top right/14px 2px, var(--b) top right/2px 14px,
+    var(--b) bottom left/14px 2px, var(--b) bottom left/2px 14px,
+    var(--b) bottom right/14px 2px, var(--b) bottom right/2px 14px;
+  background-repeat:no-repeat;
+}
+.label{font-size:11px;color:var(--cyan)}
+.section-title{font-size:15px;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:10px}
+/* Trattino ciano prima dei titoli di sezione */
+.section-title::before{content:"";width:16px;height:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+
+/* ==========================================================================
+   6. STATISTICHE (schermata Elenco)
+   ========================================================================== */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat .num{font-family:Orbitron;font-weight:700;font-size:26px;color:var(--text);margin-top:6px;text-shadow:0 0 12px rgba(79,216,255,.35)}
+.stat .num small{font-size:13px;color:var(--muted)}
+/* Anello di completamento: conic-gradient con la percentuale in --p */
+.ring{--p:25;width:62px;height:62px;border-radius:50%;float:right;display:grid;place-items:center;
+  background:conic-gradient(var(--cyan) calc(var(--p)*1%),rgba(79,216,255,.1) 0);
+  filter:drop-shadow(0 0 6px rgba(79,216,255,.5))}
+.ring span{width:50px;height:50px;border-radius:50%;background:#08111f;display:grid;place-items:center;font-family:Rajdhani;font-weight:700}
+
+/* ==========================================================================
+   7. SELETTORE ORDINE DI VISIONE
+   ========================================================================== */
+.orders{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 18px}
+.orders button{
+  background:var(--glass2);color:var(--muted);border:1px solid rgba(79,216,255,.15);
+  padding:9px 16px;font-family:Rajdhani;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%); /* forma a parallelogramma */
+}
+.orders button.on{color:#04121c;background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+
+/* ==========================================================================
+   8. CARD DEI TITOLI — copertina generata (niente locandine ufficiali)
+   ========================================================================== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{position:relative;background:var(--glass);border:1px solid rgba(79,216,255,.14);cursor:pointer;transition:.2s}
+.card:hover{border-color:var(--cyan);box-shadow:0 0 22px rgba(79,216,255,.25);transform:translateY(-2px)}
+/* Copertina: gradiente col colore del titolo + griglia + linea di scansione animata */
+.cover{position:relative;height:132px;padding:12px;display:flex;align-items:flex-end;overflow:hidden;
+  background:
+    linear-gradient(0deg,rgba(5,8,15,.95),transparent 70%),
+    linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px) 0 0/16px 16px,
+    linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px) 0 0/16px 16px,
+    linear-gradient(135deg,var(--c1),var(--c2));}
+.cover::after{content:"";position:absolute;left:0;right:0;height:30%;top:-30%;
+  background:linear-gradient(transparent,rgba(255,255,255,.12),transparent);animation:scan 4s linear infinite}
+@keyframes scan{to{top:130%}}
+.cover h3{position:relative;z-index:1;font-size:17px;line-height:1.2;text-shadow:0 0 10px rgba(0,0,0,.8)}
+/* Etichetta Fase/anno in alto a sinistra */
+.badge{position:absolute;top:10px;left:10px;z-index:1;font-family:Rajdhani;font-weight:700;font-size:11px;letter-spacing:.15em;
+  color:var(--cyan);background:rgba(5,8,15,.7);border:1px solid var(--cyan-dim);padding:2px 8px}
+/* Indicatore "visto" in alto a destra */
+.seen{position:absolute;top:10px;right:10px;z-index:1;font-family:Rajdhani;font-weight:700;font-size:11px;letter-spacing:.15em;
+  color:var(--time);border:1px solid var(--time);padding:2px 8px;background:rgba(5,8,15,.7);box-shadow:0 0 8px rgba(46,227,138,.4)}
+.meta{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-family:Rajdhani;color:var(--muted);font-size:14px}
+.group-title{margin:22px 0 12px;font-size:14px;color:var(--gold);letter-spacing:.2em}
+
+/* ==========================================================================
+   9. GEMME DELL'INFINITO — il sistema di voto da 1 a 6
+   Ogni gemma è un SVG sfaccettato: colore base + facce chiare/scure che
+   simulano il taglio, alone luminoso, pulsazione e riflesso che scorre.
+   Spenta = solo il "castone" vuoto tratteggiato.
+   ========================================================================== */
+.gems{display:flex;gap:5px;align-items:center}
+.gem{width:18px;height:18px;display:block;overflow:visible;transition:transform .2s}
+.gem .body{fill:transparent;stroke:rgba(127,148,184,.45);stroke-width:1.5;stroke-dasharray:3 2;transition:.3s}
+.gem .facets{opacity:0;transition:.3s}
+.gem .shine{opacity:0}
+/* Gemma accesa: si riempie del suo colore e si illumina */
+.gem.on .body{fill:var(--g);stroke:var(--g);stroke-dasharray:none}
+.gem.on .facets{opacity:1}
+.gem.on{filter:drop-shadow(0 0 4px var(--g)) drop-shadow(0 0 10px var(--g));animation:pulse 2.6s ease-in-out infinite}
+/* Sfaso la pulsazione di ogni gemma per un effetto "vivo" */
+.gem:nth-child(2){animation-delay:.2s}.gem:nth-child(3){animation-delay:.4s}
+.gem:nth-child(4){animation-delay:.6s}.gem:nth-child(5){animation-delay:.8s}.gem:nth-child(6){animation-delay:1s}
+@keyframes pulse{50%{filter:drop-shadow(0 0 2px var(--g)) drop-shadow(0 0 5px var(--g))}}
+
+/* Versione grande (voto nella Scheda): cliccabile, con nome della gemma sotto */
+.gems.big{gap:18px;flex-wrap:wrap}
+.gem-slot{display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;background:none;border:none;color:var(--muted);padding:0}
+.gems.big .gem{width:46px;height:46px}
+.gem-slot:hover .gem{transform:scale(1.12) translateY(-2px)}
+.gem-slot small{font-family:Rajdhani;font-size:10px;letter-spacing:.18em;text-transform:uppercase}
+.gem-slot.on small{color:var(--text)}
+/* Riflesso che attraversa la gemma accesa */
+.gems.big .gem.on .shine{opacity:1;animation:shine 3s ease-in-out infinite}
+@keyframes shine{0%,60%{transform:translateX(-30px)}100%{transform:translateX(30px)}}
+/* "Esplosione" quando selezioni una gemma */
+.gem.pop{animation:pop .45s ease-out}
+@keyframes pop{40%{transform:scale(1.35)}}
+
+/* Banner "Guanto completo" con 6/6 */
+.gauntlet{display:flex;align-items:center;gap:12px;margin-top:16px;padding:10px 14px;
+  border:1px solid var(--gold);background:linear-gradient(90deg,rgba(245,185,66,.18),transparent);
+  font-family:Orbitron;font-weight:900;letter-spacing:.2em;color:var(--gold);font-size:13px;
+  text-shadow:0 0 12px var(--gold);opacity:0;transform:translateY(4px);transition:.4s;pointer-events:none}
+.gauntlet.on{opacity:1;transform:none}
+.gauntlet i{width:10px;height:10px;transform:rotate(45deg);background:var(--gold);box-shadow:0 0 10px var(--gold)}
+/* Lettura numerica del voto (es. 4/6) */
+.score{font-family:Orbitron;font-size:30px;font-weight:900;margin-left:auto;text-shadow:0 0 14px rgba(79,216,255,.5)}
+.score small{font-size:14px;color:var(--muted)}
+
+/* ==========================================================================
+   10. SCHERMATA SCHEDA — dettaglio del titolo
+   ========================================================================== */
+.detail{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.hero{grid-column:1/-1}
+.hero .cover{height:190px;margin:-18px -18px 0}
+.hero .cover h3{font-size:40px;font-weight:900}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.chip{font-family:Rajdhani;font-weight:600;letter-spacing:.1em;font-size:13px;border:1px solid rgba(79,216,255,.2);padding:4px 10px;color:var(--muted)}
+a.official{color:var(--cyan);font-family:Rajdhani;font-weight:700;letter-spacing:.12em;text-decoration:none;margin-left:auto}
+a.official:hover{text-shadow:0 0 8px var(--cyan)}
+.rating-head{display:flex;align-items:center;margin:22px 0 12px}
+
+/* Schede (tab) Sinossi / Riassunto completo */
+.tabs{display:flex;gap:16px;margin-bottom:14px;border-bottom:1px solid rgba(79,216,255,.14)}
+.tabs button{background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--muted);padding:8px 0;font-family:Rajdhani;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+.tabs button.on{color:var(--cyan);border-color:var(--cyan)}
+.panel p{line-height:1.6;margin:0}
+
+/* Spoiler: testo sfocato + pulsante "dati classificati" finché non lo sblocchi */
+.spoiler{position:relative}
+.spoiler p{filter:blur(7px);user-select:none;transition:.4s}
+.spoiler.open p{filter:none;user-select:auto}
+.spoiler .reveal{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;
+  background:rgba(227,38,63,.15);color:var(--red);border:1px solid var(--red);padding:8px 16px;
+  font-family:Rajdhani;font-weight:700;letter-spacing:.2em;box-shadow:0 0 16px rgba(227,38,63,.4)}
+.spoiler.open .reveal{display:none}
+.src{font-size:11px;color:var(--muted);margin-top:8px;font-family:Rajdhani;letter-spacing:.1em}
+
+/* Liste dei collegamenti prima/dopo */
+.link-list{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.link-list li{display:flex;gap:10px;align-items:center;background:var(--glass2);padding:9px 12px;border-left:2px solid var(--c,var(--cyan))}
+.link-list small{color:var(--muted);display:block;font-size:12px}
+/* Scena post-credits numerata */
+.pc{display:flex;gap:12px;align-items:center;margin-top:10px}
+.pc .n{flex:none;font-family:Orbitron;font-weight:700;width:34px;height:34px;display:grid;place-items:center;color:var(--gold);border:1px solid var(--gold);box-shadow:0 0 10px rgba(245,185,66,.3)}
+/* Testi dentro la mappa SVG */
+svg text{font-family:Rajdhani;font-weight:700;font-size:11px;fill:var(--text);letter-spacing:.08em}
+
+/* ==========================================================================
+   11. SCHERMATA PREPARAZIONE — countdown, watchlist, ripasso
+   ========================================================================== */
+.countdown{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
+.countdown div{min-width:72px;padding:10px;text-align:center;border:1px solid var(--cyan-dim);background:rgba(79,216,255,.05)}
+.countdown b{display:block;font-family:Orbitron;font-size:30px;color:var(--cyan);text-shadow:0 0 14px var(--cyan)}
+.countdown span{font-size:10px;color:var(--muted);font-family:Rajdhani;letter-spacing:.2em;text-transform:uppercase}
+/* Barra di avanzamento a segmenti */
+.bar-wrap{height:10px;background:rgba(79,216,255,.08);border:1px solid var(--cyan-dim)}
+.bar-fill{height:100%;width:var(--w);transition:width .4s;
+  background:repeating-linear-gradient(90deg,var(--cyan) 0 10px,transparent 10px 13px);box-shadow:0 0 10px var(--cyan)}
+/* Righe della watchlist con casella */
+.check{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(79,216,255,.08);cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--cyan)}
+.check .t{flex:1}
+.check small{color:var(--muted);font-family:Rajdhani}
+.recap{background:var(--glass2);border-left:2px solid var(--gold);padding:10px 12px;margin-top:8px;font-size:14px}
+
+/* ==========================================================================
+   12. RESPONSIVE — su telefono le colonne diventano una sola
+   ========================================================================== */
+@media (max-width:760px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .detail{grid-template-columns:1fr}
+  .hero .cover h3{font-size:26px}
+  nav{margin-left:0;order:3;width:100%}
+  .lang{margin-left:auto}
+  .gems.big{gap:10px}
+  .gems.big .gem{width:36px;height:36px}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header>
+  <div class="bar">
+    <div class="logo"><div class="reactor"></div><h1>MARVEL <span>TRACKER</span></h1></div>
+    <!-- data-go = id della schermata da mostrare; data-i18n = chiave di traduzione -->
+    <nav>
+      <button class="on" data-go="home" data-i18n="nav_home">Elenco</button>
+      <button data-go="detail" data-i18n="nav_detail">Scheda</button>
+      <button data-go="prep" data-i18n="nav_prep">Preparazione</button>
+    </nav>
+    <div class="lang"><button class="on" data-lang="it">IT</button><button data-lang="en">EN</button></div>
+  </div>
+</header>
+
+<main>
+  <div class="note" data-i18n="proto_note"><b>PROTOTIPO</b> · titoli, testi e date sono solo di esempio e non ancora verificati sulle fonti ufficiali.</div>
+
+  <!-- ===================== SCHERMATA 1: ELENCO ===================== -->
+  <section id="home" class="screen on">
+    <!-- Statistiche personali -->
+    <div class="stats">
+      <div class="panel stat"><div class="ring" style="--p:50"><span>50%</span></div><div class="label hud" data-i18n="st_done">Completato</div><div class="num">2<small>/4</small></div></div>
+      <div class="panel stat"><div class="label hud" data-i18n="st_hours">Ore viste</div><div class="num">4<small>h</small> 10<small>m</small></div></div>
+      <div class="panel stat"><div class="label hud" data-i18n="st_avg">Media voto</div><div class="num">5.0<small>/6</small></div><div id="avgGems" style="margin-top:6px"></div></div>
+      <div class="panel stat"><div class="label hud" data-i18n="st_fav">Preferito Fase 1</div><div class="num" style="font-size:18px">IRON MAN</div></div>
+    </div>
+
+    <h2 class="section-title" data-i18n="order_title">Ordine di visione</h2>
+    <!-- data-order = modalità di ordinamento usata da renderList() -->
+    <div class="orders">
+      <button class="on" data-order="release" data-i18n="o_release">Uscita</button>
+      <button data-order="chrono" data-i18n="o_chrono">Cronologico</button>
+      <button data-order="phase" data-i18n="o_phase">Fase / Saga</button>
+      <button data-order="char" data-i18n="o_char">Personaggio</button>
+    </div>
+    <div id="list"><!-- riempito da renderList() --></div>
+  </section>
+
+  <!-- ===================== SCHERMATA 2: SCHEDA TITOLO ===================== -->
+  <section id="detail" class="screen">
+    <div class="detail">
+      <!-- Testata: copertina, info, link ufficiale, voto a Gemme -->
+      <div class="panel hero">
+        <div class="cover" style="--c1:#b3122a;--c2:#e8a531">
+          <span class="badge">FASE 1 · 2008</span>
+          <h3>IRON MAN</h3>
+        </div>
+        <div class="row">
+          <span class="chip" data-i18n="film">FILM</span>
+          <span class="chip">126 MIN</span>
+          <span class="chip">INFINITY SAGA</span>
+          <a class="official" href="https://www.marvel.com/movies" target="_blank" rel="noopener" data-i18n="official">PAGINA UFFICIALE ↗</a>
+        </div>
+        <div class="rating-head">
+          <h3 class="section-title" style="margin:0" data-i18n="your_rating">Il tuo voto</h3>
+          <div class="score" id="score"></div>
+        </div>
+        <div id="rateGems"><!-- riempito da renderRating() --></div>
+        <div class="gauntlet" id="gauntlet"><i></i><span data-i18n="gauntlet">GUANTO COMPLETO</span><i></i></div>
+      </div>
+
+      <!-- Sinossi / riassunto con spoiler / post-credits -->
+      <div class="panel">
+        <div class="tabs">
+          <button class="on" data-tab="syn" data-i18n="t_syn">Sinossi · no spoiler</button>
+          <button data-tab="full" data-i18n="t_full">Riassunto completo</button>
+        </div>
+        <div data-pane="syn">
+          <p data-i18n="syn_text">[Qui andrà la sinossi ufficiale, citata dalla fonte.] Testo segnaposto: un geniale inventore costruisce un'armatura ad alta tecnologia e decide di usarla per proteggere il mondo.</p>
+          <div class="src" data-i18n="syn_src">FONTE: MARVEL.COM (DA INSERIRE)</div>
+        </div>
+        <div data-pane="full" hidden>
+          <div class="spoiler">
+            <p data-i18n="full_text">Testo segnaposto del riassunto completo con spoiler, scritto da Claude. Qui verrà raccontata tutta la trama, compreso il finale e le rivelazioni principali, in modo da poterlo rileggere prima di un nuovo film.</p>
+            <button class="reveal" data-i18n="reveal">⚠ SBLOCCA SPOILER</button>
+          </div>
+          <div class="src" data-i18n="full_src">SCRITTO DA CLAUDE · FONTI SECONDARIE</div>
+        </div>
+
+        <h3 class="section-title" style="margin-top:24px" data-i18n="postcredits">Scene post-credits</h3>
+        <div class="pc"><div class="n">01</div>
+          <div class="spoiler" style="flex:1"><p data-i18n="pc_text">Introduce un personaggio chiave e anticipa la squadra degli Avengers.</p><button class="reveal" style="padding:4px 10px">⚠</button></div>
+        </div>
+      </div>
+
+      <!-- Collegamenti prima/dopo e mappa -->
+      <div class="panel">
+        <h3 class="section-title" data-i18n="links">Collegamenti</h3>
+        <div class="label hud" style="margin:4px 0 8px" data-i18n="before">Da vedere prima</div>
+        <ul class="link-list"><li style="--c:var(--muted)"><span data-i18n="none_before">Nessuno: è il primo film MCU</span></li></ul>
+        <div class="label hud" style="margin:16px 0 8px" data-i18n="after">Cosa viene dopo</div>
+        <ul class="link-list">
+          <li style="--c:var(--red)"><div>Iron Man 2<small data-i18n="why1">Continua la storia di Tony Stark</small></div></li>
+          <li style="--c:var(--gold)"><div>The Avengers<small data-i18n="why2">Tony entra nella squadra</small></div></li>
+        </ul>
+        <div class="label hud" style="margin:16px 0 8px" data-i18n="map">Mappa dei collegamenti</div>
+        <!-- Mappa: nodi = titoli, linee = collegamenti. Il nodo rosso è il titolo aperto. -->
+        <svg viewBox="0 0 300 170" width="100%" role="img" aria-label="Mappa dei collegamenti">
+          <defs>
+            <!-- Filtro bagliore per linee e nodo attivo -->
+            <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g stroke="#4fd8ff" stroke-width="1.2" opacity=".6" filter="url(#glow)" stroke-dasharray="4 3">
+            <line x1="60" y1="85" x2="150" y2="35"/><line x1="60" y1="85" x2="150" y2="135"/>
+            <line x1="150" y1="35" x2="245" y2="85"/><line x1="150" y1="135" x2="245" y2="85"/>
+          </g>
+          <g fill="#08111f" stroke="#4fd8ff" stroke-width="1.2">
+            <circle cx="60" cy="85" r="22" fill="rgba(227,38,63,.25)" stroke="#e3263f" filter="url(#glow)"/>
+            <circle cx="150" cy="35" r="17"/><circle cx="150" cy="135" r="17"/><circle cx="245" cy="85" r="20"/>
+          </g>
+          <text x="60" y="89" text-anchor="middle">IM</text>
+          <text x="150" y="39" text-anchor="middle">IM2</text>
+          <text x="150" y="139" text-anchor="middle">CA</text>
+          <text x="245" y="89" text-anchor="middle">AVG</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SCHERMATA 3: PREPARAZIONE ===================== -->
+  <section id="prep" class="screen">
+    <div class="panel" style="margin-bottom:16px">
+      <div class="label hud" data-i18n="next_release">Prossima uscita</div>
+      <h2 style="font-size:clamp(22px,5vw,38px);font-weight:900;margin-top:6px;text-shadow:0 0 18px rgba(79,216,255,.4)">AVENGERS: DOOMSDAY</h2>
+      <div class="countdown" id="countdown"><!-- riempito da countdown() --></div>
+      <div class="src" data-i18n="date_note">DATA DI ESEMPIO: 18 DICEMBRE 2026 (DA VERIFICARE SU MARVEL.COM)</div>
+      <div class="label hud" style="margin-top:18px" data-i18n="prep_progress">Avanzamento preparazione</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
+        <div class="bar-wrap" style="flex:1"><div class="bar-fill" id="prepBar" style="--w:40%"></div></div>
+        <b class="hud" id="prepTxt">2/5</b>
+      </div>
+    </div>
+
+    <div class="detail">
+      <!-- Watchlist minima / estesa -->
+      <div class="panel">
+        <div class="tabs">
+          <button class="on" data-wl="min" data-i18n="wl_min">Lista minima</button>
+          <button data-wl="ext" data-i18n="wl_ext">Lista estesa</button>
+        </div>
+        <div id="watchlist"><!-- riempito da renderWL() --></div>
+        <div class="src" id="wlTime"></div>
+      </div>
+      <!-- Ripasso veloce -->
+      <div class="panel">
+        <h3 class="section-title" data-i18n="recap_title">Ripasso veloce</h3>
+        <p style="color:var(--muted);font-size:13px" data-i18n="recap_sub">Cosa devi ricordare se non hai tempo di rivedere tutto:</p>
+        <div class="recap" data-i18n="recap1">01 · Testo segnaposto: punto chiave dalla Saga dell'Infinito.</div>
+        <div class="recap" data-i18n="recap2">02 · Testo segnaposto: cosa è successo al Multiverso.</div>
+        <div class="recap" data-i18n="recap3">03 · Testo segnaposto: i personaggi da tenere d'occhio.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ============================================================================
+   DATI DI ESEMPIO (segnaposto, NON verificati: nell'app vera arriveranno
+   da file dati con fonti ufficiali)
+   ============================================================================ */
+
+/* Le 6 Gemme in ordine di voto: [variabile colore, nome IT, nome EN] */
+const GEMS = [
+  ["space","Spazio","Space"], ["mind","Mente","Mind"], ["reality","Realtà","Reality"],
+  ["power","Potere","Power"], ["time","Tempo","Time"], ["soul","Anima","Soul"]
+];
+
+/* Titoli di esempio.
+   t = titolo per lingua, y = anno, min = durata, phase = Fase,
+   chrono = posizione in ordine cronologico, c = colori copertina,
+   seen = visto, r = voto 0–6, chars = personaggi (per i percorsi) */
+const T = [
+  {id:"im",  t:{it:"Iron Man",en:"Iron Man"}, y:2008,min:126,phase:1,chrono:2,c:["#b3122a","#e8a531"],seen:true, r:6,chars:["Iron Man"]},
+  {id:"hulk",t:{it:"L'incredibile Hulk",en:"The Incredible Hulk"}, y:2008,min:112,phase:1,chrono:3,c:["#0f5132","#2ee38a"],seen:true, r:4,chars:["Hulk"]},
+  {id:"ca",  t:{it:"Captain America: Il primo vendicatore",en:"Captain America: The First Avenger"}, y:2011,min:124,phase:1,chrono:1,c:["#13306b","#3d8bff"],seen:false,r:0,chars:["Captain America"]},
+  {id:"avg", t:{it:"The Avengers",en:"The Avengers"}, y:2012,min:143,phase:1,chrono:4,c:["#2a1a5e","#b05cff"],seen:false,r:0,chars:["Iron Man","Captain America","Hulk"]},
+];
+
+/* Watchlist di preparazione: [titolo, minuti (0 = serie), già visto] */
+const WL = {
+  min:[["Avengers: Endgame",181,true],["Loki",0,true],["Doctor Strange nel Multiverso della Follia",126,false]],
+  ext:[["Avengers: Infinity War",149,true],["Avengers: Endgame",181,true],["Loki",0,false],["What If...?",0,false],["Doctor Strange nel Multiverso della Follia",126,false]]
+};
+
+/* ============================================================================
+   TRADUZIONI
+   - I testi italiani sono già nell'HTML: li leggo all'avvio (IT).
+   - Le versioni inglesi stanno in I18N.en, con la stessa chiave data-i18n.
+   ============================================================================ */
+const I18N = {en:{
+  nav_home:"List",nav_detail:"Title",nav_prep:"Prep",
+  proto_note:"<b>PROTOTYPE</b> · titles, texts and dates are examples only and not yet checked against official sources.",
+  st_done:"Completed",st_hours:"Hours watched",st_avg:"Avg rating",st_fav:"Phase 1 favourite",
+  order_title:"Viewing order",o_release:"Release",o_chrono:"Chronological",o_phase:"Phase / Saga",o_char:"Character",
+  film:"MOVIE",official:"OFFICIAL PAGE ↗",your_rating:"Your rating",gauntlet:"GAUNTLET COMPLETE",
+  t_syn:"Synopsis · no spoilers",t_full:"Full recap",
+  syn_text:"[The official synopsis will go here, quoted with its source.] Placeholder: a brilliant inventor builds a high-tech suit of armour and decides to use it to protect the world.",
+  syn_src:"SOURCE: MARVEL.COM (TO ADD)",
+  full_text:"Placeholder for the full spoiler recap written by Claude. It will cover the whole plot, including the ending and key reveals, so you can reread it before a new movie.",
+  reveal:"⚠ UNLOCK SPOILERS",full_src:"WRITTEN BY CLAUDE · SECONDARY SOURCES",
+  postcredits:"Post-credits scenes",pc_text:"Introduces a key character and teases the Avengers team.",
+  links:"Connections",before:"Watch before",none_before:"None: it's the first MCU movie",after:"What comes next",
+  why1:"Continues Tony Stark's story",why2:"Tony joins the team",map:"Connection map",
+  next_release:"Next release",date_note:"EXAMPLE DATE: 18 DECEMBER 2026 (TO VERIFY ON MARVEL.COM)",
+  prep_progress:"Prep progress",wl_min:"Essential list",wl_ext:"Extended list",
+  recap_title:"Quick recap",recap_sub:"What to remember if you don't have time to rewatch:",
+  recap1:"01 · Placeholder: key point from the Infinity Saga.",recap2:"02 · Placeholder: what happened to the Multiverse.",recap3:"03 · Placeholder: characters to watch."
+}};
+const IT = {};
+document.querySelectorAll("[data-i18n]").forEach(e => IT[e.dataset.i18n] = e.innerHTML);
+I18N.it = IT;
+
+/* Piccole etichette usate dentro il codice generato */
+const L = {
+  it:{phase:"Fase",seen:"VISTO",d:"giorni",h:"ore",m:"min",s:"sec",total:"Tempo totale",series:"serie",example:"esempio"},
+  en:{phase:"Phase",seen:"SEEN",d:"days",h:"hours",m:"min",s:"sec",total:"Total time",series:"series",example:"example"}
+};
+
+/* Stato corrente dell'interfaccia */
+let lang = "it";       // lingua attiva
+let order = "release"; // ordine di visione attivo
+let wl = "min";        // watchlist attiva (minima/estesa)
+let rating = 6;        // voto della scheda di esempio
+
+/* ============================================================================
+   GEMMA SVG
+   Esagono sfaccettato (viewBox 40x40):
+   - .body   = sagoma esterna (colore della gemma o castone vuoto)
+   - .facets = 6 facce chiare/scure + "tavola" centrale che simulano il taglio
+   - .shine  = riflesso bianco che scorre (solo versione grande)
+   ============================================================================ */
+function gemSVG(i, on) {
+  const g = GEMS[i][0];
+  return `<svg class="gem${on ? " on" : ""}" viewBox="0 0 40 40" style="--g:var(--${g})" aria-hidden="true">
+    <polygon class="body" points="20,2 36,11 36,29 20,38 4,29 4,11"/>
+    <g class="facets">
+      <polygon points="20,2 36,11 28,15 20,10" fill="#fff" opacity=".55"/>
+      <polygon points="36,11 36,29 28,25 28,15" fill="#fff" opacity=".18"/>
+      <polygon points="36,29 20,38 20,30 28,25" fill="#000" opacity=".25"/>
+      <polygon points="20,38 4,29 12,25 20,30" fill="#000" opacity=".4"/>
+      <polygon points="4,29 4,11 12,15 12,25" fill="#000" opacity=".15"/>
+      <polygon points="4,11 20,2 20,10 12,15" fill="#fff" opacity=".3"/>
+      <polygon points="20,10 28,15 28,25 20,30 12,25 12,15" fill="#fff" opacity=".12"/>
+      <circle cx="16" cy="14" r="2" fill="#fff" opacity=".9"/>
+    </g>
+    <rect class="shine" x="8" y="0" width="6" height="40" fill="#fff" opacity=".35" transform="skewX(-20)"
+          style="clip-path:polygon(50% 5%,90% 27.5%,90% 72.5%,50% 95%,10% 72.5%,10% 27.5%)"/>
+  </svg>`;
+}
+/* Fila di 6 gemme piccole (per card e statistiche): accese le prime n */
+function gemsRow(n) {
+  return `<div class="gems">${GEMS.map((_, i) => gemSVG(i, i < n)).join("")}</div>`;
+}
+
+/* ============================================================================
+   ELENCO: card e ordinamenti
+   ============================================================================ */
+function card(x) {
+  return `<div class="card" data-open="detail">
+    <div class="cover" style="--c1:${x.c[0]};--c2:${x.c[1]}">
+      <span class="badge">${L[lang].phase.toUpperCase()} ${x.phase} · ${x.y}</span>
+      ${x.seen ? `<span class="seen">✓ ${L[lang].seen}</span>` : ""}
+      <h3>${x.t[lang]}</h3>
+    </div>
+    <div class="meta"><span>${x.min} MIN</span>${gemsRow(x.r)}</div>
+  </div>`;
+}
+const grid = arr => `<div class="grid">${arr.map(card).join("")}</div>`;
+
+function renderList() {
+  const el = document.getElementById("list");
+  let html = "";
+  if (order === "release") html = grid(T);                                        // ordine di uscita (già così nei dati)
+  else if (order === "chrono") html = grid([...T].sort((a,b) => a.chrono - b.chrono)); // ordine degli eventi
+  else if (order === "phase") html = `<h3 class="group-title">INFINITY SAGA · ${L[lang].phase.toUpperCase()} 1</h3>` + grid(T); // raggruppato per Fase
+  else ["Iron Man","Captain America","Hulk"].forEach(c => {                       // un gruppo per personaggio
+    html += `<h3 class="group-title">${c.toUpperCase()}</h3>` + grid(T.filter(x => x.chars.includes(c)));
+  });
+  el.innerHTML = html;
+  el.querySelectorAll("[data-open]").forEach(c => c.onclick = () => go("detail")); // clic su card → Scheda
+}
+
+/* ============================================================================
+   SCHEDA: voto a Gemme cliccabile
+   ============================================================================ */
+function renderRating(popIndex) {
+  const box = document.getElementById("rateGems");
+  box.innerHTML = `<div class="gems big">${GEMS.map((g, i) =>
+    `<button class="gem-slot${i < rating ? " on" : ""}" data-v="${i+1}" title="${g[lang === "it" ? 1 : 2]}">
+       ${gemSVG(i, i < rating)}<small>${g[lang === "it" ? 1 : 2]}</small>
+     </button>`).join("")}</div>`;
+  // Clic su una gemma = voto pari alla sua posizione; ricliccare la stessa azzera
+  box.querySelectorAll(".gem-slot").forEach(b => b.onclick = () => {
+    const v = +b.dataset.v;
+    rating = (v === rating) ? 0 : v;
+    renderRating(v - 1);
+  });
+  // Piccola animazione "pop" sulla gemma appena cliccata
+  if (popIndex !== undefined) box.querySelectorAll(".gem")[popIndex]?.classList.add("pop");
+  document.getElementById("score").innerHTML = `${rating}<small>/6</small>`;
+  document.getElementById("gauntlet").classList.toggle("on", rating === 6); // banner con 6/6
+}
+
+/* ============================================================================
+   PREPARAZIONE: watchlist, avanzamento, countdown
+   ============================================================================ */
+function renderWL() {
+  const items = WL[wl];
+  document.getElementById("watchlist").innerHTML = items.map(i =>
+    `<label class="check"><input type="checkbox" ${i[2] ? "checked" : ""}><span class="t">${i[0]}</span><small>${i[1] ? i[1] + " MIN" : L[lang].series.toUpperCase()}</small></label>`).join("");
+  // Tempo totale della lista (solo film, le serie hanno 0 nei dati di esempio)
+  const tot = items.reduce((a, i) => a + i[1], 0);
+  document.getElementById("wlTime").textContent = `${L[lang].total.toUpperCase()}: ${Math.floor(tot/60)}H ${tot%60}M (${L[lang].example})`;
+  // Aggiorna barra e contatore quando spunti una casella
+  const upd = () => {
+    const boxes = [...document.querySelectorAll("#watchlist input")];
+    const done = boxes.filter(x => x.checked).length;
+    document.getElementById("prepTxt").textContent = `${done}/${boxes.length}`;
+    document.getElementById("prepBar").style.setProperty("--w", done / boxes.length * 100 + "%");
+  };
+  document.querySelectorAll("#watchlist input").forEach(i => i.onchange = upd);
+  upd();
+}
+
+/* Countdown fino alla data di esempio, aggiornato ogni secondo */
+function countdown() {
+  const secs = Math.max(0, (new Date("2026-12-18T00:00:00") - new Date()) / 1000);
+  const v = [Math.floor(secs/86400), Math.floor(secs%86400/3600), Math.floor(secs%3600/60), Math.floor(secs%60)];
+  document.getElementById("countdown").innerHTML = ["d","h","m","s"]
+    .map((k, i) => `<div><b>${String(v[i]).padStart(2,"0")}</b><span>${L[lang][k]}</span></div>`).join("");
+}
+
+/* ============================================================================
+   NAVIGAZIONE E INTERAZIONI
+   ============================================================================ */
+/* Mostra la schermata con id s e evidenzia il pulsante corrispondente */
+function go(s) {
+  document.querySelectorAll(".screen").forEach(e => e.classList.toggle("on", e.id === s));
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.go === s));
+  scrollTo(0, 0);
+}
+/* Attiva un solo pulsante in un gruppo */
+const activate = (sel, btn) => document.querySelectorAll(sel).forEach(x => x.classList.toggle("on", x === btn));
+
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.go));
+document.querySelectorAll(".orders button").forEach(b => b.onclick = () => { order = b.dataset.order; activate(".orders button", b); renderList(); });
+document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => {
+  activate("[data-tab]", b);
+  document.querySelectorAll("[data-pane]").forEach(p => p.hidden = p.dataset.pane !== b.dataset.tab);
+});
+document.querySelectorAll("[data-wl]").forEach(b => b.onclick = () => { wl = b.dataset.wl; activate("[data-wl]", b); renderWL(); });
+/* Sblocco spoiler: aggiunge .open al contenitore */
+document.querySelectorAll(".spoiler .reveal").forEach(b => b.onclick = () => b.parentElement.classList.add("open"));
+
+/* Cambio lingua: sostituisce i testi con data-i18n e ridisegna le parti generate */
+document.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => {
+  lang = b.dataset.lang;
+  document.documentElement.lang = lang;
+  activate("[data-lang]", b);
+  document.querySelectorAll("[data-i18n]").forEach(e => { const v = I18N[lang][e.dataset.i18n]; if (v) e.innerHTML = v; });
+  renderList(); renderWL(); renderRating(); countdown();
+});
+
+/* ============================================================================
+   AVVIO
+   ============================================================================ */
+document.getElementById("avgGems").innerHTML = gemsRow(5);
+renderList(); renderWL(); renderRating(); countdown();
+setInterval(countdown, 1000);
+</script>
+</body>
+</html>
