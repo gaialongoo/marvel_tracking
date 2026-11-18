@@ -8,15 +8,14 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 
 | Area | Cosa fa |
 | --- | --- |
-| **Collezioni Disney+** | Le schede in alto sono le liste di Disney+ Italia (MCU, Infinity/Multiverse Saga, Fantastici 4, Defenders, Spider-Verse, Legacy: Mutanti…) e i suoi Grandi personaggi (Daredevil, Spider-Man, Wolverine…). Ogni lista ha due versioni: **Disney+** (esattamente come la mostra Disney+, al massimo 10 titoli) e **Completa** (integrata, con i titoli aggiunti segnati come "aggiunto"). Esclusi extra, documentari e animazione per bambini. Si combinano con qualsiasi ordine, anche "Come su Disney+" |
-| **Universi** | Continuità narrative (MCU, X-Men Fox, Fantastici 4 Fox, Sony, Animazione): servono per l'ordine cronologico e le statistiche |
+| **Universi** | Schede in alto: Tutto, MCU, X-Men (Fox), Fantastici 4 (Fox), Sony, Animazione. Si combinano con qualsiasi ordine; il cronologico si calcola dentro ogni universo |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
 | **Tipi** | Film, Serie (TV), Animazione (ANI), Speciali (SPC, es. Licantropus), Corti One-Shot (ONE): la sigla compare nell'angolo della miniatura. I filtri per tipo sono a **scelta multipla** (es. Film + Serie, senza Corti) |
 | **Episodi** | Per serie e animazione si spuntano i singoli episodi; nell'elenco un anello mostra la % vista, al 100% diventa la spunta |
 | **Riassunti** | Sinossi ufficiale senza spoiler (con fonte) + riassunto completo con spoiler, nascosto finché non lo sblocchi |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
-| **Preparazione** | Prossime uscite con conto alla rovescia, liste minima / Disney+ / completa con tempo mancante, ripasso veloce |
+| **Preparazione** | Prossime uscite con conto alla rovescia, lista minima / completa con tempo mancante, ripasso veloce |
 | **Statistiche** | Completamento, ore viste, media voti, preferito; dettaglio per universo, Fase, tipo e voti |
 | **Salvataggio** | Automatico, **solo su questo PC** (nel browser). Niente account. Backup esportabile/importabile in `.json` |
 | **Lingue** | Italiano e inglese |
@@ -58,7 +57,7 @@ marvel_tracker/
 │   ├── hooks.ts, utils.ts, toast.ts
 │   ├── data/
 │   │   ├── titles.ts       ← CATALOGO dei titoli (fonti in cima al file)
-│   │   ├── collections.ts  ← collezioni Disney+ (versione ufficiale e completa)
+│   │   ├── collections.ts  ← liste Disney+ (pronte, per ora NON mostrate nell'app)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
 │   └── components/         ← TopBar, Home, Detail, Prep, ConnectionMap, Gem…
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)

@@ -15,15 +15,13 @@ export function Prep() {
   const { t, lang } = useT();
   const { data } = useStore();
   const [upId, setUpId] = useState(UPCOMING[0].id);
-  const [wl, setWl] = useState<"min" | "dp" | "full">("min");
+  const [wl, setWl] = useState<"min" | "full">("min");
 
   const u = UPCOMING.find((x) => x.id === upId) ?? UPCOMING[0];
-  // Liste disponibili: la Disney+ solo se esiste per questa uscita
-  const lists = (["min", "dp", "full"] as const).filter((w) => w !== "dp" || u.dp.length > 0);
-  const cur = lists.includes(wl) ? wl : "min";
-  // Completa = Disney+ + aggiunte (senza doppioni); "added" = non nella lista Disney+
-  const ids = cur === "min" ? u.min : cur === "dp" ? u.dp : [...new Set([...u.dp, ...u.add])];
-  const added = new Set(cur === "full" && u.dp.length ? ids.filter((id) => !u.dp.includes(id)) : []);
+  // Liste: Minima e Completa. (La lista "Disney+" da sola è per ora nascosta:
+  // la Completa = titoli della riga Disney+ + aggiunte, senza doppioni.)
+  const lists = ["min", "full"] as const;
+  const ids = wl === "min" ? u.min : [...new Set([...u.dp, ...u.add])];
   const items = ids.map((id) => BY_ID[id]).filter(Boolean);
   const done = items.filter((d) => data.seen[d.id]).length;
   const total = items.reduce((a, d) => a + d.min, 0);
@@ -55,8 +53,8 @@ export function Prep() {
         <div className="panel">
           <div className="tabs-seg">
             {lists.map((w) => (
-              <button key={w} className={cur === w ? "on" : ""} onClick={() => setWl(w)}>
-                {t(w === "min" ? "minList" : w === "dp" ? "dpList" : "fullList")}
+              <button key={w} className={wl === w ? "on" : ""} onClick={() => setWl(w)}>
+                {t(w === "min" ? "minList" : "fullList")}
               </button>
             ))}
           </div>
@@ -66,7 +64,7 @@ export function Prep() {
           </div>
           <div className="progress" style={{ "--w": `${items.length ? (done / items.length) * 100 : 0}%` } as React.CSSProperties}><i /></div>
           <div className="wl" style={{ marginTop: 8 }}>
-            {items.map((d) => <TitleRow key={d.id} d={d} added={added.has(d.id)} />)}
+            {items.map((d) => <TitleRow key={d.id} d={d} />)}
           </div>
         </div>
 
