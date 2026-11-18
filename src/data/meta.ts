@@ -17,6 +17,8 @@ export const UNIVERSES: Universe[] = [
   { k: "xmen", it: "X-Men (20th Century Fox)", en: "X-Men (20th Century Fox)", short: "X-Men" },
   { k: "f4fox", it: "Fantastici 4 (20th Century Fox)", en: "Fantastic Four (20th Century Fox)", short: "F4 Fox" },
   { k: "sony", it: "Spider-Man (Sony Pictures)", en: "Spider-Man (Sony Pictures)", short: "Sony" },
+  { k: "other", it: "Altri film Marvel (altri studi)", en: "Other Marvel films (other studios)", short: "Altri film" },
+  { k: "tv", it: "Serie TV Marvel fuori dall'MCU", en: "Marvel TV outside the MCU", short: "Serie TV" },
   { k: "animation", it: "Animazione Marvel", en: "Marvel Animation", short: "Animazione" },
 ];
 
@@ -51,6 +53,10 @@ export const PATHS: Path[] = [
   { key: "fantastic4", kind: "chars", it: "Fantastici 4", en: "Fantastic Four" },
   { key: "wolverine", kind: "chars", it: "Wolverine", en: "Wolverine" },
   { key: "deadpool", kind: "chars", it: "Deadpool", en: "Deadpool" },
+  { key: "venom", kind: "chars", it: "Venom", en: "Venom" },
+  { key: "blade", kind: "chars", it: "Blade", en: "Blade" },
+  { key: "ghostrider", kind: "chars", it: "Ghost Rider", en: "Ghost Rider" },
+  { key: "shield", kind: "chars", it: "S.H.I.E.L.D.", en: "S.H.I.E.L.D." },
   // Temi
   { key: "avengers", kind: "themes", it: "Tema · Avengers", en: "Theme · Avengers" },
   { key: "multi", kind: "themes", it: "Tema · Multiverso", en: "Theme · Multiverse" },

@@ -56,10 +56,49 @@ interface Spec {
   uni?: string;   // universo (predefinito "mcu")
   cr?: number;    // posizione cronologica per i titoli fuori MCU (= ordine di uscita, da verificare)
 }
+/* ----------------------------------------------------------------------------
+   VERIFICHE DALLE PAGINE DISNEY+ ITALIA DEI SINGOLI TITOLI (18/11/2026)
+   disneyplus.com/it-it/browse/entity-… → durata (film/corti/speciali),
+   anno, numero di episodi. Le pagine delle serie NON mostrano la durata
+   degli episodi: per le serie la durata totale resta "da verificare".
+   min = durata ufficiale · eps = episodi confermati · y = anno confermato
+   ---------------------------------------------------------------------------- */
+const DPV: Record<string, { min?: number; eps?: boolean; y?: boolean }> = {
+  // Film
+  im: { min: 127 }, im2: { min: 124 }, thor: { min: 117 }, ca: { min: 126 }, avg: { min: 146 },
+  im3: { min: 132 }, tdw: { min: 115 }, tws: { min: 139 }, gotg: { min: 123 }, aou: { min: 144 },
+  antman: { min: 120 }, cw: { min: 151 }, ds: { min: 116 }, gotg2: { min: 138 }, homecoming: { min: 133, y: true },
+  ragnarok: { min: 133 }, bp: { min: 138 }, iw: { min: 154 }, amw: { min: 122 }, cm: { min: 127 },
+  eg: { min: 185 }, ffh: { min: 129, y: true }, bw: { min: 136 }, shangchi: { min: 135 }, eternals: { min: 156 },
+  nwh: { min: 148, y: true }, dsmom: { min: 128 }, lat: { min: 121 }, wf: { min: 163 }, quantumania: { min: 126 },
+  gotg3: { min: 152 }, marvels: { min: 106 }, dpw: { min: 130 }, bnw: { min: 120 }, thunderbolts: { min: 128 }, ff: { min: 116 },
+  // Corti (Irripetibili Marvel) e speciali
+  "os-consultant": { min: 3, y: true }, "os-item47": { min: 11, y: true }, "os-carter": { min: 15, y: true },
+  "os-king": { min: 13, y: true }, "os-hammer": { min: 3, y: true },
+  wbn: { min: 54, y: true }, holiday: { min: 44, y: true }, punolk: { min: 50, y: true },
+  // Serie: episodi; anno solo se coincide con l'inizio/fine indicati da Disney+
+  wv: { eps: true, y: true }, fatws: { eps: true, y: true }, loki1: { eps: true, y: true }, loki2: { eps: true, y: true },
+  whatif1: { eps: true, y: true }, whatif2: { eps: true }, whatif3: { eps: true, y: true },
+  hawkeye: { eps: true, y: true }, moonknight: { eps: true, y: true }, msmarvel: { eps: true, y: true }, shehulk: { eps: true, y: true },
+  groot1: { eps: true, y: true }, groot2: { eps: true, y: true }, si: { eps: true, y: true }, echo: { eps: true, y: true },
+  agatha: { eps: true, y: true }, ddba1: { eps: true, y: true }, ddba2: { eps: true, y: true }, ironheart: { eps: true, y: true },
+  eow: { eps: true, y: true }, zombies: { eps: true, y: true }, visionquest: { eps: true, y: true },
+  dd1: { eps: true, y: true }, dd2: { eps: true }, dd3: { eps: true, y: true },
+  jj1: { eps: true, y: true }, jj2: { eps: true }, jj3: { eps: true, y: true },
+  lc1: { eps: true, y: true }, lc2: { eps: true, y: true }, if1: { eps: true, y: true }, if2: { eps: true, y: true },
+  defenders: { eps: true, y: true }, pun1: { eps: true, y: true }, pun2: { eps: true, y: true },
+};
+
 function mk(s: Spec): Title {
   const uni = s.uni ?? "mcu";
   const pos = uni === "mcu" ? TIMELINE.indexOf(s.id) : -1;
   const ok = new Set<Field>(s.ok ?? []);
+  // Applica le verifiche Disney+ (durata ufficiale sostituisce quella stimata)
+  const v = DPV[s.id];
+  if (v?.min) { s = { ...s, min: v.min }; ok.add("min"); }
+  if (v?.eps) ok.add("eps");
+  if (v?.y || v?.min) ok.add("y");
+  if (v) ok.add("it");
   if (pos >= 0) ok.add("chrono");                          // in [T] → ordine confermato
   const relevant: Field[] = ["it", "y", "min", "pc", "chrono"];
   if (s.eps) relevant.push("eps");
@@ -67,7 +106,9 @@ function mk(s: Spec): Title {
   return {
     id: s.id, uni, type: s.type, t: { it: s.it, en: s.en }, y: s.y, min: s.min, eps: s.eps,
     phase: s.ph, saga: s.ph ? (s.ph <= 3 ? "inf" : "multi") : undefined,
-    chrono: pos >= 0 ? pos + 1 : s.cr ?? TIMELINE.length + 1,
+    // MCU: posizione nella timeline ufficiale (fuori timeline = in fondo);
+    // altri universi: nessuna timeline ufficiale → anno di uscita (da verificare)
+    chrono: pos >= 0 ? pos + 1 : uni === "mcu" ? TIMELINE.length + 1 : s.y,
     c: s.c, abbr: s.ab, poster: null, chars: s.ch ?? [], themes: s.th ?? [],
     before: s.b ?? [], after: s.a ?? [], pc: s.pc ?? 0,
     unverified: relevant.filter((f) => !ok.has(f)),
@@ -316,6 +357,98 @@ const OTHERS: Title[] = [
   mk({ uni: "animation", cr: 4, id: "xmen97", type: "anim", it: "X-Men ’97", en: "X-Men ’97", y: 2024, min: 570, eps: 19, c: "#3b4a5c", ab: "X97", ch: ["wolverine"], ok: DPS }),
   mk({ uni: "animation", cr: 5, id: "fnsm", type: "anim", it: "Il vostro amichevole Spider-Man di quartiere", en: "Your Friendly Neighborhood Spider-Man", y: 2025, min: 280, eps: 10, c: "#8a1c2a", ab: "FNSM", ch: ["spidey", "daredevil"], ok: DPS }),
   mk({ uni: "animation", cr: 6, id: "jeff", type: "anim", it: "Jeff e i suoi amici supereroi", en: "Jeff and His Superhero Friends", y: 2026, min: 30, eps: 6, c: "#2a5a6b", ab: "JEFF", ok: DPS }),
+
+  /* ===== Spider-Man e Sony (fuori da Disney+) ===== */
+  mk({ uni: "sony", id: "sm1", type: "film", it: "Spider-Man", en: "Spider-Man", y: 2002, min: 121, c: "#8a1c2a", ab: "SM1", ch: ["spidey"] }),
+  mk({ uni: "sony", id: "sm2", type: "film", it: "Spider-Man 2", en: "Spider-Man 2", y: 2004, min: 127, c: "#8a1c2a", ab: "SM2", ch: ["spidey"] }),
+  mk({ uni: "sony", id: "sm3", type: "film", it: "Spider-Man 3", en: "Spider-Man 3", y: 2007, min: 139, c: "#2a2a3a", ab: "SM3", ch: ["spidey"] }),
+  mk({ uni: "sony", id: "venom", type: "film", it: "Venom", en: "Venom", y: 2018, min: 112, c: "#1a1a22", ab: "VNM", ch: ["venom"] }),
+  mk({ uni: "sony", id: "venom2", type: "film", it: "Venom - La furia di Carnage", en: "Venom: Let There Be Carnage", y: 2021, min: 97, c: "#5a1414", ab: "VNM2", ch: ["venom"] }),
+  mk({ uni: "sony", id: "morbius", type: "film", it: "Morbius", en: "Morbius", y: 2022, min: 104, c: "#2a3a4a", ab: "MRB" }),
+  mk({ uni: "sony", id: "atsv", type: "anim", it: "Spider-Man: Across the Spider-Verse", en: "Spider-Man: Across the Spider-Verse", y: 2023, min: 140, c: "#6b1f5a", ab: "ATSV", ch: ["spidey"] }),
+  mk({ uni: "sony", id: "madameweb", type: "film", it: "Madame Web", en: "Madame Web", y: 2024, min: 116, c: "#6b2a3a", ab: "MW" }),
+  mk({ uni: "sony", id: "venom3", type: "film", it: "Venom: The Last Dance", en: "Venom: The Last Dance", y: 2024, min: 109, c: "#1a1a22", ab: "VNM3", ch: ["venom"] }),
+  mk({ uni: "sony", id: "kraven", type: "film", it: "Kraven - Il cacciatore", en: "Kraven the Hunter", y: 2024, min: 127, c: "#4a3a1a", ab: "KRV" }),
+
+  /* ===== Fox, fuori da Disney+ ===== */
+  mk({ uni: "xmen", id: "newmutants", type: "film", it: "The New Mutants", en: "The New Mutants", y: 2020, min: 94, c: "#3a2a4a", ab: "NM" }),
+
+  /* ===== Altri film Marvel (altri studi) ===== */
+  mk({ uni: "other", id: "daredevil03", type: "film", it: "Daredevil", en: "Daredevil", y: 2003, min: 103, c: "#6b1414", ab: "DD03", ch: ["daredevil"] }),
+  mk({ uni: "other", id: "elektra", type: "film", it: "Elektra", en: "Elektra", y: 2005, min: 97, c: "#5a1a2a", ab: "ELK", ch: ["daredevil"] }),
+  mk({ uni: "other", id: "howard", type: "film", it: "Howard e il destino del mondo", en: "Howard the Duck", y: 1986, min: 110, c: "#5a4a2a", ab: "HTD" }),
+  mk({ uni: "other", id: "punisher89", type: "film", it: "The Punisher (1989)", en: "The Punisher", y: 1989, min: 89, c: "#2a2a2a", ab: "P89", ch: ["punisher"] }),
+  mk({ uni: "other", id: "capamerica90", type: "film", it: "Captain America (1990)", en: "Captain America", y: 1990, min: 97, c: "#24406b", ab: "CA90", ch: ["cap"] }),
+  mk({ uni: "other", id: "blade", type: "film", it: "Blade", en: "Blade", y: 1998, min: 120, c: "#2a1a1a", ab: "BLD", ch: ["blade"] }),
+  mk({ uni: "other", id: "blade2", type: "film", it: "Blade II", en: "Blade II", y: 2002, min: 117, c: "#2a1a1a", ab: "BLD2", ch: ["blade"] }),
+  mk({ uni: "other", id: "hulk03", type: "film", it: "Hulk", en: "Hulk", y: 2003, min: 138, c: "#2f5d3a", ab: "HLK03", ch: ["hulk"] }),
+  mk({ uni: "other", id: "punisher04", type: "film", it: "The Punisher (2004)", en: "The Punisher", y: 2004, min: 124, c: "#2a2a2a", ab: "P04", ch: ["punisher"] }),
+  mk({ uni: "other", id: "blade3", type: "film", it: "Blade: Trinity", en: "Blade: Trinity", y: 2004, min: 113, c: "#2a1a1a", ab: "BLD3", ch: ["blade"] }),
+  mk({ uni: "other", id: "manthing", type: "film", it: "Man-Thing - La natura del terrore", en: "Man-Thing", y: 2005, min: 97, c: "#2a3a2a", ab: "MT" }),
+  mk({ uni: "other", id: "ghostrider", type: "film", it: "Ghost Rider", en: "Ghost Rider", y: 2007, min: 110, c: "#6b2a0a", ab: "GR", ch: ["ghostrider"] }),
+  mk({ uni: "other", id: "warzone", type: "film", it: "Punisher - Zona di guerra", en: "Punisher: War Zone", y: 2008, min: 103, c: "#2a2a2a", ab: "PWZ", ch: ["punisher"] }),
+  mk({ uni: "other", id: "ghostrider2", type: "film", it: "Ghost Rider - Spirito di vendetta", en: "Ghost Rider: Spirit of Vengeance", y: 2012, min: 96, c: "#6b2a0a", ab: "GR2", ch: ["ghostrider"] }),
+
+  /* ===== Serie live-action fuori dalla timeline MCU (Marvel Television, ABC, Hulu, Freeform, FX…) ===== */
+  mk({ uni: "tv", id: "hulk77", type: "serie", it: "L'incredibile Hulk (1977)", en: "The Incredible Hulk", y: 1977, min: 3800, eps: 80, c: "#2f5d3a", ab: "HLK77", ch: ["hulk"] }),
+  mk({ uni: "tv", id: "asm77", type: "serie", it: "L'uomo ragno (1977)", en: "The Amazing Spider-Man", y: 1977, min: 600, eps: 13, c: "#8a1c2a", ab: "ASM77", ch: ["spidey"] }),
+  mk({ uni: "tv", id: "genx", type: "special", it: "Generation X", en: "Generation X", y: 1996, min: 85, c: "#3a3f5a", ab: "GENX" }),
+  mk({ uni: "tv", id: "nickfury98", type: "special", it: "Nick Fury", en: "Nick Fury: Agent of S.H.I.E.L.D.", y: 1998, min: 90, c: "#3a3f48", ab: "NF98" }),
+  mk({ uni: "tv", id: "aos", type: "serie", it: "Agents of S.H.I.E.L.D.", en: "Agents of S.H.I.E.L.D.", y: 2013, min: 5800, eps: 136, c: "#2a3f5a", ab: "AOS", ch: ["shield"], ok: ["it", "y"] }),
+  mk({ uni: "tv", id: "agentcarter", type: "serie", it: "Agent Carter", en: "Agent Carter", y: 2015, min: 760, eps: 18, c: "#4a2a2a", ab: "AC", ch: ["cap"], ok: ["it", "y", "eps"] }),
+  mk({ uni: "tv", id: "inhumans", type: "serie", it: "Inhumans", en: "Inhumans", y: 2017, min: 340, eps: 8, c: "#3a3a5a", ab: "INH", ok: ["it", "y", "eps"] }),
+  mk({ uni: "tv", id: "legion", type: "serie", it: "Legion", en: "Legion", y: 2017, min: 1400, eps: 27, c: "#3a2a5a", ab: "LGN·S" }),
+  mk({ uni: "tv", id: "gifted", type: "serie", it: "The Gifted", en: "The Gifted", y: 2017, min: 1250, eps: 29, c: "#3a4a5a", ab: "GFT" }),
+  mk({ uni: "tv", id: "runaways", type: "serie", it: "Runaways", en: "Runaways", y: 2017, min: 1500, eps: 33, c: "#4a3a5a", ab: "RUN" }),
+  mk({ uni: "tv", id: "cloakdagger", type: "serie", it: "Cloak & Dagger", en: "Cloak & Dagger", y: 2018, min: 860, eps: 20, c: "#2a2a4a", ab: "C&D" }),
+  mk({ uni: "tv", id: "helstrom", type: "serie", it: "Helstrom", en: "Helstrom", y: 2020, min: 450, eps: 10, c: "#3a1a1a", ab: "HLS" }),
+
+  /* ===== Animazione classica e recente (fuori MCU) ===== */
+  mk({ uni: "animation", id: "msh66", type: "anim", it: "The Marvel Super Heroes", en: "The Marvel Super Heroes", y: 1966, min: 1300, eps: 65, c: "#4a3a2a", ab: "MSH" }),
+  mk({ uni: "animation", id: "f467", type: "anim", it: "I Fantastici 4 (1967)", en: "Fantastic Four", y: 1967, min: 400, eps: 20, c: "#1f4a7a", ab: "F4·67", ch: ["fantastic4"] }),
+  mk({ uni: "animation", id: "sm67", type: "anim", it: "L'Uomo Ragno (1967)", en: "Spider-Man", y: 1967, min: 1100, eps: 52, c: "#8a1c2a", ab: "SM67", ch: ["spidey"] }),
+  mk({ uni: "animation", id: "f478", type: "anim", it: "I nuovi Fantastici Quattro (1978)", en: "The New Fantastic Four", y: 1978, min: 290, eps: 13, c: "#1f4a7a", ab: "F4·78", ch: ["fantastic4"] }),
+  mk({ uni: "animation", id: "spiderwoman79", type: "anim", it: "Spider-Woman", en: "Spider-Woman", y: 1979, min: 350, eps: 16, c: "#6b1f3a", ab: "SW79" }),
+  mk({ uni: "animation", id: "sm81", type: "anim", it: "Spider-Man (1981)", en: "Spider-Man", y: 1981, min: 570, eps: 26, c: "#8a1c2a", ab: "SM81", ch: ["spidey"] }),
+  mk({ uni: "animation", id: "smaf", type: "anim", it: "L'Uomo Ragno e i suoi fantastici amici", en: "Spider-Man and His Amazing Friends", y: 1981, min: 550, eps: 24, c: "#8a1c2a", ab: "SMAF", ch: ["spidey"] }),
+  mk({ uni: "animation", id: "hulk82", type: "anim", it: "L'incredibile Hulk (1982)", en: "The Incredible Hulk", y: 1982, min: 290, eps: 13, c: "#2f5d3a", ab: "HLK82", ch: ["hulk"] }),
+  mk({ uni: "animation", id: "xmen92", type: "anim", it: "X-Men", en: "X-Men: The Animated Series", y: 1992, min: 1680, eps: 76, c: "#3b4a5c", ab: "XTAS", ch: ["wolverine"], ok: ["it", "y"] }),
+  mk({ uni: "animation", id: "ironman94", type: "anim", it: "Iron Man (1994)", en: "Iron Man", y: 1994, min: 570, eps: 26, c: "#8c1d26", ab: "IM94", ch: ["ironman"] }),
+  mk({ uni: "animation", id: "f494", type: "anim", it: "I Fantastici Quattro (1994)", en: "Fantastic Four", y: 1994, min: 570, eps: 26, c: "#1f4a7a", ab: "F4·94", ch: ["fantastic4"] }),
+  mk({ uni: "animation", id: "sm94", type: "anim", it: "Spider-Man (1994)", en: "Spider-Man: The Animated Series", y: 1994, min: 1430, eps: 65, c: "#8a1c2a", ab: "SMTAS", ch: ["spidey"] }),
+  mk({ uni: "animation", id: "hulk96", type: "anim", it: "L'incredibile Hulk (1996)", en: "The Incredible Hulk", y: 1996, min: 460, eps: 21, c: "#2f5d3a", ab: "HLK96", ch: ["hulk"] }),
+  mk({ uni: "animation", id: "silversurfer", type: "anim", it: "Silver Surfer", en: "Silver Surfer", y: 1998, min: 290, eps: 13, c: "#5a6b7a", ab: "SS", ch: ["fantastic4"] }),
+  mk({ uni: "animation", id: "xmenevo", type: "anim", it: "X-Men: Evolution", en: "X-Men: Evolution", y: 2000, min: 1140, eps: 52, c: "#3b4a5c", ab: "XEVO", ch: ["wolverine"] }),
+  mk({ uni: "animation", id: "smtnas", type: "anim", it: "Spider-Man: The New Animated Series", en: "Spider-Man: The New Animated Series", y: 2003, min: 290, eps: 13, c: "#8a1c2a", ab: "SMNAS", ch: ["spidey"] }),
+  mk({ uni: "animation", id: "ultavengers", type: "anim", it: "Ultimate Avengers", en: "Ultimate Avengers", y: 2006, min: 72, c: "#3d3569", ab: "UA", ch: ["cap", "ironman", "thor", "hulk"] }),
+  mk({ uni: "animation", id: "ultavengers2", type: "anim", it: "Ultimate Avengers 2", en: "Ultimate Avengers 2", y: 2006, min: 73, c: "#3d3569", ab: "UA2", ch: ["cap", "ironman", "thor", "hulk"] }),
+  mk({ uni: "animation", id: "invincibleim", type: "anim", it: "The Invincible Iron Man", en: "The Invincible Iron Man", y: 2007, min: 83, c: "#8c1d26", ab: "TIIM", ch: ["ironman"] }),
+  mk({ uni: "animation", id: "drstrange07", type: "anim", it: "Doctor Strange - Il mago supremo", en: "Doctor Strange: The Sorcerer Supreme", y: 2007, min: 76, c: "#5a1f4a", ab: "DS07", ch: ["strange"] }),
+  mk({ uni: "animation", id: "nextavengers", type: "anim", it: "Next Avengers: Heroes of Tomorrow", en: "Next Avengers: Heroes of Tomorrow", y: 2008, min: 78, c: "#3d3569", ab: "NXA" }),
+  mk({ uni: "animation", id: "spectacular", type: "anim", it: "Spectacular Spider-Man", en: "The Spectacular Spider-Man", y: 2008, min: 570, eps: 26, c: "#8a1c2a", ab: "SSM", ch: ["spidey"] }),
+  mk({ uni: "animation", id: "hulkvs", type: "anim", it: "Hulk Vs", en: "Hulk Vs.", y: 2009, min: 82, c: "#2f5d3a", ab: "HVS", ch: ["hulk", "wolverine", "thor"] }),
+  mk({ uni: "animation", id: "wolvxmen", type: "anim", it: "Wolverine e gli X-Men", en: "Wolverine and the X-Men", y: 2009, min: 570, eps: 26, c: "#3b4a5c", ab: "W&X", ch: ["wolverine"] }),
+  mk({ uni: "animation", id: "imaa", type: "anim", it: "Iron Man: Armored Adventures", en: "Iron Man: Armored Adventures", y: 2009, min: 1140, eps: 52, c: "#8c1d26", ab: "IMAA", ch: ["ironman"] }),
+  mk({ uni: "animation", id: "planethulk", type: "anim", it: "Planet Hulk", en: "Planet Hulk", y: 2010, min: 81, c: "#2f5d3a", ab: "PH", ch: ["hulk"] }),
+  mk({ uni: "animation", id: "emh", type: "anim", it: "Gli Avengers: I più potenti eroi della Terra!", en: "The Avengers: Earth's Mightiest Heroes", y: 2010, min: 1060, eps: 48, c: "#3d3569", ab: "EMH", ch: ["ironman", "cap", "thor", "hulk"], ok: ["it", "y", "eps"] }),
+  mk({ uni: "animation", id: "anime-im", type: "anim", it: "Marvel Anime: Iron Man", en: "Marvel Anime: Iron Man", y: 2010, min: 270, eps: 12, c: "#8c1d26", ab: "MA-IM", ch: ["ironman"] }),
+  mk({ uni: "animation", id: "anime-wolv", type: "anim", it: "Marvel Anime: Wolverine", en: "Marvel Anime: Wolverine", y: 2011, min: 270, eps: 12, c: "#5a4630", ab: "MA-W", ch: ["wolverine"] }),
+  mk({ uni: "animation", id: "anime-xmen", type: "anim", it: "Marvel Anime: X-Men", en: "Marvel Anime: X-Men", y: 2011, min: 270, eps: 12, c: "#3b4a5c", ab: "MA-X", ch: ["wolverine"] }),
+  mk({ uni: "animation", id: "anime-blade", type: "anim", it: "Marvel Anime: Blade", en: "Marvel Anime: Blade", y: 2011, min: 270, eps: 12, c: "#2a1a1a", ab: "MA-B", ch: ["blade"] }),
+  mk({ uni: "animation", id: "thortales", type: "anim", it: "Thor: Tales of Asgard", en: "Thor: Tales of Asgard", y: 2011, min: 77, c: "#2b4a78", ab: "TTA", ch: ["thor", "loki"] }),
+  mk({ uni: "animation", id: "usm", type: "anim", it: "Ultimate Spider-Man", en: "Ultimate Spider-Man", y: 2012, min: 2100, eps: 96, c: "#8a1c2a", ab: "USM", ch: ["spidey"], ok: ["it", "y", "eps"] }),
+  mk({ uni: "animation", id: "technovore", type: "anim", it: "Iron Man: Rise of Technovore", en: "Iron Man: Rise of Technovore", y: 2013, min: 88, c: "#8c1d26", ab: "IMRT", ch: ["ironman"] }),
+  mk({ uni: "animation", id: "imhulk", type: "anim", it: "Iron Man & Hulk: Heroes United", en: "Iron Man & Hulk: Heroes United", y: 2013, min: 74, c: "#5a3a1c", ab: "IMH", ch: ["ironman", "hulk"], ok: ["it", "y", "min"] }),
+  mk({ uni: "animation", id: "assemble", type: "anim", it: "Avengers Assemble", en: "Avengers Assemble", y: 2013, min: 2650, eps: 121, c: "#3d3569", ab: "AA", ch: ["ironman", "cap", "thor", "hulk"], ok: ["it", "y"] }),
+  mk({ uni: "animation", id: "smash", type: "anim", it: "Hulk e gli Agenti S.M.A.S.H.", en: "Hulk and the Agents of S.M.A.S.H.", y: 2013, min: 1060, eps: 48, c: "#2f5d3a", ab: "SMASH", ch: ["hulk"], ok: ["it", "y", "eps"] }),
+  mk({ uni: "animation", id: "imcap", type: "anim", it: "Iron Man & Captain America: Heroes United", en: "Iron Man & Captain America: Heroes United", y: 2014, min: 72, c: "#24406b", ab: "IMCA", ch: ["ironman", "cap"], ok: ["it", "y", "min"] }),
+  mk({ uni: "animation", id: "avconf", type: "anim", it: "Avengers Confidential: La Vedova Nera e Punisher", en: "Avengers Confidential: Black Widow & Punisher", y: 2014, min: 83, c: "#2a2a3a", ab: "AVC", ch: ["blackwidow", "punisher"] }),
+  mk({ uni: "animation", id: "gotg15", type: "anim", it: "Guardiani della galassia (serie animata)", en: "Guardians of the Galaxy", y: 2015, min: 1580, eps: 72, c: "#5a2d6b", ab: "GG·TV", ch: ["gotg"], ok: ["it", "y", "eps"] }),
+  mk({ uni: "animation", id: "futureavengers", type: "anim", it: "Gli Avengers del Futuro", en: "Marvel Future Avengers", y: 2017, min: 870, eps: 37, c: "#3d3569", ab: "MFA", ok: ["it", "y", "eps"] }),
+  mk({ uni: "animation", id: "rising", type: "anim", it: "Marvel Rising: Secret Warriors", en: "Marvel Rising: Secret Warriors", y: 2018, min: 85, c: "#4a2a6b", ab: "MR" }),
+  mk({ uni: "animation", id: "modok", type: "anim", it: "M.O.D.O.K.", en: "M.O.D.O.K.", y: 2021, min: 230, eps: 10, c: "#5a4a2a", ab: "MODOK" }),
+  mk({ uni: "animation", id: "hitmonkey", type: "anim", it: "Hit-Monkey", en: "Hit-Monkey", y: 2021, min: 460, eps: 20, c: "#4a3a2a", ab: "HM" }),
+  mk({ uni: "animation", id: "moongirl", type: "anim", it: "Moon Girl and Devil Dinosaur", en: "Moon Girl and Devil Dinosaur", y: 2023, min: 700, eps: 31, c: "#6b2a6b", ab: "MGDD" }),
 ];
 
 /** Tutti i titoli in ordine di uscita (sort stabile: a parità di anno resta l'ordine scritto) */
