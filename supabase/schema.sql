@@ -4,7 +4,8 @@
 -- incolla tutto questo file → Run.
 --
 -- Una riga per utente: dentro "data" c'è lo stesso oggetto che l'app salvava
--- nel browser ({ seen, rating, eps }). Le regole RLS (Row Level Security)
+-- nel browser ({ seen, rating, eps, profile }; profile = avatar, nome, preferiti…
+-- è facoltativo e non richiede colonne in più). Le regole RLS (Row Level Security)
 -- fanno sì che ogni utente possa leggere e scrivere SOLO la propria riga.
 -- ============================================================================
 

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Originali delle immagini generate (pesanti): nell'app vanno le versioni ottimizzate in public/
+immagini/

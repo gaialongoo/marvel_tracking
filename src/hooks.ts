@@ -1,6 +1,7 @@
 /* ============================================================================
    HOOK CONDIVISI tra più componenti
    ============================================================================ */
+import { useAuth } from "./auth";
 import { useT } from "./i18n";
 import { useStore } from "./store";
 import type { Title } from "./types";
@@ -15,4 +16,12 @@ export function useMetaLine() {
     const n = epsSeen(data, d.id);
     return `${d.y} · ${t(d.type)} · ${n && n < (d.eps as number) ? `${n}/` : ""}${d.eps} ${t("eps")}`;
   };
+}
+
+/** Nome da mostrare: quello scelto nel profilo, altrimenti la parte
+    dell'email prima di "@" (es. "mario.rossi@…" → "mario.rossi") */
+export function useDisplayName() {
+  const { data } = useStore();
+  const { user } = useAuth();
+  return data.profile?.name || (user?.email ?? "").split("@")[0] || "?";
 }

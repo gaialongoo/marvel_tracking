@@ -1,5 +1,7 @@
 /* ============================================================================
-   STORE — i dati personali (visti, voti, episodi) legati all'ACCOUNT.
+   STORE — i dati personali (visti, voti, episodi, profilo) legati all'ACCOUNT.
+   Il profilo sta nello stesso oggetto dei visti (campo "profile"), quindi
+   finisce nella stessa riga di Supabase e nel backup senza tabelle in più.
    - Dopo l'accesso i dati vengono scaricati da Supabase (tabella "progress",
      una riga per utente, vedi supabase/schema.sql).
    - Ogni modifica si vede subito e viene salvata nell'account poco dopo
@@ -17,7 +19,7 @@ import type { User } from "@supabase/supabase-js";
 import { onUserChange } from "./auth";
 import { BY_ID } from "./data/titles";
 import { supabase } from "./supabase";
-import type { Lang, SavedData } from "./types";
+import type { Lang, Profile, SavedData } from "./types";
 
 const LEGACY_KEY = "marvel-tracker-v1";   // dati salvati nel browser prima degli account
 const CACHE_PREFIX = "marvel-tracker-v1:"; // + id utente: copia locale dei dati dell'account
@@ -53,8 +55,12 @@ export function isSavedData(x: unknown): x is SavedData {
   const o = x as SavedData | null;
   return !!o && typeof o.seen === "object" && typeof o.rating === "object";
 }
-/** Copia pulita dei dati (eps può mancare nei salvataggi più vecchi) */
-const clean = (d: SavedData): SavedData => ({ seen: d.seen, rating: d.rating, eps: d.eps || {} });
+/** Copia pulita dei dati (eps e profile possono mancare nei salvataggi più vecchi;
+    un profilo che non è un oggetto viene scartato) */
+const clean = (d: SavedData): SavedData => ({
+  seen: d.seen, rating: d.rating, eps: d.eps || {},
+  ...(d.profile && typeof d.profile === "object" ? { profile: d.profile } : {}),
+});
 
 /** true se non c'è niente di segnato (nessun visto, voto o episodio) */
 const isEmpty = (d: SavedData) =>
@@ -235,7 +241,8 @@ window.addEventListener("beforeunload", (e) => { if (pending) e.preventDefault()
 
 /** Unisce due salvataggi: visti ed episodi si sommano; se un titolo ha due
     voti diversi vince quello dell'account. Una serie con tutti gli episodi
-    risulta vista. */
+    risulta vista. Il profilo resta quello dell'account (i dati di prima
+    degli account non ne avevano uno). */
 function mergeData(account: SavedData, browser: SavedData): SavedData {
   const seen: Record<string, boolean> = { ...account.seen };
   for (const [id, v] of Object.entries(browser.seen)) if (v) seen[id] = true;
@@ -246,7 +253,7 @@ function mergeData(account: SavedData, browser: SavedData): SavedData {
     eps[id] = [...new Set([...(eps[id] || []), ...list])].sort((a, b) => a - b);
     if (epsOf(id) && eps[id].length >= epsOf(id)) seen[id] = true;
   }
-  return { seen, rating, eps };
+  return { seen, rating, eps, ...(account.profile ? { profile: account.profile } : {}) };
 }
 
 /** Risposta alla domanda sui dati del browser. Dopo la scelta i dati del
@@ -299,6 +306,14 @@ export function rate(id: string, n: number) {
   const value = d.rating[id] === n ? 0 : n;
   const markSeen = value > 0 && !epsOf(id) && !d.seen[id];
   setData({ ...d, rating: { ...d.rating, [id]: value }, seen: markSeen ? { ...d.seen, [id]: true } : d.seen });
+}
+
+/** Aggiorna il profilo (solo i campi passati; stringa vuota = campo tolto) */
+export function setProfile(p: Partial<Profile>) {
+  const d = state.data;
+  const next: Profile = { ...d.profile, ...p };
+  for (const k of Object.keys(next) as (keyof Profile)[]) if (next[k] === "" || next[k] === undefined) delete next[k];
+  setData({ ...d, profile: next });
 }
 
 /** Cambia lingua (solo su questo dispositivo) */

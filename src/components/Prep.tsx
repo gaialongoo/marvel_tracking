@@ -68,7 +68,7 @@ export function Prep() {
 }
 
 /** Conto alla rovescia aggiornato ogni secondo */
-function Countdown({ date }: { date: string }) {
+export function Countdown({ date }: { date: string }) {
   const { t } = useT();
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {

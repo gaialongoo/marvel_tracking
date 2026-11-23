@@ -8,7 +8,10 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 
 | Area | Cosa fa |
 | --- | --- |
-| **Universi** | Schede in alto: Tutto, MCU, X-Men (Fox), Fantastici 4 (Fox), Sony, Animazione. Si combinano con qualsiasi ordine; il cronologico si calcola dentro ogni universo |
+| **Home** | La prima pagina dopo l'accesso: avatar, nome, frase e quanto hai visto in tutto; a destra i giorni alla **prossima uscita** (cliccando si va a Preparazione). Sotto, le **porte degli universi**: un riquadro con immagine per ogni universo (l'MCU più grande) con visti/totale; cliccando si apre il Catalogo su quell'universo. In fondo, **Continua a guardare** (serie iniziate + il **prossimo** titolo non visto nell'ordine delle preferenze di visione) |
+| **Catalogo** | L'elenco completo (prima era la Home), con universi, ordini e filtri qui sotto. All'accesso si apre con le preferenze di visione del Profilo |
+| **Profilo** | Avatar (22 personaggi: 16 eroi e 6 cattivi; immagini generate, vedi «Immagini» sotto), nome, frase breve, personaggio preferito (se ha un percorso, cliccandolo si apre nel Catalogo), titolo preferito, preferenze di visione (universo e ordine iniziali del Catalogo), statistiche e backup. Tutto si salva da solo nell'account |
+| **Universi** | Schede in cima al Catalogo: Tutto, MCU, X-Men (Fox), Fantastici 4 (Fox), Sony, Animazione. Si combinano con qualsiasi ordine; il cronologico si calcola dentro ogni universo |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
 | **Tipi** | Film, Serie (TV), Animazione (ANI), Speciali (SPC, es. Licantropus), Corti One-Shot (ONE): la sigla compare nell'angolo della miniatura. I filtri per tipo sono a **scelta multipla** (es. Film + Serie, senza Corti) |
@@ -16,14 +19,14 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Riassunti** | Sinossi senza spoiler + riassunto completo con spoiler (nascosto finché non lo sblocchi) + descrizione di ogni scena dopo i titoli. Testi scritti da Claude in italiano e inglese; il pulsante «Pagina ufficiale» apre la pagina Disney+ Italia con la sinossi ufficiale. **Stato:** tutti i 188 titoli hanno la sinossi e 187 il riassunto completo (manca Jeff, serie su cui Wikipedia non ha ancora una trama). Tutte le scene dopo i titoli scritte sono confermate (le ultime due, Speciale di Natale dei Guardiani e Thunderbolts*, il 23/11/2026). Per i titoli 2025-2026 la trama viene da Wikipedia (en) |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
 | **Preparazione** | Prossime uscite con conto alla rovescia, lista **ufficiale** (Disney+) con tempo mancante, nessuna proposta nostra |
-| **Statistiche** | In alto: completamento, ore viste, media voti e preferito **della vista corrente** (universo, ordine/percorso, tipi scelti); dettaglio per universo, Fase, tipo e voti |
+| **Statistiche** | Nel Profilo: completamento, ore viste, media voti e titolo col voto più alto su tutto il catalogo; dettaglio per universo, Fase, tipo e voti |
 | **Account** | Accesso **obbligatorio** con email e password (Supabase). Chiunque può registrarsi; ognuno vede solo i propri dati. C'è «Password dimenticata?» con link via email |
-| **Salvataggio** | Automatico **nell'account**: i dati ti seguono su telefono e PC. Una copia resta nel browser, così se manca la connessione non si perde niente (viene inviata appena torna). Il pallino dell'account in alto mostra lo stato: grigio = salvato, oro = salvataggio, rosso = non salvato. Backup esportabile/importabile in `.json` |
+| **Salvataggio** | Automatico **nell'account**: i dati ti seguono su telefono e PC. Una copia resta nel browser, così se manca la connessione non si perde niente (viene inviata appena torna). L'anello intorno all'avatar in alto mostra lo stato: grigio = salvato, oro = salvataggio, rosso = non salvato. Backup (nel Profilo) esportabile/importabile in `.json`, profilo compreso |
 | **Lingue** | Italiano e inglese. La lingua resta **per dispositivo** (non va nell'account); la prima volta si usa quella del browser |
 
 **Stile:** "Stark Industries": grafite scura, oro come accento, rosso solo per avvisi e spoiler. Funziona su telefono e su PC.
 
-**Navigazione:** barra in alto con **Home | Preparazione**, ricerca (scorciatoia `/`) e lingua. La **scheda** di un titolo si apre solo cliccando un titolo o dalla ricerca, e ha il pulsante **Home**. Indirizzi: `#/` Home, `#/prep` Preparazione, `#/t/<id>` scheda.
+**Navigazione:** barra in alto con **Home | Catalogo | Preparazione**, ricerca (scorciatoia `/`), lingua e **avatar** (menu con Profilo, stato del salvataggio ed Esci). La **scheda** di un titolo si apre solo cliccando un titolo o dalla ricerca, e ha il pulsante **← Indietro** (torna alla pagina da cui sei arrivato; se hai aperto la scheda da un link, va alla Home). Indirizzi: `#/` Home, `#/catalog` Catalogo, `#/prep` Preparazione, `#/profile` Profilo, `#/t/<id>` scheda.
 
 **Fonti:** date, ordini e sinossi solo da fonti ufficiali (marvel.com, Disney+, Marvel Studios). I riassunti completi sono scritti a parte e possono usare fonti secondarie.
 
@@ -40,7 +43,7 @@ npm run lint    # controlla il codice
 
 > **Errore "running scripts is disabled on this system" in PowerShell?** Usa `npm.cmd run dev`, oppure abilita gli script una volta per sempre (solo per il tuo utente) con `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, oppure usa il terminale Command Prompt o Git Bash in VS Code.
 
-I tuoi dati (visti, voti, episodi) sono salvati nel tuo account Supabase. Per avviare l'app in locale serve prima il collegamento a Supabase (vedi sotto); senza, l'app mostra una pagina che spiega cosa manca.
+I tuoi dati (visti, voti, episodi e profilo) sono salvati nel tuo account Supabase. Per avviare l'app in locale serve prima il collegamento a Supabase (vedi sotto); senza, l'app mostra una pagina che spiega cosa manca.
 
 ## Account e Supabase (da fare una volta)
 
@@ -62,8 +65,17 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 - dopo l'accesso i dati vengono scaricati dall'account; ogni modifica si vede subito e parte verso l'account dopo meno di un secondo;
 - tornando sull'app (cambio scheda o finestra) i dati vengono riletti, così si vedono le modifiche fatte su un altro dispositivo. Se modifichi la stessa cosa su due dispositivi nello stesso momento vale l'ultimo salvataggio;
 - **dati di prima degli account**: se nel browser ci sono visti e voti salvati prima, dopo l'accesso una finestra chiede se *unirli* (visti ed episodi si sommano, per i voti diversi vince l'account), *tenere quelli del browser* o *tenere quelli dell'account*. Dopo la scelta i dati del browser vengono cancellati;
-- uscendo dall'account (pulsante in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
+- il **profilo** sta nella stessa riga dei visti (campo `profile` dentro `data`): non serve nessuna tabella nuova né rieseguire lo schema;
+- uscendo dall'account (avatar in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
 - i link nelle email (conferma, nuova password) vanno aperti **nello stesso browser** in cui li hai chiesti. Se apri il link di conferma altrove l'email risulta comunque confermata: basta accedere.
+
+## Immagini (avatar e porte degli universi)
+
+Le immagini sono generate con un generatore di immagini (testi da incollare in [docs/prompt-immagini.md](docs/prompt-immagini.md)).
+
+1. Salva gli originali, con il nome indicato, in `immagini/avatars/` (es. `ironman.png`) e `immagini/universes/` (es. `mcu.png`). Questa cartella non va su GitHub.
+2. Esegui `python scripts/ottimizza-immagini.py` (serve Pillow: `pip install pillow`). Le immagini vengono ritagliate, ridotte e convertite in WEBP dentro `public/avatars/` (256×256) e `public/universes/` (1280×720).
+3. L'app le usa da sola. Se un'immagine manca, l'avatar usa il disegno di riserva in [src/data/avatars.ts](src/data/avatars.ts) e la porta dell'universo uno sfondo di colore.
 
 ## Struttura del progetto
 
@@ -79,15 +91,19 @@ marvel_tracker/
 │   ├── supabase.ts         ← collegamento a Supabase (legge .env.local)
 │   ├── router.ts           ← navigazione con #/…
 │   ├── i18n.ts             ← testi IT/EN
-│   ├── homeState.ts        ← scelte dell'elenco (universo, ordine…)
+│   ├── homeState.ts        ← scelte del Catalogo (universo, ordine…) e costruzione dei gruppi dell'elenco
 │   ├── hooks.ts, utils.ts, toast.ts
 │   ├── data/
 │   │   ├── titles.ts       ← CATALOGO dei titoli (fonti in cima al file)
+│   │   ├── avatars.ts      ← elenco degli avatar (+ disegni di riserva se manca l'immagine)
 │   │   ├── collections.ts  ← liste Disney+ (pronte, per ora NON mostrate nell'app)
 │   │   ├── disneyLinks.ts  ← indirizzi delle pagine ufficiali Disney+ Italia
 │   │   ├── texts/          ← sinossi, riassunti e scene dopo i titoli (un file per blocco)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
-│   └── components/         ← TopBar, Home, Detail, Prep, Auth (accesso e menu account), ConnectionMap, Gem…
+│   └── components/         ← TopBar, Home (bacheca), Catalog, Profile, Avatar, Detail, Prep, Auth (accesso e menu account), ConnectionMap, Gem…
+├── public/avatars/, public/universes/ ← immagini ottimizzate usate dall'app
+├── scripts/ottimizza-immagini.py ← prepara le immagini generate
+├── docs/prompt-immagini.md ← testi per generare le immagini
 ├── supabase/schema.sql     ← tabella e regole di sicurezza da eseguire su Supabase
 ├── .env.example            ← modello per .env.local (indirizzo e chiave di Supabase)
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)

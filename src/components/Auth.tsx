@@ -5,13 +5,17 @@
    - AuthPage: Accedi / Registrati / Password dimenticata
    - NewPassword: dopo il link "password dimenticata" ricevuto via email
    - BrowserDataDialog: cosa fare dei dati salvati nel browser prima degli account
-   - AccountMenu: pulsante nella barra in alto (email, stato salvataggio, Esci)
+   - AccountMenu: avatar nella barra in alto (nome, email, Profilo,
+     stato salvataggio, Esci)
    ============================================================================ */
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { signIn, signOut, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
+import { useDisplayName } from "../hooks";
 import { useT } from "../i18n";
+import { go } from "../router";
 import { clearLocalCopy, resolveBrowserData, setLang, useStore } from "../store";
 import { isConfigured } from "../supabase";
+import { Avatar } from "./Avatar";
 
 /** Password lunga almeno 8 caratteri (stessa regola da impostare su Supabase) */
 const MIN_PW = 8;
@@ -225,13 +229,15 @@ function BrowserDataDialog() {
 }
 
 /* ---------------------------------------------------------------------------
-   MENU ACCOUNT — nella barra in alto: pallino con lo stato del salvataggio,
-   al clic mostra email e "Esci"
+   MENU ACCOUNT — nella barra in alto: l'avatar del profilo con un anello
+   che indica lo stato del salvataggio; al clic mostra nome, email,
+   "Profilo" ed "Esci"
    --------------------------------------------------------------------------- */
 export function AccountMenu() {
   const { t } = useT();
   const { user } = useAuth();
-  const { sync } = useStore();
+  const { sync, data } = useStore();
+  const name = useDisplayName();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
@@ -250,18 +256,23 @@ export function AccountMenu() {
   };
 
   const syncLabel = t(sync === "error" ? "syncError" : sync === "saving" || sync === "loading" ? "syncSaving" : "syncSaved");
-  const initial = (user?.email || "?")[0].toUpperCase();
 
   return (
     <div className="account" ref={box}>
       <button className={`account-btn sync-${sync}`} onClick={() => setOpen((o) => !o)} title={syncLabel} aria-label={t("account")}>
-        {initial}
+        <Avatar k={data.profile?.avatar} size={30} fallback={name} />
       </button>
       {open && (
         <div className="account-menu">
-          <span className="eyebrow">{t("account")}</span>
-          <b>{user?.email}</b>
+          <div className="am-head">
+            <Avatar k={data.profile?.avatar} size={40} fallback={name} />
+            <div>
+              <b>{name}</b>
+              <small className="am-mail">{user?.email}</small>
+            </div>
+          </div>
           <small className={`sync-txt sync-${sync}`}>{syncLabel}</small>
+          <button className="btn" onClick={() => { setOpen(false); go({ page: "profile" }); }}>{t("profile")}</button>
           <button className="btn" onClick={logout}>{t("signOut")}</button>
         </div>
       )}

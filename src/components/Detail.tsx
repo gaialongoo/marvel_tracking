@@ -10,7 +10,7 @@ import { TEXTS } from "../data/texts";
 import { disneyUrl } from "../data/disneyLinks";
 import { GEMS, UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";
-import { go } from "../router";
+import { go, goBack } from "../router";
 import { rate, setSeen, toggleEp, toggleSeen, useStore } from "../store";
 import type { Link, Title } from "../types";
 import { epsSeen, hasEps } from "../utils";
@@ -26,7 +26,7 @@ export function Detail({ id }: { id: string }) {
   if (!d) {
     return (
       <div className="page">
-        <button className="back" onClick={() => go({ page: "home" })}>{t("back")}</button>
+        <button className="back" onClick={goBack}>{t("back")}</button>
         <p className="empty">{t("notFound")}</p>
       </div>
     );
@@ -39,7 +39,7 @@ export function Detail({ id }: { id: string }) {
 
   return (
     <div className="page page-enter">
-      <button className="back" onClick={() => go({ page: "home" })}>{t("back")}</button>
+      <button className="back" onClick={goBack}>{t("back")}</button>
       <Head d={d} ctx={ctx} />
 
       <div className="detail-grid" style={{ marginTop: 26 }}>

@@ -1,22 +1,33 @@
 /* ============================================================================
    NAVIGAZIONE — basata sull'indirizzo dopo il "#" (funziona anche su
    GitHub Pages senza configurazioni). Pagine:
-     #/          → Home
+     #/          → Home (bacheca personale)
+     #/catalog   → Catalogo (elenco completo con universi e ordini)
      #/prep      → Preparazione
+     #/profile   → Profilo (dati, avatar, statistiche, backup)
      #/t/<id>    → Scheda del titolo
    Così i pulsanti Avanti/Indietro del browser funzionano.
    ============================================================================ */
 import { useSyncExternalStore } from "react";
 
-export type Route = { page: "home" } | { page: "prep" } | { page: "title"; id: string };
+export type Route =
+  | { page: "home" } | { page: "catalog" } | { page: "prep" } | { page: "profile" }
+  | { page: "title"; id: string };
+
+/** Pagine senza parametri e il loro indirizzo */
+const SIMPLE = { catalog: "/catalog", prep: "/prep", profile: "/profile" } as const;
 
 /** Trasforma l'indirizzo in una pagina */
 function parse(hash: string): Route {
   const h = hash.replace(/^#\/?/, "");
-  if (h === "prep") return { page: "prep" };
+  if (h === "catalog" || h === "prep" || h === "profile") return { page: h };
   if (h.startsWith("t/")) return { page: "title", id: decodeURIComponent(h.slice(2)) };
   return { page: "home" };
 }
+
+/** Quante volte si è cambiata pagina DENTRO l'app (serve a goBack) */
+let inside = 0;
+window.addEventListener("hashchange", () => { inside++; });
 
 /** Hook: la pagina attuale, aggiornata quando cambia l'indirizzo */
 export function useRoute(): Route {
@@ -29,5 +40,13 @@ export function useRoute(): Route {
 
 /** Vai a una pagina */
 export function go(r: Route) {
-  location.hash = r.page === "home" ? "/" : r.page === "prep" ? "/prep" : `/t/${encodeURIComponent(r.id)}`;
+  location.hash = r.page === "home" ? "/" : r.page === "title" ? `/t/${encodeURIComponent(r.id)}` : SIMPLE[r.page];
+}
+
+/** Torna alla pagina precedente (Catalogo, Home, Preparazione…).
+    Se la scheda è stata aperta direttamente da un link, non c'è una pagina
+    precedente dell'app: si va alla Home invece di uscire dal sito. */
+export function goBack() {
+  if (inside > 0) history.back();
+  else go({ page: "home" });
 }

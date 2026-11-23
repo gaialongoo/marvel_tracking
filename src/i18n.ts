@@ -29,7 +29,7 @@ const it = {
   postcredits: "Scene post-credits", noPc: "Nessuna scena post-credits.",
   links: "Collegamenti", before: "Da vedere prima", after: "Cosa viene dopo", none: "Nessuno", map: "Mappa dei collegamenti",
   mapBefore: "Prima", mapNow: "Questo titolo", mapAfter: "Dopo", legSeen: "già visto", legTodo: "da vedere",
-  back: "← Home", min: "min", eps: "ep.", year: "Anno", duration: "Durata",
+  min: "min", eps: "ep.", year: "Anno", duration: "Durata",
   prepSub: "Cosa vedere prima delle prossime uscite", next: "Prossima uscita", dateNote: "Data ufficiale (Marvel / Disney)", dateApprox: "Giorno esatto non ancora annunciato",
   d: "giorni", h: "ore", m: "min", s: "sec", officialList: "Lista ufficiale", officialListSrc: "Disney+ · Inizia il conto alla rovescia", noOfficialList: "Nessuna lista ufficiale ancora pubblicata",
   progress: "Avanzamento", left: "Ti mancano",
@@ -39,6 +39,16 @@ const it = {
   // nomi dei campi "da verificare"
   f_it: "titolo italiano", f_y: "anno", f_min: "durata", f_eps: "episodi", f_phase: "Fase", f_chrono: "posizione cronologica", f_pc: "post-credits",
   notFound: "Titolo non trovato",
+  // --- bacheca, catalogo e profilo ---
+  catalog: "Catalogo", profile: "Profilo", continue: "Continua a guardare", nextUp: "Prossimo",
+ 
+  favChar: "Personaggio preferito", favTitle: "Titolo preferito", openPath: "Apri il suo percorso nel Catalogo",
+  noBio: "Nessuna frase: aggiungila con Modifica profilo", editProfile: "Modifica profilo", done2: "Fatto",
+  stats: "Statistiche", topRated: "Voto più alto",
+  pickAvatar: "Scegli l'avatar", heroesG: "Eroi", villainsG: "Cattivi",
+  displayName: "Nome", namePh: "Come vuoi essere chiamato/a", bio: "Frase", bioPh: "Es. Team Cap dal 2011",
+  prefs: "Preferenze di visione", prefsSub: "Universo e ordine con cui si apre il Catalogo. Servono anche per il \"prossimo\" in Home.",
+  back: "← Indietro",
   // --- account (components/Auth.tsx) ---
   account: "Account", signIn: "Accedi", signUp: "Crea un account", signOut: "Esci", createAccount: "Registrati",
   authSub: "I tuoi visti, voti ed episodi sono salvati nel tuo account: li ritrovi su ogni dispositivo.",
@@ -89,7 +99,7 @@ const en: Record<keyof typeof it, string> = {
   postcredits: "Post-credits scenes", noPc: "No post-credits scenes.",
   links: "Connections", before: "Watch before", after: "What comes next", none: "None", map: "Connection map",
   mapBefore: "Before", mapNow: "This title", mapAfter: "After", legSeen: "seen", legTodo: "to watch",
-  back: "← Home", min: "min", eps: "ep.", year: "Year", duration: "Runtime",
+  min: "min", eps: "ep.", year: "Year", duration: "Runtime",
   prepSub: "What to watch before upcoming releases", next: "Next release", dateNote: "Official date (Marvel / Disney)", dateApprox: "Exact day not yet announced",
   d: "days", h: "hours", m: "min", s: "sec", officialList: "Official list", officialListSrc: "Disney+ · Countdown", noOfficialList: "No official list published yet",
   progress: "Progress", left: "Left to watch",
@@ -98,6 +108,16 @@ const en: Record<keyof typeof it, string> = {
   sample: "To verify",
   f_it: "Italian title", f_y: "year", f_min: "runtime", f_eps: "episodes", f_phase: "Phase", f_chrono: "timeline position", f_pc: "post-credits",
   notFound: "Title not found",
+  // --- dashboard, catalogue and profile ---
+  catalog: "Catalogue", profile: "Profile", continue: "Continue watching", nextUp: "Next",
+ 
+  favChar: "Favourite character", favTitle: "Favourite title", openPath: "Open their path in the Catalogue",
+  noBio: "No tagline yet: add one with Edit profile", editProfile: "Edit profile", done2: "Done",
+  stats: "Stats", topRated: "Top rated",
+  pickAvatar: "Choose your avatar", heroesG: "Heroes", villainsG: "Villains",
+  displayName: "Name", namePh: "What should we call you", bio: "Tagline", bioPh: "E.g. Team Cap since 2011",
+  prefs: "Viewing preferences", prefsSub: "Universe and order the Catalogue opens with. Also used for \"next\" on Home.",
+  back: "← Back",
   // --- account (components/Auth.tsx) ---
   account: "Account", signIn: "Sign in", signUp: "Create an account", signOut: "Sign out", createAccount: "Sign up",
   authSub: "Your seen titles, ratings and episodes are saved to your account: you'll find them on every device.",

@@ -1,6 +1,7 @@
 /* ============================================================================
    BARRA IN ALTO
-   [logo]   [Home | Preparazione]   [ricerca] [IT | EN] [account]
+   [logo]   [Home | Catalogo | Preparazione]   [ricerca] [IT | EN] [avatar]
+   L'avatar apre il menu: Profilo, stato del salvataggio, Esci.
    La scheda di un titolo NON è nel selettore: si apre solo cliccando un
    titolo o dalla ricerca.
    ============================================================================ */
@@ -25,7 +26,7 @@ export function TopBar({ route }: { route: Route }) {
 
       {/* Selettore centrale: nessuna voce attiva quando sei in una scheda */}
       <div className="switch">
-        {(["home", "prep"] as const).map((p) => (
+        {(["home", "catalog", "prep"] as const).map((p) => (
           <button key={p} className={route.page === p ? "on" : ""} onClick={() => go({ page: p })}>{t(p)}</button>
         ))}
       </div>
@@ -37,7 +38,7 @@ export function TopBar({ route }: { route: Route }) {
             <button key={l} className={lang === l ? "on" : ""} onClick={() => setLang(l)}>{l.toUpperCase()}</button>
           ))}
         </div>
-        {/* Account: stato del salvataggio + Esci */}
+        {/* Account: avatar con lo stato del salvataggio; menu con Profilo ed Esci */}
         <AccountMenu />
       </div>
     </header>

@@ -1,7 +1,6 @@
 /* ============================================================================
    STATISTICHE — tutto calcolato dai dati salvati
-   <Kpis items/>  = 4 riquadri in cima alla Home, calcolati SOLO sui titoli
-                    della vista corrente (universo, ordine/percorso, tipi)
+   <Kpis items/>  = 4 riquadri (nel Profilo, su tutto il catalogo)
    <StatsDetail/> = barre per universo, Fase, tipo e distribuzione dei voti
    ============================================================================ */
 import { DATA } from "../data/titles";
@@ -19,7 +18,8 @@ function useStats(list: Title[] = DATA) {
   const seen = list.filter((d) => data.seen[d.id]);
   const rated = list.filter((d) => data.rating[d.id]);
   const avg = rated.length ? rated.reduce((a, d) => a + data.rating[d.id], 0) / rated.length : 0;
-  // Preferito = voto più alto; a parità, il primo in ordine di uscita
+  // Voto più alto; a parità, il primo in ordine di uscita
+  // (il "titolo preferito" scelto a mano è invece nel Profilo)
   const fav = [...rated].sort((a, b) => data.rating[b.id] - data.rating[a.id])[0];
   const minutes = list.reduce((a, d) => a + watchedMin(d, data), 0);
   return { data, seen, rated, avg, fav, minutes };
@@ -42,9 +42,9 @@ export function Kpis({ items }: { items: Title[] }) {
         <b>{avg ? avg.toFixed(1) : "–"}<small>/6</small></b>
         <div style={{ marginTop: 6 }}><GemsRow n={Math.round(avg)} /></div>
       </div>
-      {/* Il preferito è cliccabile: apre la sua scheda */}
+      {/* Il titolo col voto più alto è cliccabile: apre la sua scheda */}
       <div className="panel kpi" style={fav ? { cursor: "pointer" } : undefined} onClick={() => fav && go({ page: "title", id: fav.id })}>
-        <span className="eyebrow">{t("fav")}</span>
+        <span className="eyebrow">{t("topRated")}</span>
         <b style={{ fontFamily: "Inter", fontSize: 16, fontWeight: 600 }}>{fav ? fav.t[lang] : "–"}</b>
       </div>
     </div>
