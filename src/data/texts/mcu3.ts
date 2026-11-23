@@ -260,6 +260,12 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "I Guardiani hanno comprato Ovunque dal Collezionista e adottato il cane Cosmo. Kraglin racconta di come Yondu rovinò il Natale a Peter, ancora triste per Gamora. Mantis e Drax decidono di regalargli il suo eroe d'infanzia, Kevin Bacon: lo cercano a Hollywood, lo trovano nella sua villa e, quando arriva la polizia, Mantis lo ipnotizza e lo porta via. Su Ovunque scoprono che Bacon è solo un attore. Peter, sconvolto dal rapimento, vuole che venga riportato a casa; Kraglin spiega a Bacon quanto abbia ispirato Peter, e Bacon accetta di festeggiare con loro prima di tornare. Peter rivela che Yondu, un Natale, gli regalò le sue pistole. Mantis gli confessa di essere sua sorellastra, figlia di Ego: Peter ne è felicissimo.",
       en: "The Guardians have bought Knowhere from the Collector and taken in Cosmo the dog. Kraglin tells how Yondu ruined Christmas for Peter, who is still sad about Gamora. Mantis and Drax decide to give him his childhood hero, Kevin Bacon: they search Hollywood, find him at his house and, when the police arrive, Mantis hypnotizes him and takes him away. On Knowhere they learn Bacon is just an actor. Peter, horrified by the kidnapping, wants him taken home; Kraglin tells Bacon how much he inspired Peter, and Bacon agrees to celebrate with them before going back. Peter reveals that Yondu once gave him his blasters for Christmas. Mantis confesses she is his half-sister, Ego's daughter: Peter is overjoyed.",
     },
-    pc: [null],
+    // Scena confermata il 23/11/2026 (en.wikipedia, voce sulle scene dopo i titoli del MCU)
+    pc: [
+      {
+        it: "Groot abbassa le braccia e le decorazioni natalizie cadono; Rocket si rivolge al pubblico: servirà un altro speciale.",
+        en: "Groot lowers his arms and the Christmas decorations fall; Rocket turns to the audience: they'll need another special.",
+      },
+    ],
   },
 };

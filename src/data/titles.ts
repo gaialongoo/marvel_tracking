@@ -160,6 +160,10 @@ const PHASE_OK = new Set([
   "wv", "fatws", "loki1", "loki2", "whatif1", "whatif2", "whatif3", "hawkeye", "moonknight", "msmarvel", "shehulk",
   "groot1", "groot2", "wbn", "holiday", "si", "echo", "agatha", "ddba1", "ddba2", "ironheart", "eow", "zombies",
   "wonderman", "punolk", "visionquest", "homecoming", "ffh", "nwh", "bnd", "os-item47", "os-carter", "os-king",
+  // 23/11/2026 — en.wikipedia "Marvel Cinematic Universe: Phase One", introduzione:
+  // «the phase also includes three short films … Marvel One-Shots» (The Consultant,
+  // A Funny Thing Happened on the Way to Thor's Hammer, Item 47)
+  "os-consultant", "os-hammer",
 ]);
 
 /* Terzo giro (en/it.wikipedia lette parola per parola).
@@ -183,16 +187,30 @@ const REL3: typeof REL = {
   "anime-im": { it: true }, "anime-wolv": { it: true, y: true }, "anime-xmen": { it: true, y: true }, "anime-blade": { it: true, y: true },
 };
 
-/** Verifiche unite: per ogni titolo i campi di REL, REL2 e REL3 insieme */
+/* Quarto giro (23/11/2026).
+   MCU: en.wikipedia "Mid-credits and post-credits scenes in the Marvel
+   Cinematic Universe", tabelle delle Fasi 4–6 lette per intero: i numeri
+   coincidono con quelli che erano in SOFT → confermati.
+   Fuori MCU: trama letta per intero (en.wikipedia; per i film animati
+   it.wikipedia), nessuna scena durante o dopo i titoli → 0. */
+const REL4: typeof REL = {
+  nwh: { pc: 2 }, dsmom: { pc: 2 }, holiday: { pc: 1 }, gotg3: { pc: 2 }, dpw: { pc: 1 },
+  thunderbolts: { pc: 2 }, ff: { pc: 2 }, bnd: { pc: 1 },
+  howard: { pc: 0 }, hulk03: { pc: 0 }, ghostrider: { pc: 0 }, ghostrider2: { pc: 0 }, atsv: { pc: 0 },
+  ultavengers: { pc: 0 }, ultavengers2: { pc: 0 }, nextavengers: { pc: 0 },
+  invincibleim: { pc: 0 }, drstrange07: { pc: 0 }, thortales: { pc: 0 },
+};
+
+/** Verifiche unite: per ogni titolo i campi di REL, REL2, REL3 e REL4 insieme */
 const VER: typeof REL = { ...REL };
-for (const extra of [REL2, REL3]) for (const [id, f] of Object.entries(extra)) VER[id] = { ...VER[id], ...f };
+for (const extra of [REL2, REL3, REL4]) for (const [id, f] of Object.entries(extra)) VER[id] = { ...VER[id], ...f };
 
 /* Valori aggiornati da un riassunto delle fonti affidabili, NON ancora
    confermati parola per parola: si usano ma restano "da verificare". */
 const SOFT: Record<string, { pc?: number }> = {
-  // la trama su Wikipedia ne cita meno di quante indicate dalle altre letture → resta da verificare
-  holiday: { pc: 1 }, bnd: { pc: 1 }, nwh: { pc: 2 }, dsmom: { pc: 2 }, gotg3: { pc: 2 }, dpw: { pc: 1 },
-  thunderbolts: { pc: 2 }, ff: { pc: 2 }, tasm2: { pc: 1 }, atsv: { pc: 0 },
+  // TASM2: la scena a metà titoli (anteprima di X-Men: Giorni di un futuro passato)
+  // è citata nella sezione Release di en.wikipedia, non ancora letta parola per parola
+  tasm2: { pc: 1 },
 };
 
 function mk(s: Spec): Title {

@@ -193,8 +193,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Valentina Allegra de Fontaine, direttrice della CIA, sta cancellando le prove del Progetto Sentry e manda Yelena Belova, John Walker, Ghost (Ava Starr) e Taskmaster (Antonia Dreykov) in una trappola perché si uccidano a vicenda. Ava uccide Antonia, e da una capsula esce un uomo senza memoria, Bob. I sopravvissuti fuggono con lui. Alexei Shostakov, il Guardiano Rosso, li salva e Walker li battezza «Thunderbolts». Bucky Barnes, ora deputato, si unisce a loro. Bob, diventato Sentry, si rivolta contro Valentina; il suo lato oscuro, il Vuoto, avvolge New York nell'ombra e intrappola le persone nei loro ricordi peggiori. Yelena entra nell'oscurità e raggiunge i ricordi di Bob; il gruppo lo abbraccia e lui riprende il controllo. Valentina presenta la squadra al mondo come i nuovi Vendicatori, prendendosene il merito, ma Yelena le dice che ora sono loro ad avere potere su di lei.",
       en: "CIA director Valentina Allegra de Fontaine is erasing evidence of Project Sentry and sends Yelena Belova, John Walker, Ghost (Ava Starr) and Taskmaster (Antonia Dreykov) into a trap to kill one another. Ava kills Antonia, and a man with no memory, Bob, emerges from a pod. The survivors escape with him. Alexei Shostakov, the Red Guardian, rescues them and Walker names them the \"Thunderbolts\". Bucky Barnes, now a congressman, joins them. Bob, now Sentry, turns on Valentina; his dark side, the Void, engulfs New York in shadow and traps people in their worst memories. Yelena enters the darkness and reaches Bob's memories; the group embraces him and he regains control. Valentina presents the team to the world as the New Avengers, taking the credit, but Yelena tells her they now have power over her.",
     },
+    // Prima scena confermata il 23/11/2026 (en.wikipedia, voce sulle scene dopo i titoli del MCU)
     pc: [
-      null,
+      {
+        it: "Alexei Shostakov prova, senza successo, a convincere un cliente a comprare una scatola di Wheaties con i Nuovi Vendicatori in copertina.",
+        en: "Alexei Shostakov tries, and fails, to get a shopper to buy a Wheaties box with the New Avengers on the cover.",
+      },
       {
         it: "Quattordici mesi dopo, i Nuovi Vendicatori discutono della causa che Sam Wilson ha fatto loro per il nome, quando rilevano un'astronave da un'altra dimensione con il simbolo «4».",
         en: "Fourteen months later, the New Avengers are discussing Sam Wilson's lawsuit over the name, when they detect a spacecraft from another dimension bearing a \"4\" emblem.",
