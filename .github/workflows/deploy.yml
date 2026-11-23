@@ -28,7 +28,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Indirizzo e chiave pubblica di Supabase, presi dalle Variables del repo
+      # (Settings → Secrets and variables → Actions → Variables)
       - run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

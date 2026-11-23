@@ -17,8 +17,9 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
 | **Preparazione** | Prossime uscite con conto alla rovescia, lista **ufficiale** (Disney+) con tempo mancante, nessuna proposta nostra |
 | **Statistiche** | In alto: completamento, ore viste, media voti e preferito **della vista corrente** (universo, ordine/percorso, tipi scelti); dettaglio per universo, Fase, tipo e voti |
-| **Salvataggio** | Automatico, **solo su questo PC** (nel browser). Niente account. Backup esportabile/importabile in `.json` |
-| **Lingue** | Italiano e inglese |
+| **Account** | Accesso **obbligatorio** con email e password (Supabase). Chiunque può registrarsi; ognuno vede solo i propri dati. C'è «Password dimenticata?» con link via email |
+| **Salvataggio** | Automatico **nell'account**: i dati ti seguono su telefono e PC. Una copia resta nel browser, così se manca la connessione non si perde niente (viene inviata appena torna). Il pallino dell'account in alto mostra lo stato: grigio = salvato, oro = salvataggio, rosso = non salvato. Backup esportabile/importabile in `.json` |
+| **Lingue** | Italiano e inglese. La lingua resta **per dispositivo** (non va nell'account); la prima volta si usa quella del browser |
 
 **Stile:** "Stark Industries": grafite scura, oro come accento, rosso solo per avvisi e spoiler. Funziona su telefono e su PC.
 
@@ -39,7 +40,30 @@ npm run lint    # controlla il codice
 
 > **Errore "running scripts is disabled on this system" in PowerShell?** Usa `npm.cmd run dev`, oppure abilita gli script una volta per sempre (solo per il tuo utente) con `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, oppure usa il terminale Command Prompt o Git Bash in VS Code.
 
-I tuoi dati (visti, voti, episodi) restano nel browser con cui usi l'app. Se cancelli i dati di navigazione si perdono: usa **Esporta backup** in fondo alla Home.
+I tuoi dati (visti, voti, episodi) sono salvati nel tuo account Supabase. Per avviare l'app in locale serve prima il collegamento a Supabase (vedi sotto); senza, l'app mostra una pagina che spiega cosa manca.
+
+## Account e Supabase (da fare una volta)
+
+L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e per salvare i dati. I passaggi da fare a mano:
+
+1. **Crea il progetto** su supabase.com → New project.
+2. **Crea la tabella**: SQL Editor → New query → incolla tutto [supabase/schema.sql](supabase/schema.sql) → Run. Crea la tabella `progress` (una riga per utente) con le regole che permettono a ognuno di leggere e scrivere **solo i propri dati**.
+3. **Indirizzi consentiti**: Authentication → URL Configuration
+   - *Site URL*: `https://gaialongoo.github.io/marvel_tracking/`
+   - *Redirect URLs*: aggiungi `https://gaialongoo.github.io/marvel_tracking/**` e `http://localhost:5173/**`
+   Servono per i link nelle email (conferma dell'account e nuova password).
+4. **Password**: Authentication → Sign In / Providers → Email: lascia attivi «Enable sign ups» e «Confirm email», e porta la lunghezza minima della password a **8** (l'app chiede almeno 8 caratteri).
+5. **Chiavi in locale**: copia [.env.example](.env.example) come `.env.local` e incolla *Project URL* e *Publishable key* (Project Settings → API Keys; va bene anche la vecchia chiave *anon*). `.env.local` non viene caricato su GitHub. Riavvia `npm run dev`.
+6. **Chiavi per GitHub Pages**: su GitHub → Settings → Secrets and variables → Actions → scheda **Variables** → crea `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` con gli stessi valori. La chiave publishable è fatta per stare in un sito pubblico: i dati sono protetti dalle regole del punto 2.
+
+**Email:** le email di Supabase gratuite hanno un limite di pochi invii all'ora e possono finire nello spam. Per molti utenti conviene collegare un servizio SMTP (Authentication → Emails → SMTP Settings).
+
+**Come funziona il salvataggio** ([src/store.ts](src/store.ts)):
+- dopo l'accesso i dati vengono scaricati dall'account; ogni modifica si vede subito e parte verso l'account dopo meno di un secondo;
+- tornando sull'app (cambio scheda o finestra) i dati vengono riletti, così si vedono le modifiche fatte su un altro dispositivo. Se modifichi la stessa cosa su due dispositivi nello stesso momento vale l'ultimo salvataggio;
+- **dati di prima degli account**: se nel browser ci sono visti e voti salvati prima, dopo l'accesso una finestra chiede se *unirli* (visti ed episodi si sommano, per i voti diversi vince l'account), *tenere quelli del browser* o *tenere quelli dell'account*. Dopo la scelta i dati del browser vengono cancellati;
+- uscendo dall'account (pulsante in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
+- i link nelle email (conferma, nuova password) vanno aperti **nello stesso browser** in cui li hai chiesti. Se apri il link di conferma altrove l'email risulta comunque confermata: basta accedere.
 
 ## Struttura del progetto
 
@@ -50,7 +74,9 @@ marvel_tracker/
 │   ├── App.tsx             ← barra + pagina attiva
 │   ├── styles.css          ← tutti gli stili
 │   ├── types.ts            ← forma dei dati (Title, SavedData…)
-│   ├── store.ts            ← dati personali salvati su questo PC + azioni
+│   ├── store.ts            ← dati personali: salvataggio nell'account + azioni
+│   ├── auth.ts             ← accesso, registrazione, uscita, recupero password
+│   ├── supabase.ts         ← collegamento a Supabase (legge .env.local)
 │   ├── router.ts           ← navigazione con #/…
 │   ├── i18n.ts             ← testi IT/EN
 │   ├── homeState.ts        ← scelte dell'elenco (universo, ordine…)
@@ -61,7 +87,9 @@ marvel_tracker/
 │   │   ├── disneyLinks.ts  ← indirizzi delle pagine ufficiali Disney+ Italia
 │   │   ├── texts/          ← sinossi, riassunti e scene dopo i titoli (un file per blocco)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
-│   └── components/         ← TopBar, Home, Detail, Prep, ConnectionMap, Gem…
+│   └── components/         ← TopBar, Home, Detail, Prep, Auth (accesso e menu account), ConnectionMap, Gem…
+├── supabase/schema.sql     ← tabella e regole di sicurezza da eseguire su Supabase
+├── .env.example            ← modello per .env.local (indirizzo e chiave di Supabase)
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)
 ├── index.html              ← pagina di ingresso
 └── vite.config.ts          ← configurazione (base relativa per GitHub Pages)
@@ -81,4 +109,5 @@ marvel_tracker/
 L'app è online su **https://gaialongoo.github.io/marvel_tracking/** e si apre anche dal telefono.
 - A ogni push su `main`, il flusso `.github/workflows/deploy.yml` compila l'app e pubblica la cartella `dist`.
 - Va fatto **una volta sola**: su GitHub, Settings → Pages → Build and deployment → Source = **GitHub Actions**. Con "Deploy from a branch" GitHub pubblica i file sorgente e la pagina resta bianca.
-- "Visto" e voti restano salvati sul dispositivo su cui li segni: telefono e PC hanno dati separati. Per spostarli si usano esporta e importa.
+- Il flusso legge `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` dalle Variables del repo (vedi «Account e Supabase», punto 6): senza, il sito pubblicato mostra la pagina «Collegamento all'account da configurare».
+- Con l'account, «visto» e voti sono gli stessi su telefono e PC.

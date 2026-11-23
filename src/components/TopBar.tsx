@@ -1,6 +1,6 @@
 /* ============================================================================
    BARRA IN ALTO
-   [logo]   [Home | Preparazione]   [ricerca] [IT | EN]
+   [logo]   [Home | Preparazione]   [ricerca] [IT | EN] [account]
    La scheda di un titolo NON è nel selettore: si apre solo cliccando un
    titolo o dalla ricerca.
    ============================================================================ */
@@ -10,6 +10,7 @@ import { useT } from "../i18n";
 import { go, type Route } from "../router";
 import { setLang } from "../store";
 import { hasEps, norm } from "../utils";
+import { AccountMenu } from "./Auth";
 import { IconSearch } from "./Icons";
 import { Thumb } from "./Thumb";
 
@@ -36,6 +37,8 @@ export function TopBar({ route }: { route: Route }) {
             <button key={l} className={lang === l ? "on" : ""} onClick={() => setLang(l)}>{l.toUpperCase()}</button>
           ))}
         </div>
+        {/* Account: stato del salvataggio + Esci */}
+        <AccountMenu />
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 /* ============================================================================
-   BACKUP — i dati si salvano già da soli su questo PC; qui puoi anche
-   scaricarne una copia (.json) e reimportarla (es. dopo aver pulito il browser).
+   BACKUP — i dati si salvano già da soli nell'account; qui puoi anche
+   scaricarne una copia (.json) e reimportarla. Importare un backup
+   sostituisce i dati dell'account (su tutti i dispositivi).
    ============================================================================ */
 import { useT } from "../i18n";
 import { getData, isSavedData, replaceData } from "../store";

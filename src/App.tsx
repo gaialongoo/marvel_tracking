@@ -1,8 +1,11 @@
 /* ============================================================================
    APP — struttura generale: barra in alto + pagina attiva + messaggi.
    La pagina dipende dall'indirizzo (vedi router.ts).
+   Tutto è dentro AuthGate: senza aver fatto l'accesso si vede solo la
+   pagina di login (vedi components/Auth.tsx).
    ============================================================================ */
 import { useEffect, useState } from "react";
+import { AuthGate } from "./components/Auth";
 import { Detail } from "./components/Detail";
 import { Home } from "./components/Home";
 import { defaultHome, type HomeState } from "./homeState";
@@ -28,13 +31,15 @@ export default function App() {
 
   return (
     <>
-      <TopBar route={route} />
-      <main>
-        {route.page === "home" && <Home s={home} set={setHomePart} />}
-        {route.page === "prep" && <Prep />}
-        {/* key: cambiando titolo la scheda riparte pulita (tab, spoiler chiusi) */}
-        {route.page === "title" && <Detail key={route.id} id={route.id} />}
-      </main>
+      <AuthGate>
+        <TopBar route={route} />
+        <main>
+          {route.page === "home" && <Home s={home} set={setHomePart} />}
+          {route.page === "prep" && <Prep />}
+          {/* key: cambiando titolo la scheda riparte pulita (tab, spoiler chiusi) */}
+          {route.page === "title" && <Detail key={route.id} id={route.id} />}
+        </main>
+      </AuthGate>
       <Toast />
     </>
   );
