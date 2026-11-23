@@ -7,6 +7,9 @@
    [T]  marvel.com — "See the Complete MCU Timeline on Disney+" (MCU Complete
         Timeline, 81 voci con le stagioni separate) → ORDINE CRONOLOGICO.
         Testo incollato dall'utente (il sito blocca la lettura automatica).
+        Ricontrollato il 23/11/2026 (articolo aggiornato al 22/10/2026): stesse
+        81 voci nello stesso ordine; Spider-Man: Brand New Day NON è in elenco,
+        quindi la sua posizione cronologica resta "da verificare".
    [R]  disneyplus.com — "How to Watch the Marvel Movies in Order" (4/11/2026)
         → ordine di USCITA, ANNO e FASE dei film; elenco di serie/speciali/corti.
    [IT] disneyplus.com/it-it "Film e show Marvel" + disney.it (Universo Marvel,
