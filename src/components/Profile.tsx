@@ -15,7 +15,7 @@ import { useAuth } from "../auth";
 import { DATA, BY_ID } from "../data/titles";
 import { PATHS, UNIVERSES } from "../data/meta";
 import { useDisplayName } from "../hooks";
-import { ORDERS, prefsToHome } from "../homeState";
+import { ALL_TYPES, ORDERS, prefsToHome } from "../homeState";
 import { useT } from "../i18n";
 import { go } from "../router";
 import { setProfile, useStore } from "../store";
@@ -194,6 +194,18 @@ function Prefs() {
             {PATHS.map((x) => <option key={x.key} value={x.key}>{x[lang]}</option>)}
           </select>
         )}
+        {/* Cosa voglio guardare: come i filtri del Catalogo, "Tutti" azzera */}
+        <div className="chips">
+          <button className={`chip${cur.types.length === 0 ? " on" : ""}`} onClick={() => setProfile({ prefTypes: undefined })}>{t("all")}</button>
+          {ALL_TYPES.map((ty) => (
+            <button key={ty} className={`chip${cur.types.includes(ty) ? " on" : ""}`} aria-pressed={cur.types.includes(ty)}
+              onClick={() => {
+                const next = cur.types.includes(ty) ? cur.types.filter((x) => x !== ty) : [...cur.types, ty];
+                // nessuno o tutti accesi = "Tutti" (il campo si toglie dal profilo)
+                setProfile({ prefTypes: next.length === 0 || next.length === ALL_TYPES.length ? undefined : next });
+              }}>{t(ty)}</button>
+          ))}
+        </div>
       </div>
     </section>
   );

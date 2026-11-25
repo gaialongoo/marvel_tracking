@@ -32,13 +32,33 @@ export function sanitize(raw: Partial<HomeState>): HomeState {
     uni: UNIVERSES.some((u) => u.k === raw.uni) ? raw.uni! : defaultHome.uni,
     order: ORDERS.includes(raw.order as Order) ? raw.order! : defaultHome.order,
     path: PATHS.some((p) => p.key === raw.path) ? raw.path! : defaultHome.path,
-    types: Array.isArray(raw.types) ? raw.types : [],
+    // solo tipi validi; se sono accesi tutti equivale a "Tutti" (lista vuota)
+    types: cleanTypes(raw.types),
   };
+}
+
+/** Tipi validi e senza doppioni; tutti accesi (o nessuno) = [] cioè "Tutti" */
+function cleanTypes(raw: unknown): TitleType[] {
+  if (!Array.isArray(raw)) return [];
+  const ok = ALL_TYPES.filter((ty) => raw.includes(ty));
+  return ok.length === ALL_TYPES.length ? [] : ok;
 }
 
 /** Le preferenze di visione del profilo, come scelte del Catalogo */
 export const prefsToHome = (p?: Profile): HomeState =>
-  sanitize({ uni: p?.prefUni, order: p?.prefOrder, path: p?.prefPath, types: [] });
+  sanitize({ uni: p?.prefUni, order: p?.prefOrder, path: p?.prefPath, types: p?.prefTypes });
+
+/** Il "prossimo da guardare" secondo le preferenze di visione:
+    il primo titolo non visto che viene DOPO quello visto più in fondo
+    alla lista. I titoli saltati più indietro non contano (se li hai
+    lasciati indietro è una scelta tua). Le serie iniziate contano come
+    "arrivato fin qui", ma non vengono proposte: stanno già in
+    "Continua a guardare". Se la lista è finita non c'è un prossimo. */
+export function nextUp(list: Title[], isSeen: (d: Title) => boolean, isStarted: (d: Title) => boolean): Title | undefined {
+  let last = -1; // posizione dell'ultimo titolo visto (o iniziato)
+  list.forEach((d, i) => { if (isSeen(d) || isStarted(d)) last = i; });
+  return list.slice(last + 1).find((d) => !isSeen(d) && !isStarted(d));
+}
 
 export interface Group { h: string | null; items: Title[] }
 

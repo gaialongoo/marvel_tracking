@@ -61,6 +61,7 @@ export interface Profile {
   prefUni?: string;   // preferenze di visione: universo con cui si apre il Catalogo
   prefOrder?: Order;  //   … ordine
   prefPath?: string;  //   … percorso (se l'ordine è "paths")
+  prefTypes?: TitleType[]; // … tipi da guardare (film, serie…); mancante = tutti
 }
 
 /** Dati personali salvati nell'account (e in copia nel browser) */

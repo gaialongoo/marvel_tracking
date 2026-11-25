@@ -5,15 +5,15 @@
    2. Le "porte" degli universi: un riquadro con immagine per ogni universo,
       con la sua avanzata; cliccando si apre il Catalogo su quell'universo
    3. Continua a guardare: serie iniziate e non finite + il prossimo titolo
-      non visto nell'ordine delle preferenze di visione del Profilo
-   Le immagini degli universi sono in public/universes/<chiave>.webp
-   (scripts/ottimizza-immagini.py); finché mancano si vede uno sfondo di colore.
+      secondo le preferenze di visione del Profilo (universo, ordine, tipi):
+      quello dopo l'ultimo visto della lista, senza tornare ai saltati
+   Ogni porta ha il colore del suo universo e un grande simbolo in filigrana
+   (disegni SVG nostri, vedi DOOR_SYMBOL).
    ============================================================================ */
-import { useState } from "react";
 import { DATA, BY_ID } from "../data/titles";
 import { PATHS, UNIVERSES, UPCOMING } from "../data/meta";
 import { useDisplayName } from "../hooks";
-import { buildGroups, prefsToHome } from "../homeState";
+import { buildGroups, nextUp, prefsToHome } from "../homeState";
 import { useT } from "../i18n";
 import { go } from "../router";
 import { useStore } from "../store";
@@ -22,10 +22,48 @@ import { epsSeen, fmtMin, hasEps, watchedMin } from "../utils";
 import { Avatar } from "./Avatar";
 import { Thumb } from "./Thumb";
 
-/** Colore di riserva di ogni porta (quando l'immagine non c'è ancora) */
+/** Colore di sfondo di ogni porta: una tinta diversa per ciascun universo,
+    così si riconoscono a colpo d'occhio */
 const DOOR_COLOR: Record<string, string> = {
-  mcu: "#7a1a1a", xmen: "#1f3a6b", f4fox: "#1d4f7a", sony: "#5a1018",
-  other: "#4a3218", tv: "#4a0f14", animation: "#4b2f63",
+  mcu: "#8a1c1c",       // rosso
+  xmen: "#1f3f8a",      // blu
+  f4fox: "#0f6a6e",     // verde acqua
+  sony: "#7a1a55",      // magenta
+  other: "#8a5212",     // arancio
+  tv: "#2f6a2c",        // verde
+  animation: "#53318f", // viola
+};
+
+/** Simbolo in filigrana di ogni porta (viewBox 100x100, linee bianche).
+    Disegni nostri: richiamano l'universo con un oggetto o un personaggio
+    riconoscibile, senza copiare i loghi ufficiali. */
+const DOOR_SYMBOL: Record<string, string> = {
+  // MCU: lo scudo di Captain America (anelli + stella piena)
+  mcu: `<circle cx="50" cy="50" r="43"/><circle cx="50" cy="50" r="31"/><circle cx="50" cy="50" r="19"/>`
+    + `<path d="M50.0 33.0 L54.1 44.3 L66.2 44.7 L56.7 52.2 L60.0 63.8 L50.0 57.0 L40.0 63.8 L43.3 52.2 L33.8 44.7 L45.9 44.3Z" fill="#fff" stroke-width="2"/>`,
+  // X-Men: i tre artigli di Wolverine che escono dal pugno, a ventaglio
+  xmen: `<path d="M28.5 76 L35.5 76 L34.5 22 L32 2 L29.5 22Z" transform="rotate(-12 50 96)"/>`
+    + `<path d="M46.5 76 L53.5 76 L52.5 22 L50 2 L47.5 22Z"/>`
+    + `<path d="M64.5 76 L71.5 76 L70.5 22 L68 2 L65.5 22Z" transform="rotate(12 50 96)"/>`
+    + `<path d="M18 98 V84 Q18 76 27 76 H73 Q82 76 82 84 V98 M36 76 V84 M50 76 V84 M64 76 V84"/>`,
+  // Fantastici 4: un "4" pieno e squadrato, con il buco a triangolo
+  f4fox: `<path d="M56 10 H71 V56 H82 V70 H71 V90 H56 V70 H16 V57Z M56 33 L33 56 H56Z" fill-rule="evenodd"/>`,
+  // Spider-Man: ragno con testa, addome a goccia e otto zampe piegate
+  sony: `<ellipse cx="50" cy="36" rx="6" ry="7"/><path d="M50 45 Q60 49 58 65 Q55 82 50 87 Q45 82 42 65 Q40 49 50 45Z"/>`
+    + `<path d="M45 38 L31 25 L27 6 M44 45 L24 39 L11 24 M44 55 L24 61 L11 77 M46 63 L32 77 L28 95`
+    + ` M55 38 L69 25 L73 6 M56 45 L76 39 L89 24 M56 55 L76 61 L89 77 M54 63 L68 77 L72 95"/>`,
+  // Altri film: teschio in fiamme (Ghost Rider)
+  other: `<path d="M30 34 Q22 18 32 6 Q35 18 41 21 Q41 9 50 2 Q55 14 59 21 Q64 11 70 8 Q77 20 70 34"/>`
+    + `<path d="M28 52 Q28 26 50 26 Q72 26 72 52 Q72 62 64 66 V78 H36 V66 Q28 62 28 52Z"/>`
+    + `<circle cx="40" cy="50" r="7"/><circle cx="60" cy="50" r="7"/><path d="M50 57 L46 64 H54Z M43 67 V78 M50 67 V78 M57 67 V78"/>`,
+  // Serie TV: vecchio televisore con le antenne
+  tv: `<rect x="12" y="30" width="76" height="54" rx="10"/><rect x="21" y="39" width="45" height="36" rx="6"/>`
+    + `<circle cx="77" cy="47" r="3.5"/><circle cx="77" cy="62" r="3.5"/><path d="M44 30 L30 10 M56 30 L70 10 M28 84 V92 M72 84 V92"/>`,
+  // Animazione: striscia di pellicola con la pallina che rimbalza (il primo esercizio di ogni animatore)
+  animation: `<rect x="28" y="4" width="44" height="92" rx="4"/><rect x="37" y="10" width="26" height="24" rx="2" stroke-width="3"/>`
+    + `<rect x="37" y="38" width="26" height="24" rx="2" stroke-width="3"/><rect x="37" y="66" width="26" height="24" rx="2" stroke-width="3"/>`
+    + `<circle cx="50" cy="18" r="5" fill="#fff"/><circle cx="50" cy="47" r="5" fill="#fff"/><ellipse cx="50" cy="85" rx="7" ry="3.5" fill="#fff"/>`
+    + `<path d="M32.5 12 V16 M32.5 26 V30 M32.5 40 V44 M32.5 54 V58 M32.5 68 V72 M32.5 82 V86 M67.5 12 V16 M67.5 26 V30 M67.5 40 V44 M67.5 54 V58 M67.5 68 V72 M67.5 82 V86" stroke-width="3.5"/>`,
 };
 
 /** openUni = apre il Catalogo su un universo (da App) */
@@ -42,7 +80,8 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
   // --- 3. continua a guardare ---
   const started = DATA.filter((d) => hasEps(d) && !data.seen[d.id] && epsSeen(data, d.id) > 0);
   const prefs = prefsToHome(p);
-  const next = buildGroups(prefs, lang, t).flatMap((g) => g.items).find((d) => !data.seen[d.id] && !started.includes(d));
+  // prossimo = il primo non visto DOPO l'ultimo visto della lista (vedi nextUp)
+  const next = nextUp(buildGroups(prefs, lang, t).flatMap((g) => g.items), (d) => !!data.seen[d.id], (d) => started.includes(d));
   const uni = UNIVERSES.find((u) => u.k === prefs.uni);
   // Ordine usato per il "prossimo", es. "Cronologico · MCU" o "Percorsi · Iron Man"
   const orderLabel = prefs.order === "paths"
@@ -106,15 +145,14 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
 }
 
 /* ---------------------------------------------------------------------------
-   PORTA di un universo: immagine di sfondo, nome, visti e barra.
-   Se l'immagine non si carica resta lo sfondo di colore.
+   PORTA di un universo: colore, simbolo in filigrana, nome, visti e barra.
    --------------------------------------------------------------------------- */
 function Door({ k, title, sub, seen, total, onClick }: { k: string; title: string; sub: string; seen: number; total: number; onClick: () => void }) {
-  const [imgOk, setImgOk] = useState(true);
   const pct = total ? (seen / total) * 100 : 0;
   return (
     <button className={`door door-${k}`} onClick={onClick} style={{ "--c": DOOR_COLOR[k] ?? "#333" } as React.CSSProperties}>
-      {imgOk && <img src={`${import.meta.env.BASE_URL}universes/${k}.webp`} alt="" loading="lazy" onError={() => setImgOk(false)} />}
+      {/* Disegno costante scritto da noi: sicuro da inserire così */}
+      <svg className="door-sym" viewBox="0 0 100 100" aria-hidden="true" dangerouslySetInnerHTML={{ __html: DOOR_SYMBOL[k] ?? "" }} />
       <div className="door-txt">
         <b>{title}</b>
         {sub && <small>{sub}</small>}

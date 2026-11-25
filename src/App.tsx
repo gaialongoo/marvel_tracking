@@ -18,6 +18,7 @@ import { useT } from "./i18n";
 import { go, useRoute } from "./router";
 import { useStore } from "./store";
 import { useToast } from "./toast";
+import type { TitleType } from "./types";
 
 export default function App() {
   const route = useRoute();
@@ -29,10 +30,12 @@ export default function App() {
 
   // Preferenze di visione del profilo: il Catalogo parte da lì all'accesso
   // e si riallinea quando le cambi nel Profilo
-  const { prefUni, prefOrder, prefPath } = data.profile ?? {};
+  const { prefUni, prefOrder, prefPath, prefTypes } = data.profile ?? {};
+  // i tipi come testo, così l'effetto riparte solo se cambiano davvero
+  const typesKey = (prefTypes ?? []).join(",");
   useEffect(() => {
-    if (loaded) setHome(prefsToHome({ prefUni, prefOrder, prefPath }));
-  }, [loaded, prefUni, prefOrder, prefPath]);
+    if (loaded) setHome(prefsToHome({ prefUni, prefOrder, prefPath, prefTypes: typesKey ? (typesKey.split(",") as TitleType[]) : undefined }));
+  }, [loaded, prefUni, prefOrder, prefPath, typesKey]);
 
   /** Dalla Home: apre il Catalogo su un universo (ordine e tipi restano quelli scelti) */
   const openUni = (uni: string) => {

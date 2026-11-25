@@ -47,7 +47,7 @@ const it = {
   stats: "Statistiche", topRated: "Voto più alto",
   pickAvatar: "Scegli l'avatar", heroesG: "Eroi", villainsG: "Cattivi",
   displayName: "Nome", namePh: "Come vuoi essere chiamato/a", bio: "Frase", bioPh: "Es. Team Cap dal 2011",
-  prefs: "Preferenze di visione", prefsSub: "Universo e ordine con cui si apre il Catalogo. Servono anche per il \"prossimo\" in Home.",
+  prefs: "Preferenze di visione", prefsSub: "Universo, ordine e cosa guardare: il Catalogo si apre così. In Home il \"prossimo\" è il titolo dopo l'ultimo che hai visto in questa lista (quelli saltati non contano).",
   back: "← Indietro",
   // --- account (components/Auth.tsx) ---
   account: "Account", signIn: "Accedi", signUp: "Crea un account", signOut: "Esci", createAccount: "Registrati",
@@ -116,7 +116,7 @@ const en: Record<keyof typeof it, string> = {
   stats: "Stats", topRated: "Top rated",
   pickAvatar: "Choose your avatar", heroesG: "Heroes", villainsG: "Villains",
   displayName: "Name", namePh: "What should we call you", bio: "Tagline", bioPh: "E.g. Team Cap since 2011",
-  prefs: "Viewing preferences", prefsSub: "Universe and order the Catalogue opens with. Also used for \"next\" on Home.",
+  prefs: "Viewing preferences", prefsSub: "Universe, order and what to watch: the Catalogue opens like this. On Home, \"next\" is the title after the last one you watched in this list (skipped ones don't count).",
   back: "← Back",
   // --- account (components/Auth.tsx) ---
   account: "Account", signIn: "Sign in", signUp: "Create an account", signOut: "Sign out", createAccount: "Sign up",

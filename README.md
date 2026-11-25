@@ -8,9 +8,9 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 
 | Area | Cosa fa |
 | --- | --- |
-| **Home** | La prima pagina dopo l'accesso: avatar, nome, frase e quanto hai visto in tutto; a destra i giorni alla **prossima uscita** (cliccando si va a Preparazione). Sotto, le **porte degli universi**: un riquadro con immagine per ogni universo (l'MCU più grande) con visti/totale; cliccando si apre il Catalogo su quell'universo. In fondo, **Continua a guardare** (serie iniziate + il **prossimo** titolo non visto nell'ordine delle preferenze di visione) |
-| **Catalogo** | L'elenco completo (prima era la Home), con universi, ordini e filtri qui sotto. All'accesso si apre con le preferenze di visione del Profilo |
-| **Profilo** | Avatar (22 personaggi: 16 eroi e 6 cattivi; immagini generate, vedi «Immagini» sotto), nome, frase breve, personaggio preferito (se ha un percorso, cliccandolo si apre nel Catalogo), titolo preferito, preferenze di visione (universo e ordine iniziali del Catalogo), statistiche e backup. Tutto si salva da solo nell'account |
+| **Home** | La prima pagina dopo l'accesso: avatar, nome, frase e quanto hai visto in tutto; a destra i giorni alla **prossima uscita** (cliccando si va a Preparazione). Sotto, le **porte degli universi**: un riquadro per ogni universo, con un colore diverso per ogni universo e un grande simbolo in filigrana (scudo di Cap, artigli di Wolverine, 4, ragno, teschio in fiamme, televisore, pellicola) (l'MCU più grande) con visti/totale; cliccando si apre il Catalogo su quell'universo. In fondo, **Continua a guardare** (serie iniziate + il **prossimo** titolo secondo le preferenze di visione: il primo non visto **dopo l'ultimo visto** della lista; i titoli saltati più indietro non vengono riproposti) |
+| **Catalogo** | L'elenco completo (prima era la Home), con universi, ordini e filtri qui sotto. All'accesso si apre con le preferenze di visione del Profilo (universo, ordine e tipi) |
+| **Profilo** | Avatar (22 personaggi disegnati da noi in SVG: 16 eroi e 6 cattivi, in stile kawaii che «si affaccia dal bordo» con le manine, tratto disegnato a mano), nome, frase breve, personaggio preferito (se ha un percorso, cliccandolo si apre nel Catalogo), titolo preferito, preferenze di visione (universo, ordine e tipi da guardare — film, serie, animazione… — con cui si apre il Catalogo e si calcola il «prossimo»), statistiche e backup. Tutto si salva da solo nell'account |
 | **Universi** | Schede in cima al Catalogo: Tutto, MCU, X-Men (Fox), Fantastici 4 (Fox), Sony, Animazione. Si combinano con qualsiasi ordine; il cronologico si calcola dentro ogni universo |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
@@ -69,13 +69,11 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 - uscendo dall'account (avatar in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
 - i link nelle email (conferma, nuova password) vanno aperti **nello stesso browser** in cui li hai chiesti. Se apri il link di conferma altrove l'email risulta comunque confermata: basta accedere.
 
-## Immagini (avatar e porte degli universi)
+## Avatar e porte degli universi
 
-Le immagini sono generate con un generatore di immagini (testi da incollare in [docs/prompt-immagini.md](docs/prompt-immagini.md)).
-
-1. Salva gli originali, con il nome indicato, in `immagini/avatars/` (es. `ironman.png`) e `immagini/universes/` (es. `mcu.png`). Questa cartella non va su GitHub.
-2. Esegui `python scripts/ottimizza-immagini.py` (serve Pillow: `pip install pillow`). Le immagini vengono ritagliate, ridotte e convertite in WEBP dentro `public/avatars/` (256×256) e `public/universes/` (1280×720).
-3. L'app le usa da sola. Se un'immagine manca, l'avatar usa il disegno di riserva in [src/data/avatars.ts](src/data/avatars.ts) e la porta dell'universo uno sfondo di colore.
+- **Avatar** ([src/data/avatars.ts](src/data/avatars.ts)): disegni SVG nostri. Testa larga con contorno nero spesso, colori piatti, manine appoggiate a una linea e un dettaglio del personaggio che spunta (scudo, Mjolnir, artigli, Guanto…). Un filtro SVG (`feTurbulence` + `feDisplacementMap`) fa tremare appena le linee, come un tratto a pennarello.
+- **Porte della Home** ([src/components/Home.tsx](src/components/Home.tsx)): un colore per universo (rosso, blu, verde acqua, magenta, arancio, verde, viola) + simbolo in filigrana disegnato da noi, preso da un oggetto o personaggio dell'universo (nessun logo ufficiale).
+- [docs/prompt-immagini.md](docs/prompt-immagini.md) e [scripts/ottimizza-immagini.py](scripts/ottimizza-immagini.py) servivano per le immagini generate: per ora l'app non le usa.
 
 ## Struttura del progetto
 
@@ -95,13 +93,12 @@ marvel_tracker/
 │   ├── hooks.ts, utils.ts, toast.ts
 │   ├── data/
 │   │   ├── titles.ts       ← CATALOGO dei titoli (fonti in cima al file)
-│   │   ├── avatars.ts      ← elenco degli avatar (+ disegni di riserva se manca l'immagine)
+│   │   ├── avatars.ts      ← avatar del profilo (disegni SVG)
 │   │   ├── collections.ts  ← liste Disney+ (pronte, per ora NON mostrate nell'app)
 │   │   ├── disneyLinks.ts  ← indirizzi delle pagine ufficiali Disney+ Italia
 │   │   ├── texts/          ← sinossi, riassunti e scene dopo i titoli (un file per blocco)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
 │   └── components/         ← TopBar, Home (bacheca), Catalog, Profile, Avatar, Detail, Prep, Auth (accesso e menu account), ConnectionMap, Gem…
-├── public/avatars/, public/universes/ ← immagini ottimizzate usate dall'app
 ├── scripts/ottimizza-immagini.py ← prepara le immagini generate
 ├── docs/prompt-immagini.md ← testi per generare le immagini
 ├── supabase/schema.sql     ← tabella e regole di sicurezza da eseguire su Supabase
