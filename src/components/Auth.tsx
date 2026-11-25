@@ -9,13 +9,14 @@
      stato salvataggio, Esci)
    ============================================================================ */
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { signIn, signOut, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
+import { clearLinkErr, signIn, signOut, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
 import { useHandle } from "../handle";
 import { useDisplayName } from "../hooks";
 import { useT } from "../i18n";
 import { go } from "../router";
 import { clearLocalCopy, resolveBrowserData, setLang, useStore } from "../store";
 import { isConfigured } from "../supabase";
+import { ArcReactor } from "./ArcReactor";
 import { Avatar } from "./Avatar";
 
 /** Password lunga almeno 8 caratteri (stessa regola da impostare su Supabase) */
@@ -45,8 +46,8 @@ function Shell({ children }: { children: ReactNode }) {
       <div className="auth-box panel">
         <div className="auth-head">
           <div className="brand">
-            <div className="brand-mark" />
-            <div><b>MARVEL TRACKER</b><small>v0.1</small></div>
+            <ArcReactor size={32} />
+            <b>MARVEL TRACKER</b>
           </div>
           <div className="seg">
             {(["it", "en"] as const).map((l) => (
@@ -77,9 +78,20 @@ function SetupHelp() {
    --------------------------------------------------------------------------- */
 type Mode = "signin" | "signup" | "forgot";
 
+/** Secondi di attesa prima di poter chiedere un altro link (limite di Supabase) */
+const RESEND_WAIT = 60;
+
 function AuthPage() {
   const { t } = useT();
+  const { linkErr } = useAuth();
   const [mode, setMode] = useState<Mode>("signin");
+  // Conto alla rovescia per richiedere un altro link (0 = si può)
+  const [wait, setWait] = useState(0);
+  useEffect(() => {
+    if (wait <= 0) return;
+    const id = window.setTimeout(() => setWait((w) => w - 1), 1000);
+    return () => clearTimeout(id);
+  }, [wait]);
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
@@ -88,7 +100,7 @@ function AuthPage() {
   const [info, setInfo] = useState<"infoConfirm" | "infoReset" | null>(null);
 
   /** Cambia modalità tenendo l'email già scritta */
-  const switchTo = (m: Mode) => { setMode(m); setErr(null); setInfo(null); setPw(""); setPw2(""); };
+  const switchTo = (m: Mode) => { setMode(m); setErr(null); setInfo(null); setPw(""); setPw2(""); clearLinkErr(); };
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -105,8 +117,11 @@ function AuthPage() {
       setErr(r.err);
       if (!r.err && r.needsConfirm) { setInfo("infoConfirm"); setMode("signin"); setPw(""); setPw2(""); }
     } else {
+      clearLinkErr();
       const r = await sendReset(mail);
       setErr(r);
+      // dopo l'invio (o se Supabase dice di aspettare) parte il conto alla rovescia
+      if (!r || r === "err_emailRate" || r === "err_rate") setWait(RESEND_WAIT);
       if (!r) setInfo("infoReset");
     }
     setBusy(false);
@@ -125,8 +140,10 @@ function AuthPage() {
         {mode !== "forgot" && (
           <label>
             <span className="eyebrow">{t("password")}</span>
-            <input type="password" required minLength={mode === "signup" ? MIN_PW : undefined}
+            {/* niente minLength del browser: il controllo lo fa l'app, con un messaggio chiaro */}
+            <input type="password" required
               autoComplete={mode === "signup" ? "new-password" : "current-password"} value={pw} onChange={(e) => setPw(e.target.value)} />
+            {mode === "signup" && <PwHint pw={pw} />}
           </label>
         )}
         {mode === "signup" && (
@@ -137,11 +154,15 @@ function AuthPage() {
         )}
 
         {/* Messaggi: errore in rosso, informazione in oro */}
+        {/* Il link dell'email non ha funzionato (vale per conferma e per password) */}
+        {linkErr && !err && !info && <p className="auth-msg err" role="alert">{t("err_link")}</p>}
         {err && <p className="auth-msg err" role="alert">{t(err)}</p>}
         {info && <p className="auth-msg" role="status">{t(info)}</p>}
 
-        <button className="btn primary" type="submit" disabled={busy}>
-          {busy ? "…" : t(mode === "signin" ? "signIn" : mode === "signup" ? "createAccount" : "sendLink")}
+        {/* "Manda il link" resta bloccato finché Supabase non permette un altro invio */}
+        <button className="btn primary" type="submit" disabled={busy || (mode === "forgot" && wait > 0)}>
+          {busy ? "…" : mode === "forgot" && wait > 0 ? `${t("resendIn")} ${wait}s`
+            : t(mode === "signin" ? "signIn" : mode === "signup" ? "createAccount" : "sendLink")}
         </button>
       </form>
 
@@ -154,6 +175,17 @@ function AuthPage() {
         {mode !== "signin" && <button onClick={() => switchTo("signin")}>{t("haveAccount")}</button>}
       </div>
     </Shell>
+  );
+}
+
+/** Sotto il campo password: quanti caratteri mancano (verde quando basta) */
+function PwHint({ pw }: { pw: string }) {
+  const { t } = useT();
+  const ok = pw.length >= MIN_PW;
+  return (
+    <small className={`pw-hint${ok ? " ok" : ""}`}>
+      {ok ? `✓ ${t("pwOk")}` : `${t("pwMin")} · ${pw.length}/${MIN_PW}`}
+    </small>
   );
 }
 
@@ -183,7 +215,9 @@ function NewPassword() {
       <form className="auth-form" onSubmit={submit}>
         <label>
           <span className="eyebrow">{t("password")}</span>
-          <input type="password" required minLength={MIN_PW} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} />
+          {/* niente minLength del browser: il controllo lo fa l'app, con un messaggio chiaro */}
+          <input type="password" required autoComplete="new-password" value={pw} onChange={(e) => { setPw(e.target.value); setErr(null); }} />
+          <PwHint pw={pw} />
         </label>
         <label>
           <span className="eyebrow">{t("password2")}</span>

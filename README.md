@@ -71,6 +71,9 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 - il **tag utente** invece sta nella tabella `handles` ([src/handle.ts](src/handle.ts)), perché solo il database può garantire che sia unico. Nella finestra «Modifica profilo» l'app controlla mentre scrivi se il tag è libero e lo salva col pulsante;
 - uscendo dall'account (avatar in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
 - i link nelle email (conferma, nuova password) vanno aperti **nello stesso browser** in cui li hai chiesti. Se apri il link di conferma altrove l'email risulta comunque confermata: basta accedere.
+- se un link dell'email non funziona (scaduto, già usato o aperto in un altro browser) la pagina di accesso lo dice e spiega cosa fare, invece di tornare muta all'accesso;
+- **password**: il controllo degli 8 caratteri lo fa l'app (con il contatore sotto il campo, es. «Almeno 8 caratteri · 5/8»), non il browser; se la nuova password è uguale alla vecchia compare un messaggio apposta;
+- **«Manda il link»** dopo un invio resta bloccato 60 secondi con il conto alla rovescia: Supabase permette poche email (con il servizio email gratuito sono pochissime all'ora), e un secondo invio troppo vicino verrebbe rifiutato.
 
 ## Avatar, badge e porte degli universi
 

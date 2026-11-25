@@ -14,9 +14,19 @@ interface AuthState {
   ready: boolean;       // false finché non so se c'è una sessione salvata
   user: User | null;    // utente collegato (null = pagina di accesso)
   recovery: boolean;    // true = arrivato dal link "password dimenticata"
+  linkErr: boolean;     // true = il link dell'email non ha funzionato (scaduto,
+                        // già usato o aperto in un altro browser)
 }
 
-let state: AuthState = { ready: !supabase, user: null, recovery: false };
+/* Il link dell'email torna con ?code=… (va bene) oppure con un errore
+   (?error=… o #error=…, es. link scaduto). Lo guardo PRIMA che Supabase
+   pulisca l'indirizzo. */
+const hadCode = location.search.includes("code=");
+const urlErr = /[?&#]error(_code|_description)?=/.test(location.search + location.hash);
+// L'errore nel "#" rovinerebbe la navigazione dell'app (#/…): lo tolgo subito
+if (/^#error/.test(location.hash) || /[?&]error/.test(location.search)) history.replaceState(null, "", location.pathname + "#/");
+
+let state: AuthState = { ready: !supabase, user: null, recovery: false, linkErr: urlErr };
 const listeners = new Set<() => void>();
 const setState = (p: Partial<AuthState>) => { state = { ...state, ...p }; listeners.forEach((l) => l()); };
 
@@ -57,14 +67,20 @@ supabase?.auth.onAuthStateChange((event, session) => {
     ready: true,
     user: sameUser ? state.user : user,
     recovery: event === "PASSWORD_RECOVERY" ? true : user ? state.recovery : false,
+    // c'era un ?code=… ma all'avvio non è entrato nessuno: il link non ha funzionato
+    linkErr: state.linkErr || (event === "INITIAL_SESSION" && hadCode && !user),
   });
 });
+
+/** Nasconde l'avviso sul link (quando si chiede un link nuovo o si accede) */
+export const clearLinkErr = () => setState({ linkErr: false });
 
 /* ---------------------------------------------------------------------------
    ERRORI — Supabase risponde con codici in inglese; li riduco a poche chiavi
    che i18n.ts traduce (err_…).
    --------------------------------------------------------------------------- */
-export type AuthErr = "err_credentials" | "err_notConfirmed" | "err_exists" | "err_weak" | "err_rate" | "err_network" | "err_generic";
+export type AuthErr = "err_credentials" | "err_notConfirmed" | "err_exists" | "err_weak" | "err_rate" | "err_emailRate"
+  | "err_samePw" | "err_network" | "err_generic";
 
 function toErr(e: { code?: string; message?: string; status?: number } | null): AuthErr | null {
   if (!e) return null;
@@ -73,6 +89,8 @@ function toErr(e: { code?: string; message?: string; status?: number } | null): 
   if (c === "email_not_confirmed") return "err_notConfirmed";
   if (c === "user_already_exists" || c === "email_exists") return "err_exists";
   if (c === "weak_password") return "err_weak";
+  if (c === "same_password") return "err_samePw";                    // nuova password = quella vecchia
+  if (c === "over_email_send_rate_limit") return "err_emailRate";    // troppe email in poco tempo
   if (c.startsWith("over_") || e.status === 429) return "err_rate";
   if (!e.status || /fetch|network/i.test(e.message || "")) return "err_network";
   return "err_generic";
