@@ -17,7 +17,7 @@
 import { useSyncExternalStore } from "react";
 import type { User } from "@supabase/supabase-js";
 import { onUserChange } from "./auth";
-import { BY_ID } from "./data/titles";
+import { BY_ID, DATA } from "./data/titles";
 import { supabase } from "./supabase";
 import type { Lang, Profile, SavedData } from "./types";
 
@@ -60,6 +60,7 @@ export function isSavedData(x: unknown): x is SavedData {
 const clean = (d: SavedData): SavedData => ({
   seen: d.seen, rating: d.rating, eps: d.eps || {},
   ...(d.profile && typeof d.profile === "object" ? { profile: d.profile } : {}),
+  ...(typeof d.back === "number" && d.back > 0 ? { back: d.back } : {}),
 });
 
 /** true se non c'è niente di segnato (nessun visto, voto o episodio) */
@@ -253,7 +254,8 @@ function mergeData(account: SavedData, browser: SavedData): SavedData {
     eps[id] = [...new Set([...(eps[id] || []), ...list])].sort((a, b) => a - b);
     if (epsOf(id) && eps[id].length >= epsOf(id)) seen[id] = true;
   }
-  return { seen, rating, eps, ...(account.profile ? { profile: account.profile } : {}) };
+  const back = Math.max(account.back ?? 0, browser.back ?? 0); // il conteggio più alto dei due
+  return { seen, rating, eps, ...(account.profile ? { profile: account.profile } : {}), ...(back ? { back } : {}) };
 }
 
 /** Risposta alla domanda sui dati del browser. Dopo la scelta i dati del
@@ -275,12 +277,26 @@ export function resolveBrowserData(choice: "browser" | "account" | "merge") {
 /** Numero totale di episodi di un titolo (0 per i film) */
 const epsOf = (id: string) => (BY_ID[id]?.type !== "film" ? BY_ID[id]?.eps ?? 0 : 0);
 
+/** Posizione di ogni titolo nell'ordine di uscita (DATA è già in quell'ordine) */
+const RELEASE_POS: Record<string, number> = Object.fromEntries(DATA.map((d, i) => [d.id, i]));
+
+/** Nuovo valore del contatore "Ritorno al passato": +1 se il titolo che diventa
+    visto è uscito PRIMA dell'ultimo titolo che avevi già visto (cioè l'avevi saltato) */
+function backAfter(d: SavedData, id: string): number | undefined {
+  const last = Math.max(-1, ...Object.keys(d.seen).filter((k) => d.seen[k]).map((k) => RELEASE_POS[k] ?? -1));
+  const was = d.back ?? 0;
+  const now = RELEASE_POS[id] < last ? was + 1 : was;
+  return now || undefined;
+}
+
 /** Segna/toglie "visto". Per le serie spunta (o azzera) tutti gli episodi. */
 export function setSeen(id: string, on: boolean) {
   const d = state.data;
   const n = epsOf(id);
   setData({
     ...d,
+    // conta i recuperi solo quando il titolo passa da non visto a visto
+    back: on && !d.seen[id] ? backAfter(d, id) : d.back,
     seen: { ...d.seen, [id]: on },
     eps: n ? { ...d.eps, [id]: on ? Array.from({ length: n }, (_, i) => i + 1) : [] } : d.eps,
   });
@@ -296,6 +312,7 @@ export function toggleEp(id: string, ep: number) {
     ...d,
     eps: { ...d.eps, [id]: [...set].sort((a, b) => a - b) },
     seen: { ...d.seen, [id]: set.size === epsOf(id) },
+    back: set.size === epsOf(id) && !d.seen[id] ? backAfter(d, id) : d.back,
   });
 }
 

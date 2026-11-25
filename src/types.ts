@@ -70,4 +70,6 @@ export interface SavedData {
   rating: Record<string, number>;  // voto 1–6 (Gemme)
   eps: Record<string, number[]>;   // episodi visti per serie
   profile?: Profile;               // profilo (assente nei salvataggi più vecchi)
+  back?: number;                   // quante volte hai recuperato un titolo "saltato"
+                                   // (uscito prima dell'ultimo che avevi visto): badge "Ritorno al passato"
 }

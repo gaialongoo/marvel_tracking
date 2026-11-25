@@ -8,9 +8,9 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 
 | Area | Cosa fa |
 | --- | --- |
-| **Home** | La prima pagina dopo l'accesso: avatar, nome, frase e quanto hai visto in tutto; a destra i giorni alla **prossima uscita** (cliccando si va a Preparazione). Sotto, le **porte degli universi**: un riquadro per ogni universo, con un colore diverso per ogni universo e un grande simbolo in filigrana (scudo di Cap, X degli X-Men, 4, ragno, scritta MARVEL, televisore, pellicola) (l'MCU più grande) con visti/totale; cliccando si apre il Catalogo su quell'universo. In fondo, **Continua a guardare** (serie iniziate + il **prossimo** titolo secondo le preferenze di visione: il primo non visto **dopo l'ultimo visto** della lista; i titoli saltati più indietro non vengono riproposti) |
+| **Home** | La prima pagina dopo l'accesso, **a tutta larghezza** (niente bande vuote ai lati). **Su PC è in 3 colonne**: a sinistra la scheda del profilo (avatar, nome, @tag, frase, visti, ore, riepilogo dei badge) e sotto **Amici** (richieste in arrivo e i primi amici; ricerca e lista complete sono nel Profilo); al centro gli universi (MCU su tutta la riga, poi 3 per riga su due righe); a destra Continua a guardare (in colonna) e Preparazione. **Su telefono e tablet** le parti vanno una sotto l'altra: avatar, nome, frase e quanto hai visto in tutto. Subito sotto, affiancati: **Continua a guardare** (al massimo **3 titoli**: serie iniziate e poi i prossimi da guardare; da telefono scorrono di lato con una barra sotto che mostra dove sei. Il **prossimo** titolo è secondo le preferenze di visione: il primo non visto **dopo l'ultimo visto** della lista; i titoli saltati più indietro non vengono riproposti) e **Preparazione**, con i giorni alla prossima uscita (cliccando si va alla pagina Preparazione). Sotto, le **porte degli universi**: un riquadro per ogni universo, con un colore diverso per ogni universo e un grande simbolo in filigrana (scudo di Cap, X degli X-Men, 4, ragno, scritta MARVEL, televisore, pellicola) (l'MCU su tutta la riga, gli altri in tante colonne quante ne stanno) con visti/totale; cliccando si apre il Catalogo su quell'universo. |
 | **Catalogo** | L'elenco completo (prima era la Home), con universi, ordini e filtri qui sotto. All'accesso si apre con le preferenze di visione del Profilo (universo, ordine e tipi) |
-| **Profilo** | Avatar (22 personaggi disegnati da noi in SVG: 16 eroi e 6 cattivi, in stile kawaii che «si affaccia dal bordo» con le manine, tratto disegnato a mano), nome, frase breve, personaggio preferito (se ha un percorso, cliccandolo si apre nel Catalogo), titolo preferito, preferenze di visione (universo, ordine e tipi da guardare — film, serie, animazione… — con cui si apre il Catalogo e si calcola il «prossimo»), statistiche e backup. Tutto si salva da solo nell'account |
+| **Profilo** | Con **Modifica profilo** si apre una finestra a comparsa (si chiude con Fatto, la X, Esc o un clic fuori). Avatar (22 personaggi disegnati da noi in SVG: 16 eroi e 6 cattivi, in stile kawaii che «si affaccia dal bordo» con le manine, tratto disegnato a mano), nome, **tag utente `@nome`** (unico tra tutti gli utenti, per la futura community; modificabile), frase breve, personaggio preferito (se ha un percorso, cliccandolo si apre nel Catalogo), titolo preferito, preferenze di visione (universo, ordine e tipi da guardare — film, serie, animazione… — con cui si apre il Catalogo e si calcola il «prossimo»), **badge**, statistiche e backup. Tutto si salva da solo nell'account |
 | **Universi** | Schede in cima al Catalogo: Tutto, MCU, X-Men (Fox), Fantastici 4 (Fox), Sony, Animazione. Si combinano con qualsiasi ordine; il cronologico si calcola dentro ogni universo |
 | **Ordini di visione** | Uscita, cronologico (dentro ogni universo), per Fase/Saga, per personaggio e percorsi tematici |
 | **Voto** | Da 1 a 6 con le Gemme dell'Infinito; 6/6 = Guanto completo |
@@ -19,14 +19,16 @@ Web app personale per seguire tutto l'universo Marvel: film e serie MCU, film Fo
 | **Riassunti** | Sinossi senza spoiler + riassunto completo con spoiler (nascosto finché non lo sblocchi) + descrizione di ogni scena dopo i titoli. Testi scritti da Claude in italiano e inglese; il pulsante «Pagina ufficiale» apre la pagina Disney+ Italia con la sinossi ufficiale. **Stato:** tutti i 188 titoli hanno la sinossi e 187 il riassunto completo (manca Jeff, serie su cui Wikipedia non ha ancora una trama). Tutte le scene dopo i titoli scritte sono confermate (le ultime due, Speciale di Natale dei Guardiani e Thunderbolts*, il 23/11/2026). Per i titoli 2025-2026 la trama viene da Wikipedia (en) |
 | **Collegamenti** | Cosa vedere prima, cosa viene dopo, scene post-credits, mappa visiva con frecce |
 | **Preparazione** | Prossime uscite con conto alla rovescia, lista **ufficiale** (Disney+) con tempo mancante, nessuna proposta nostra |
+| **Badge** | Nel Profilo, divisi in **tendine** per gruppo (chiuse all'inizio; nell'intestazione badge conquistati, livelli e barra di completamento): 61 traguardi a **3 livelli** (Bronzo, Argento, Oro), ognuno con un disegno kawaii a tema (popcorn, clessidra, Gemme, scudo di Cap, shawarma…; per i percorsi l'avatar del personaggio). Gruppi: Traguardi (titoli, ore, episodi), MCU (ogni Fase, le due Saghe, Avengers, pronto per la prossima uscita), Universi (esploratore, un badge per universo, Defenders), Percorsi dei personaggi, Modo di guardare (cronologico, scene dopo i titoli, voti, titoli di prima del 2000, serie finite, animazione) e Segreti («???» finché non li scopri). I badge di completamento hanno come soglie un terzo, due terzi e tutto. Calcoli in [src/badges.ts](src/badges.ts), disegni in [src/data/badgeArt.ts](src/data/badgeArt.ts) |
+| **Amici** | Solo «amici» (niente seguiti/follower): nel **Profilo** cerchi una persona per **@tag**, le mandi una richiesta e lei la accetta o la rifiuta; puoi ritirare una richiesta o togliere un'amicizia. Cliccando un amico si apre la sua pagina (`#/u/<tag>`) con avatar, nome, frase, titoli visti, ore, badge, cosa sta guardando e i suoi voti. Prima di diventare amici si vedono solo avatar, nome e @tag. Logica in [src/friends.ts](src/friends.ts), pagine in [src/components/Friends.tsx](src/components/Friends.tsx) |
 | **Statistiche** | Nel Profilo: completamento, ore viste, media voti e titolo col voto più alto su tutto il catalogo; dettaglio per universo, Fase, tipo e voti |
 | **Account** | Accesso **obbligatorio** con email e password (Supabase). Chiunque può registrarsi; ognuno vede solo i propri dati. C'è «Password dimenticata?» con link via email |
 | **Salvataggio** | Automatico **nell'account**: i dati ti seguono su telefono e PC. Una copia resta nel browser, così se manca la connessione non si perde niente (viene inviata appena torna). L'anello intorno all'avatar in alto mostra lo stato: grigio = salvato, oro = salvataggio, rosso = non salvato. Backup (nel Profilo) esportabile/importabile in `.json`, profilo compreso |
 | **Lingue** | Italiano e inglese. La lingua resta **per dispositivo** (non va nell'account); la prima volta si usa quella del browser |
 
-**Stile:** "Stark Industries": grafite scura, oro come accento, rosso solo per avvisi e spoiler. Funziona su telefono e su PC.
+**Stile:** "Stark Industries": grafite scura, oro come accento, rosso solo per avvisi e spoiler. **Logo:** il reattore arc di Iron Man (anello d'oro, bobine di rame, nucleo azzurro che pulsa piano), disegnato in SVG in [src/components/ArcReactor.tsx](src/components/ArcReactor.tsx); lo stesso disegno, semplificato, è l'icona della scheda del browser. Funziona su telefono e su PC.
 
-**Navigazione:** barra in alto con **Home | Catalogo | Preparazione**, ricerca (scorciatoia `/`), lingua e **avatar** (menu con Profilo, stato del salvataggio ed Esci). La **scheda** di un titolo si apre solo cliccando un titolo o dalla ricerca, e ha il pulsante **← Indietro** (torna alla pagina da cui sei arrivato; se hai aperto la scheda da un link, va alla Home). Indirizzi: `#/` Home, `#/catalog` Catalogo, `#/prep` Preparazione, `#/profile` Profilo, `#/t/<id>` scheda.
+**Navigazione:** barra in alto con **Home | Catalogo | Preparazione**, ricerca (scorciatoia `/`; da telefono occupa una riga intera), lingua e **avatar** (menu con Profilo, stato del salvataggio ed Esci). La **scheda** di un titolo si apre solo cliccando un titolo o dalla ricerca, e ha il pulsante **← Indietro** (torna alla pagina da cui sei arrivato; se hai aperto la scheda da un link, va alla Home). Indirizzi: `#/` Home, `#/catalog` Catalogo, `#/prep` Preparazione, `#/profile` Profilo, `#/t/<id>` scheda, `#/u/<tag>` pagina di un amico.
 
 **Fonti:** date, ordini e sinossi solo da fonti ufficiali (marvel.com, Disney+, Marvel Studios). I riassunti completi sono scritti a parte e possono usare fonti secondarie.
 
@@ -50,7 +52,7 @@ I tuoi dati (visti, voti, episodi e profilo) sono salvati nel tuo account Supaba
 L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e per salvare i dati. I passaggi da fare a mano:
 
 1. **Crea il progetto** su supabase.com → New project.
-2. **Crea la tabella**: SQL Editor → New query → incolla tutto [supabase/schema.sql](supabase/schema.sql) → Run. Crea la tabella `progress` (una riga per utente) con le regole che permettono a ognuno di leggere e scrivere **solo i propri dati**.
+2. **Crea le tabelle**: SQL Editor → New query → incolla tutto [supabase/schema.sql](supabase/schema.sql) → Run. Crea la tabella `progress` (una riga per utente) con le regole che permettono a ognuno di leggere e scrivere **solo i propri dati**, la tabella `handles` per i **tag utente** (`@nome`, con nome e avatar accanto per la ricerca amici): il tag è unico, tutti gli utenti collegati possono leggere i tag ma ognuno modifica solo il proprio; la tabella `friendships` per le **amicizie** (richiesta → accettata) e la regola che permette agli **amici** di leggere i tuoi dati (solo lettura, solo se l'amicizia è accettata). Il file si può rieseguire senza problemi: se avevi già creato le tabelle, rieseguilo per aggiungere quelle nuove (ogni volta che il file cambia).
 3. **Indirizzi consentiti**: Authentication → URL Configuration
    - *Site URL*: `https://gaialongoo.github.io/marvel_tracking/`
    - *Redirect URLs*: aggiungi `https://gaialongoo.github.io/marvel_tracking/**` e `http://localhost:5173/**`
@@ -65,14 +67,16 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 - dopo l'accesso i dati vengono scaricati dall'account; ogni modifica si vede subito e parte verso l'account dopo meno di un secondo;
 - tornando sull'app (cambio scheda o finestra) i dati vengono riletti, così si vedono le modifiche fatte su un altro dispositivo. Se modifichi la stessa cosa su due dispositivi nello stesso momento vale l'ultimo salvataggio;
 - **dati di prima degli account**: se nel browser ci sono visti e voti salvati prima, dopo l'accesso una finestra chiede se *unirli* (visti ed episodi si sommano, per i voti diversi vince l'account), *tenere quelli del browser* o *tenere quelli dell'account*. Dopo la scelta i dati del browser vengono cancellati;
-- il **profilo** sta nella stessa riga dei visti (campo `profile` dentro `data`): non serve nessuna tabella nuova né rieseguire lo schema;
+- il **profilo** sta nella stessa riga dei visti (campo `profile` dentro `data`), come il contatore `back` del badge «Ritorno al passato» (quante volte hai visto un titolo uscito prima dell'ultimo che avevi già visto);
+- il **tag utente** invece sta nella tabella `handles` ([src/handle.ts](src/handle.ts)), perché solo il database può garantire che sia unico. Nella finestra «Modifica profilo» l'app controlla mentre scrivi se il tag è libero e lo salva col pulsante;
 - uscendo dall'account (avatar in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
 - i link nelle email (conferma, nuova password) vanno aperti **nello stesso browser** in cui li hai chiesti. Se apri il link di conferma altrove l'email risulta comunque confermata: basta accedere.
 
-## Avatar e porte degli universi
+## Avatar, badge e porte degli universi
 
 - **Avatar** ([src/data/avatars.ts](src/data/avatars.ts)): disegni SVG nostri. Testa larga con contorno nero spesso, colori piatti, manine appoggiate a una linea e un dettaglio del personaggio che spunta (scudo, Mjolnir, artigli, Guanto…). Un filtro SVG (`feTurbulence` + `feDisplacementMap`) fa tremare appena le linee, come un tratto a pennarello.
-- **Porte della Home** ([src/components/Home.tsx](src/components/Home.tsx)): un colore per universo (rosso, blu, verde acqua, magenta, arancio, verde, viola) + simbolo in filigrana disegnato da noi, preso da un oggetto, un personaggio o il segno più noto dell'universo (la X degli X-Men, la scritta MARVEL per gli altri film).
+- **Badge** ([src/data/badgeArt.ts](src/data/badgeArt.ts)): icone nello stesso stile degli avatar (contorno nero, colori piatti, faccine) dentro una medaglia rotonda; l'anello è di bronzo, argento o oro secondo il livello, grigio se il badge non è ancora conquistato.
+- **Porte della Home** ([src/data/universeArt.ts](src/data/universeArt.ts), usati anche dai badge degli universi): un colore per universo (rosso, blu, verde acqua, magenta, arancio, verde, viola) + simbolo in filigrana disegnato da noi, preso da un oggetto, un personaggio o il segno più noto dell'universo (la X degli X-Men, la scritta MARVEL per gli altri film).
 - [docs/prompt-immagini.md](docs/prompt-immagini.md) e [scripts/ottimizza-immagini.py](scripts/ottimizza-immagini.py) servivano per le immagini generate: per ora l'app non le usa.
 
 ## Struttura del progetto
@@ -90,18 +94,23 @@ marvel_tracker/
 │   ├── router.ts           ← navigazione con #/…
 │   ├── i18n.ts             ← testi IT/EN
 │   ├── homeState.ts        ← scelte del Catalogo (universo, ordine…) e costruzione dei gruppi dell'elenco
+│   ├── badges.ts           ← regole e livelli dei badge
+│   ├── handle.ts           ← tag utente @nome (tabella "handles" su Supabase)
+│   ├── friends.ts          ← amici: ricerca per @tag, richieste, dati degli amici
 │   ├── hooks.ts, utils.ts, toast.ts
 │   ├── data/
 │   │   ├── titles.ts       ← CATALOGO dei titoli (fonti in cima al file)
 │   │   ├── avatars.ts      ← avatar del profilo (disegni SVG)
+│   │   ├── badgeArt.ts     ← disegni dei badge
+│   │   ├── universeArt.ts  ← colori e simboli degli universi (porte della Home, badge)
 │   │   ├── collections.ts  ← liste Disney+ (pronte, per ora NON mostrate nell'app)
 │   │   ├── disneyLinks.ts  ← indirizzi delle pagine ufficiali Disney+ Italia
 │   │   ├── texts/          ← sinossi, riassunti e scene dopo i titoli (un file per blocco)
 │   │   └── meta.ts         ← universi, percorsi, prossime uscite, Gemme
-│   └── components/         ← TopBar, Home (bacheca), Catalog, Profile, Avatar, Detail, Prep, Auth (accesso e menu account), ConnectionMap, Gem…
+│   └── components/         ← TopBar, ArcReactor (logo), Home (bacheca), Catalog, Profile, Badges, Friends, Avatar, Detail, Prep, Auth (accesso e menu account), ConnectionMap, Gem…
 ├── scripts/ottimizza-immagini.py ← prepara le immagini generate
 ├── docs/prompt-immagini.md ← testi per generare le immagini
-├── supabase/schema.sql     ← tabella e regole di sicurezza da eseguire su Supabase
+├── supabase/schema.sql     ← tabelle (progress, handles, friendships) e regole di sicurezza da eseguire su Supabase
 ├── .env.example            ← modello per .env.local (indirizzo e chiave di Supabase)
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)
 ├── index.html              ← pagina di ingresso

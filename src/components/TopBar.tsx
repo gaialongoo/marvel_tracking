@@ -1,6 +1,6 @@
 /* ============================================================================
    BARRA IN ALTO
-   [logo]   [Home | Catalogo | Preparazione]   [ricerca] [IT | EN] [avatar]
+   [logo: reattore arc + nome]   [Home | Catalogo | Preparazione]   [ricerca] [IT | EN] [avatar]
    L'avatar apre il menu: Profilo, stato del salvataggio, Esci.
    La scheda di un titolo NON è nel selettore: si apre solo cliccando un
    titolo o dalla ricerca.
@@ -11,6 +11,7 @@ import { useT } from "../i18n";
 import { go, type Route } from "../router";
 import { setLang } from "../store";
 import { hasEps, norm } from "../utils";
+import { ArcReactor } from "./ArcReactor";
 import { AccountMenu } from "./Auth";
 import { IconSearch } from "./Icons";
 import { Thumb } from "./Thumb";
@@ -20,8 +21,9 @@ export function TopBar({ route }: { route: Route }) {
   return (
     <header className="top">
       <div className="brand" onClick={() => go({ page: "home" })}>
-        <div className="brand-mark" />
-        <div><b>MARVEL TRACKER</b><small>v0.1</small></div>
+        {/* Logo: il reattore arc di Iron Man */}
+        <ArcReactor size={32} />
+        <b>MARVEL TRACKER</b>
       </div>
 
       {/* Selettore centrale: nessuna voce attiva quando sei in una scheda */}

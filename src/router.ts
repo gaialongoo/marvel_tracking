@@ -6,13 +6,14 @@
      #/prep      → Preparazione
      #/profile   → Profilo (dati, avatar, statistiche, backup)
      #/t/<id>    → Scheda del titolo
+     #/u/<tag>   → Pagina di un amico (dal suo @tag)
    Così i pulsanti Avanti/Indietro del browser funzionano.
    ============================================================================ */
 import { useSyncExternalStore } from "react";
 
 export type Route =
   | { page: "home" } | { page: "catalog" } | { page: "prep" } | { page: "profile" }
-  | { page: "title"; id: string };
+  | { page: "title"; id: string } | { page: "friend"; tag: string };
 
 /** Pagine senza parametri e il loro indirizzo */
 const SIMPLE = { catalog: "/catalog", prep: "/prep", profile: "/profile" } as const;
@@ -22,6 +23,7 @@ function parse(hash: string): Route {
   const h = hash.replace(/^#\/?/, "");
   if (h === "catalog" || h === "prep" || h === "profile") return { page: h };
   if (h.startsWith("t/")) return { page: "title", id: decodeURIComponent(h.slice(2)) };
+  if (h.startsWith("u/")) return { page: "friend", tag: decodeURIComponent(h.slice(2)) };
   return { page: "home" };
 }
 
@@ -40,7 +42,10 @@ export function useRoute(): Route {
 
 /** Vai a una pagina */
 export function go(r: Route) {
-  location.hash = r.page === "home" ? "/" : r.page === "title" ? `/t/${encodeURIComponent(r.id)}` : SIMPLE[r.page];
+  location.hash = r.page === "home" ? "/"
+    : r.page === "title" ? `/t/${encodeURIComponent(r.id)}`
+    : r.page === "friend" ? `/u/${encodeURIComponent(r.tag)}`
+    : SIMPLE[r.page];
 }
 
 /** Torna alla pagina precedente (Catalogo, Home, Preparazione…).

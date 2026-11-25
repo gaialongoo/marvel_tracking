@@ -53,11 +53,12 @@ export const prefsToHome = (p?: Profile): HomeState =>
     alla lista. I titoli saltati più indietro non contano (se li hai
     lasciati indietro è una scelta tua). Le serie iniziate contano come
     "arrivato fin qui", ma non vengono proposte: stanno già in
-    "Continua a guardare". Se la lista è finita non c'è un prossimo. */
-export function nextUp(list: Title[], isSeen: (d: Title) => boolean, isStarted: (d: Title) => boolean): Title | undefined {
+    "Continua a guardare". Se la lista è finita non c'è un prossimo.
+    n = quanti titoli restituire (il prossimo e quelli che vengono dopo). */
+export function nextUp(list: Title[], isSeen: (d: Title) => boolean, isStarted: (d: Title) => boolean, n = 1): Title[] {
   let last = -1; // posizione dell'ultimo titolo visto (o iniziato)
   list.forEach((d, i) => { if (isSeen(d) || isStarted(d)) last = i; });
-  return list.slice(last + 1).find((d) => !isSeen(d) && !isStarted(d));
+  return list.slice(last + 1).filter((d) => !isSeen(d) && !isStarted(d)).slice(0, n);
 }
 
 export interface Group { h: string | null; items: Title[] }

@@ -11,8 +11,10 @@ import { Detail } from "./components/Detail";
 import { Catalog } from "./components/Catalog";
 import { Home } from "./components/Home";
 import { defaultHome, prefsToHome, type HomeState } from "./homeState";
+import { syncCard, useHandle } from "./handle";
 import { Prep } from "./components/Prep";
 import { Profile } from "./components/Profile";
+import { FriendPage } from "./components/Friends";
 import { TopBar } from "./components/TopBar";
 import { useT } from "./i18n";
 import { go, useRoute } from "./router";
@@ -37,6 +39,15 @@ export default function App() {
     if (loaded) setHome(prefsToHome({ prefUni, prefOrder, prefPath, prefTypes: typesKey ? (typesKey.split(",") as TitleType[]) : undefined }));
   }, [loaded, prefUni, prefOrder, prefPath, typesKey]);
 
+  // Nome e avatar del profilo vanno anche accanto al @tag (ricerca amici)
+  const { handle } = useHandle();
+  const pName = data.profile?.name, pAvatar = data.profile?.avatar;
+  useEffect(() => {
+    if (!loaded || !handle) return;
+    const id = window.setTimeout(() => void syncCard(pName, pAvatar), 800); // aspetto che finisca di scrivere
+    return () => clearTimeout(id);
+  }, [loaded, handle, pName, pAvatar]);
+
   /** Dalla Home: apre il Catalogo su un universo (ordine e tipi restano quelli scelti) */
   const openUni = (uni: string) => {
     setHomePart({ uni });
@@ -53,7 +64,7 @@ export default function App() {
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
 
   // Le pagine partono dall'alto (il Catalogo ripristina da solo la sua posizione)
-  const key = route.page === "title" ? `t-${route.id}` : route.page;
+  const key = route.page === "title" ? `t-${route.id}` : route.page === "friend" ? `u-${route.tag}` : route.page;
   useEffect(() => { if (route.page !== "catalog") window.scrollTo(0, 0); }, [key, route.page]);
 
   return (
@@ -67,6 +78,7 @@ export default function App() {
           {route.page === "profile" && <Profile openPath={openPath} />}
           {/* key: cambiando titolo la scheda riparte pulita (tab, spoiler chiusi) */}
           {route.page === "title" && <Detail key={route.id} id={route.id} />}
+          {route.page === "friend" && <FriendPage key={route.tag} tag={route.tag} />}
         </main>
       </AuthGate>
       <Toast />

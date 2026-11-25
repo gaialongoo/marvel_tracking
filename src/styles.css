@@ -53,10 +53,14 @@ h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
   padding:0 24px;background:rgba(11,12,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;cursor:pointer;justify-self:start}
 /* Logo: anello oro sottile con nucleo (richiamo discreto al reattore) */
-.brand-mark{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--gold);display:grid;place-items:center;flex:none}
-.brand-mark::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold)}
-.brand b{font-size:12.5px;letter-spacing:.16em}
-.brand small{display:block;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.14em}
+/* Logo: reattore arc con un alone azzurro; il nucleo pulsa piano */
+.arc{flex:none;display:block;filter:drop-shadow(0 0 6px rgba(79,214,255,.45));transition:transform .3s}
+.brand:hover .arc{transform:rotate(36deg)}
+.arc .arc-glow{animation:arc-pulse 3s ease-in-out infinite;transform-origin:32px 32px}
+@keyframes arc-pulse{50%{opacity:.6;transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.arc .arc-glow{animation:none}}
+/* scritta centrata in verticale rispetto al logo */
+.brand b{font-size:12.5px;letter-spacing:.16em;line-height:1;padding-top:1px}
 
 /* Selettore centrale "delicato": pillola sottile, la voce attiva ha solo un filo d'oro */
 .switch{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
@@ -362,11 +366,21 @@ label.btn{cursor:pointer}
   .detail-grid{grid-template-columns:1fr}
 }
 @media (max-width:760px){
-  /* Barra in alto su due righe: logo + ricerca/lingua sopra, selettore sotto */
-  .top{height:auto;grid-template-columns:auto 1fr;padding:10px 16px;row-gap:10px}
-  .brand b{font-size:11px}.brand small{display:none}
-  .switch{grid-column:1/-1;grid-row:2;justify-self:center}
+  /* Barra in alto su tre righe: logo + lingua + account sopra, ricerca larga
+     quanto lo schermo in mezzo, selettore delle pagine sotto.
+     .top-right "sparisce" (display:contents) così i suoi pezzi si mettono
+     direttamente nella griglia della barra. */
+  .top{height:auto;grid-template-columns:1fr auto auto;padding:10px 16px;row-gap:10px;column-gap:10px}
+  .top-right{display:contents}
+  .brand{grid-column:1;grid-row:1}
+  .seg{grid-column:2;grid-row:1}
+  .account{grid-column:3;grid-row:1}
+  .search{grid-column:1/-1;grid-row:2}
+  .brand b{font-size:11px}
+  .switch{grid-column:1/-1;grid-row:3;justify-self:center}
   .search{width:100%}
+  /* risultati larghi quanto il campo di ricerca, che ora occupa tutta la riga */
+  .results{left:0;right:0;width:auto;max-width:none;max-height:60vh}
   .page{padding:18px 16px 40px}
   .grid2{grid-template-columns:1fr}
   .release{grid-template-columns:1fr}
@@ -484,7 +498,7 @@ main{display:block}
    continua a guardare
    ========================================================================== */
 /* Intestazione: avatar | nome e numeri | prossima uscita */
-.home-head{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;margin-bottom:22px}
+.home-head{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-bottom:22px}
 .home-av{border-radius:50%;transition:transform .15s}
 .home-av:hover{transform:translateY(-2px)}
 .home-who{min-width:0}
@@ -492,14 +506,60 @@ main{display:block}
 .home-who p{margin:4px 0 0;color:var(--muted);font-size:13px}
 .home-who .mono{color:var(--text)}
 /* Prossima uscita: giorni mancanti in grande, cliccabile verso Preparazione */
-.home-next{display:grid;justify-items:end;gap:2px;text-align:right;padding:8px 0 8px 18px;border-left:1px solid var(--line)}
+/* Fila in alto: Continua a guardare (si allarga) + Preparazione (larghezza fissa) */
+/* --top-h = altezza comune delle card di Continua a guardare e del riquadro Preparazione */
+.home-top{--top-h:92px;display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:16px;align-items:start;margin-bottom:24px}
+.home-prep{grid-column:2}
+/* Riquadro della prossima uscita, stessa cornice delle card di "Continua a guardare" */
+.home-next{display:grid;gap:2px;width:100%;text-align:left;padding:10px 16px;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface);transition:.15s;height:var(--top-h);align-content:center}
+.home-next:hover{border-color:var(--gold);background:var(--surface2)}
 .home-next small{color:var(--muted);font-size:12px}
-.home-next b{font-size:30px;font-weight:500;color:var(--gold);line-height:1.1}
+.home-next b{font-size:26px;font-weight:500;color:var(--gold);line-height:1.1}
 .home-next b span{font-size:13px;color:var(--muted)}
 .home-next:hover small:last-child{color:var(--gold)}
 
 /* Porte: MCU grande in cima, poi gli altri universi a griglia */
+/* La Home usa tutta la larghezza dello schermo (niente bande vuote ai lati) */
+.page.home{max-width:none;padding-left:clamp(16px,3vw,48px);padding-right:clamp(16px,3vw,48px)}
+/* Porte: l'MCU su tutta la riga, le altre 6 sempre 3 per riga (due righe
+   piene e simmetriche); da telefono 2 per riga (vedi sotto) */
 .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+/* @tag sotto il nome; riepilogo badge e "Amici" si vedono solo su PC */
+.home-tag{color:var(--gold);font-size:13px}
+.home-badges{display:none}
+.home-friends{display:none}
+
+/* --------------------------------------------------------------------------
+   HOME SU PC: 3 colonne
+   sinistra = profilo + amici · centro = universi · destra = Continua a guardare + Preparazione
+   -------------------------------------------------------------------------- */
+@media (min-width:1100px){
+  .page.home{display:grid;grid-template-columns:280px minmax(0,1fr) 320px;
+    grid-template-areas:"me doors side" "friends doors side";grid-template-rows:auto 1fr;gap:20px 24px;align-items:start}
+  /* colonna sinistra: scheda del profilo centrata */
+  .home-head{grid-area:me;margin:0;grid-template-columns:1fr;justify-items:center;text-align:center;
+    padding:22px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+  .home-head .avatar{width:104px!important;height:104px!important}
+  .home-who h1{font-size:24px}
+  .home-who p{margin-top:8px}
+  .home-badges{display:inline-block;margin-top:12px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--muted);transition:.15s}
+  .home-badges .mono{color:var(--text)}
+  .home-badges:hover{border-color:var(--gold);color:var(--gold)}
+  .home-friends{display:grid;gap:10px;grid-area:friends;padding:18px;justify-items:start}
+  .home-friends .muted-p{margin:0}
+  /* colonna centrale: universi */
+  .doors{grid-area:doors;gap:14px}
+  .door.door-mcu{height:280px}
+  /* colonna destra: Continua a guardare (in colonna) + Preparazione sotto */
+  .home-top{grid-area:side;grid-template-columns:1fr;margin:0;gap:20px}
+  .home-prep{grid-column:auto}
+  .home .cw-row{flex-direction:column;overflow:visible;padding:0}
+  .home .cw-card{flex:none;width:100%}
+  /* su PC le card sono in colonna: la barra di scorrimento non serve */
+  .home .cw-bar{display:none}
+}
+
 .door{position:relative;overflow:hidden;border-radius:12px;aspect-ratio:16/9;text-align:left;isolation:isolate;
   background:radial-gradient(120% 90% at 85% 10%,color-mix(in srgb,var(--c) 85%,#fff 8%),var(--c) 45%,#0b0c0f 100%);
   border:1px solid rgba(255,255,255,.06);transition:transform .2s,border-color .2s}
@@ -510,6 +570,9 @@ main{display:block}
 .door-mcu .door-sym{right:4%;height:140%}
 /* la scritta MARVEL è larga: più dentro, così si legge intera */
 .door-other .door-sym{right:3%;height:110%}
+/* il ragno è alto: più piccolo, così zampe e addome restano dentro il banner */
+.door-sony .door-sym{right:2%;height:100%;transform:translateY(-50%) rotate(-12deg)}
+.door-sony:hover .door-sym{transform:translateY(-50%) rotate(-8deg) scale(1.05)}
 /* Velo scuro in basso a sinistra, dove sta il testo */
 .door::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(15deg,rgba(8,9,11,.92) 10%,rgba(8,9,11,.35) 55%,transparent 80%)}
 .door:hover{transform:translateY(-3px);border-color:rgba(201,162,75,.6)}
@@ -525,8 +588,13 @@ main{display:block}
 .home-h2{font-size:17px;margin-bottom:12px}
 
 /* Continua a guardare: riquadri in fila che scorrono di lato */
-.cw-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory}
+.cw-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.cw-row::-webkit-scrollbar{display:none} /* niente barra del browser: c'è la nostra (.cw-bar) */
+/* Barra sotto la fila: binario grigio + cursore oro che si sposta scorrendo */
+.cw-bar{position:relative;height:4px;margin-top:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.cw-bar i{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--gold);opacity:.8}
 .cw-card{flex:0 0 260px;scroll-snap-align:start;display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;text-align:left;
+  height:var(--top-h,auto);
   padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);transition:.15s}
 .cw-card:hover{border-color:var(--gold);background:var(--surface2)}
 .cw-card.is-next{border-style:dashed}
@@ -563,6 +631,73 @@ main{display:block}
 .av-pick.on span{color:var(--text)}
 
 /* Campi del modulo */
+/* Tag utente nell'intestazione del Profilo e nel menu account */
+/* @tag su una riga sua, sopra l'email (prima finivano attaccati) */
+.prof-tag{display:block;width:fit-content;margin:2px 0 4px;font-size:13px;color:var(--gold);text-align:left}
+.prof-mail{display:block}
+.prof-tag.empty{font-family:inherit;color:var(--muted);text-decoration:underline dotted;text-underline-offset:3px}
+.prof-tag.empty:hover{color:var(--gold)}
+.am-tag{display:block;color:var(--gold);font-size:11.5px}
+/* Campo "@nome" nella finestra di modifica */
+.handle-field{display:grid;gap:6px;margin:16px 0 6px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.handle-row{display:flex;gap:10px;align-items:stretch}
+.handle-in{flex:1;display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:0 10px;min-width:0}
+.handle-in:focus-within{border-color:var(--gold)}
+.handle-in span{color:var(--gold);font-family:var(--mono)}
+.handle-in input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:14px;padding:9px 0}
+.handle-msg{font-size:12px;color:var(--muted)}
+.handle-msg.ok{color:#5fbf7a}.handle-msg.bad{color:var(--red)}
+
+/* ==========================================================================
+   BADGE (components/Badges.tsx)
+   ========================================================================== */
+.badges-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+/* Tendine dei gruppi: intestazione cliccabile con nome, frazione, livelli e barra */
+.badge-group{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-top:10px}
+.badge-group summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto auto 1fr minmax(80px,180px) 14px;
+  align-items:center;gap:12px;padding:14px 16px}
+.badge-group summary::-webkit-details-marker{display:none}
+.badge-group summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:rotate(45deg);transition:transform .2s;justify-self:end;margin-top:-4px}
+.badge-group[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+.badge-group summary:hover .bgs-name{color:var(--gold)}
+.bgs-name{font-weight:600;font-size:15px}
+.bgs-frac{color:var(--gold);font-size:13px}
+.bgs-lv{color:var(--muted);font-size:12px}
+.bgs-bar{height:5px}
+.badge-group .badge-grid{padding:0 12px 12px}
+.badge-group .badge-card{background:var(--bg)}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.badge-card{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.badge-card.lv3{border-color:rgba(245,196,60,.45);background:linear-gradient(135deg,rgba(245,196,60,.08),var(--surface) 60%)}
+.badge-txt{min-width:0;display:grid;gap:3px}
+.badge-txt b{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge-txt small{color:var(--muted);font-size:11.5px;line-height:1.35}
+.badge-txt .progress{height:4px;margin:3px 0 2px}
+.badge-lvl{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lv1 .badge-lvl{color:#d99a5b}.lv2 .badge-lvl{color:#c9cdd4}.lv3 .badge-lvl{color:var(--gold)}
+.stars{display:inline-flex;gap:1px}
+.stars i{font-style:normal;color:#3a3f48}
+.lv1 .stars i.on{color:#d99a5b}.lv2 .stars i.on{color:#c9cdd4}.lv3 .stars i.on{color:#f5c43c}
+/* Medaglia: fondo colorato del badge + anello del colore del livello */
+.medal{display:grid;place-items:center;flex:none;border-radius:50%;overflow:hidden;background:var(--tint);margin:4px;
+  box-shadow:0 0 0 3px #3a3f48,inset 0 -6px 0 rgba(0,0,0,.08)}
+.medal svg{width:86%;height:86%;display:block}
+.medal.lv1{box-shadow:0 0 0 3px #b87333,0 0 0 5px rgba(184,115,51,.25)}
+.medal.lv2{box-shadow:0 0 0 3px #c9cdd4,0 0 0 5px rgba(201,205,212,.25)}
+.medal.lv3{box-shadow:0 0 0 3px #f5c43c,0 0 0 6px rgba(245,196,60,.3),0 0 18px rgba(245,196,60,.35)}
+/* non ancora conquistato: grigio e sbiadito */
+.medal.lv0{background:#2b2f36}
+.medal.lv0 svg{filter:grayscale(1);opacity:.45}
+
+/* Finestra "Modifica profilo": titolo e "Fatto" fissi, il contenuto scorre */
+.modal.prof-form{width:min(760px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);padding:0;display:flex;flex-direction:column}
+.ep-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.ep-head h2{margin:0}
+.ep-x{width:32px;height:32px;border-radius:50%;color:var(--muted);font-size:14px}
+.ep-x:hover{background:var(--surface2);color:var(--text)}
+.ep-body{overflow:auto;padding:4px 20px 20px;flex:1}
+.ep-foot{display:flex;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--line)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
 .form-grid label{display:grid;gap:6px;min-width:0}
 .form-grid .eyebrow small{float:right;letter-spacing:0}
@@ -572,10 +707,13 @@ main{display:block}
 
 /* Responsive delle nuove pagine */
 @media (max-width:760px){
-  .home-head{grid-template-columns:auto 1fr;gap:12px}
+  .home-head{gap:12px}
+  .badge-group summary{grid-template-columns:1fr auto 14px;row-gap:8px}
+  .bgs-lv{display:none}
+  .bgs-bar{grid-column:1/-1;grid-row:2}
+  .home-top{grid-template-columns:minmax(0,1fr)}
+  .home-prep{grid-column:auto}
   .home-who h1,.prof-main h1{font-size:21px}
-  .home-next{grid-column:1/-1;justify-items:start;text-align:left;border-left:none;border-top:1px solid var(--line);padding:10px 0 0;
-    grid-template-columns:1fr auto;align-items:baseline}
   .doors{grid-template-columns:1fr 1fr;gap:10px}
   .door.door-mcu{height:200px}
   .door-txt{left:12px;right:12px;bottom:10px}
@@ -588,4 +726,49 @@ main{display:block}
   .form-grid{grid-template-columns:1fr}
   .av-grid{grid-template-columns:repeat(auto-fill,minmax(72px,1fr))}
   .av-pick .avatar{width:56px!important;height:56px!important}
+}
+
+/* ==========================================================================
+   AMICI (components/Friends.tsx) e riquadro Amici della Home
+   ========================================================================== */
+.link-btn{color:var(--gold);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+.friends .eyebrow small{color:var(--muted);margin-left:4px}
+.fr-search{display:grid;gap:8px;margin-top:12px;max-width:520px}
+.fr-results{display:grid;gap:6px}
+.fr-block{margin-top:6px}
+.fr-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.fr-row + .fr-row{margin-top:6px}
+.fr-who{min-width:0;display:grid}
+.fr-who b,.fr-card b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fr-who small,.fr-card small{color:var(--muted);font-size:11.5px}
+.fr-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.fr-state{font-size:12px;color:var(--muted)}
+.fr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.fr-card{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);transition:.15s}
+.fr-card > span{min-width:0;display:grid}
+.fr-card:hover{border-color:var(--gold)}
+/* pagina di un amico */
+.fr-head{margin-top:14px}
+.fr-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fr-kpis .panel{padding:14px 16px;display:grid;gap:4px}
+.fr-kpis b{font-size:22px;font-weight:500;color:var(--gold)}
+.fr-rated{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.fr-rate{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;text-align:left;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.fr-rate:hover{border-color:var(--gold)}
+.fr-rate > span{min-width:0;display:grid}
+.fr-rate b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fr-rate small{color:var(--muted);font-size:11.5px}
+.muted{color:var(--muted)}
+/* riquadro Amici della Home (PC) */
+.hf-req{justify-self:start;padding:6px 12px;border-radius:999px;background:var(--gold-soft);color:var(--gold);font-size:12.5px}
+.hf-list{display:grid;gap:4px;width:100%}
+.hf-item{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:8px;text-align:left;font-size:13.5px}
+.hf-item:hover{background:var(--surface2)}
+.hf-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:760px){
+  .fr-kpis{grid-template-columns:1fr 1fr}
+  .fr-row{grid-template-columns:auto 1fr}
+  .fr-row .fr-acts{grid-column:1/-1;justify-content:flex-start}
+  .fr-head .fr-acts{grid-column:1/-1;justify-content:flex-start}
+  .fr-rated{grid-template-columns:1fr}
 }

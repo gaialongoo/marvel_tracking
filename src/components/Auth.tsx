@@ -10,6 +10,7 @@
    ============================================================================ */
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { signIn, signOut, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
+import { useHandle } from "../handle";
 import { useDisplayName } from "../hooks";
 import { useT } from "../i18n";
 import { go } from "../router";
@@ -237,6 +238,7 @@ export function AccountMenu() {
   const { t } = useT();
   const { user } = useAuth();
   const { sync, data } = useStore();
+  const { handle } = useHandle();
   const name = useDisplayName();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -268,6 +270,7 @@ export function AccountMenu() {
             <Avatar k={data.profile?.avatar} size={40} fallback={name} />
             <div>
               <b>{name}</b>
+              {handle && <small className="am-tag mono">@{handle}</small>}
               <small className="am-mail">{user?.email}</small>
             </div>
           </div>

@@ -1,17 +1,29 @@
 /* ============================================================================
-   HOME — la prima pagina dopo l'accesso:
-   1. Intestazione: avatar, nome, frase e quanto hai visto in tutto;
-      a destra la prossima uscita con il conto alla rovescia
-   2. Le "porte" degli universi: un riquadro con immagine per ogni universo,
-      con la sua avanzata; cliccando si apre il Catalogo su quell'universo
-   3. Continua a guardare: serie iniziate e non finite + il prossimo titolo
-      secondo le preferenze di visione del Profilo (universo, ordine, tipi):
-      quello dopo l'ultimo visto della lista, senza tornare ai saltati
+   HOME — la prima pagina dopo l'accesso.
+   Su PC (schermo largo) è divisa in 3 colonne:
+     sinistra = profilo + amici · centro = universi ·
+     destra = Continua a guardare + Preparazione
+   Su telefono e tablet le parti vanno una sotto l'altra, in questo ordine:
+   1. Intestazione: avatar, nome, @tag, frase e quanto hai visto in tutto
+      (su PC diventa la scheda del profilo, con i badge; sotto c'è "Amici")
+   2. In alto, affiancati:
+      - Continua a guardare: serie iniziate e non finite + il prossimo titolo
+        secondo le preferenze di visione del Profilo (universo, ordine, tipi):
+        quello dopo l'ultimo visto della lista, senza tornare ai saltati
+      - Preparazione: la prossima uscita con il conto alla rovescia
+        (cliccando si va alla pagina Preparazione)
+   3. Le "porte" degli universi: un riquadro per ogni universo, con la sua
+      avanzata; cliccando si apre il Catalogo su quell'universo
    Ogni porta ha il colore del suo universo e un grande simbolo in filigrana
-   (disegni SVG nostri, vedi DOOR_SYMBOL).
+   (disegni SVG nostri, in data/universeArt.ts: li usano anche i badge).
    ============================================================================ */
 import { DATA, BY_ID } from "../data/titles";
 import { PATHS, UNIVERSES, UPCOMING } from "../data/meta";
+import { DOOR_COLOR, DOOR_SYMBOL } from "../data/universeArt";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { computeBadges } from "../badges";
+import { useFriends } from "../friends";
+import { useHandle } from "../handle";
 import { useDisplayName } from "../hooks";
 import { buildGroups, nextUp, prefsToHome } from "../homeState";
 import { useT } from "../i18n";
@@ -22,46 +34,7 @@ import { epsSeen, fmtMin, hasEps, watchedMin } from "../utils";
 import { Avatar } from "./Avatar";
 import { Thumb } from "./Thumb";
 
-/** Colore di sfondo di ogni porta: una tinta diversa per ciascun universo,
-    così si riconoscono a colpo d'occhio */
-const DOOR_COLOR: Record<string, string> = {
-  mcu: "#8a1c1c",       // rosso
-  xmen: "#1f3f8a",      // blu
-  f4fox: "#0f6a6e",     // verde acqua
-  sony: "#7a1a55",      // magenta
-  other: "#8a5212",     // arancio
-  tv: "#2f6a2c",        // verde
-  animation: "#53318f", // viola
-};
 
-/** Simbolo in filigrana di ogni porta (viewBox 100x100, linee bianche).
-    Disegni nostri: richiamano l'universo con un oggetto, un personaggio
-    o il suo segno più noto (la X degli X-Men, la scritta MARVEL). */
-const DOOR_SYMBOL: Record<string, string> = {
-  // MCU: lo scudo di Captain America (anelli + stella piena)
-  mcu: `<circle cx="50" cy="50" r="43"/><circle cx="50" cy="50" r="31"/><circle cx="50" cy="50" r="19"/>`
-    + `<path d="M50.0 33.0 L54.1 44.3 L66.2 44.7 L56.7 52.2 L60.0 63.8 L50.0 57.0 L40.0 63.8 L43.3 52.2 L33.8 44.7 L45.9 44.3Z" fill="#fff" stroke-width="2"/>`,
-  // X-Men: la "X" con le punte allargate dentro il cerchio
-  xmen: `<circle cx="50" cy="50" r="43"/><path d="M24 20 H40 L50 38 L60 20 H76 L58 50 L76 80 H60 L50 62 L40 80 H24 L42 50Z"/>`,
-  // Fantastici 4: un "4" pieno e squadrato, con il buco a triangolo
-  f4fox: `<path d="M56 10 H71 V56 H82 V70 H71 V90 H56 V70 H16 V57Z M56 33 L33 56 H56Z" fill-rule="evenodd"/>`,
-  // Spider-Man: ragno con testa, addome a goccia e otto zampe piegate
-  sony: `<ellipse cx="50" cy="36" rx="6" ry="7"/><path d="M50 45 Q60 49 58 65 Q55 82 50 87 Q45 82 42 65 Q40 49 50 45Z"/>`
-    + `<path d="M45 38 L31 25 L27 6 M44 45 L24 39 L11 24 M44 55 L24 61 L11 77 M46 63 L32 77 L28 95`
-    + ` M55 38 L69 25 L73 6 M56 45 L76 39 L89 24 M56 55 L76 61 L89 77 M54 63 L68 77 L72 95"/>`,
-  // Altri film: la scritta MARVEL nel riquadro (testo pieno, senza contorno)
-  other: `<rect x="5" y="31" width="90" height="38" rx="3"/>`
-    + `<text x="50" y="60" text-anchor="middle" textLength="78" lengthAdjust="spacingAndGlyphs" fill="#fff" stroke="none"`
-    + ` font-family="Impact, 'Arial Black', sans-serif" font-weight="900" font-size="30">MARVEL</text>`,
-  // Serie TV: vecchio televisore con le antenne
-  tv: `<rect x="12" y="30" width="76" height="54" rx="10"/><rect x="21" y="39" width="45" height="36" rx="6"/>`
-    + `<circle cx="77" cy="47" r="3.5"/><circle cx="77" cy="62" r="3.5"/><path d="M44 30 L30 10 M56 30 L70 10 M28 84 V92 M72 84 V92"/>`,
-  // Animazione: striscia di pellicola con la pallina che rimbalza (il primo esercizio di ogni animatore)
-  animation: `<rect x="28" y="4" width="44" height="92" rx="4"/><rect x="37" y="10" width="26" height="24" rx="2" stroke-width="3"/>`
-    + `<rect x="37" y="38" width="26" height="24" rx="2" stroke-width="3"/><rect x="37" y="66" width="26" height="24" rx="2" stroke-width="3"/>`
-    + `<circle cx="50" cy="18" r="5" fill="#fff"/><circle cx="50" cy="47" r="5" fill="#fff"/><ellipse cx="50" cy="85" rx="7" ry="3.5" fill="#fff"/>`
-    + `<path d="M32.5 12 V16 M32.5 26 V30 M32.5 40 V44 M32.5 54 V58 M32.5 68 V72 M32.5 82 V86 M67.5 12 V16 M67.5 26 V30 M67.5 40 V44 M67.5 54 V58 M67.5 68 V72 M67.5 82 V86" stroke-width="3.5"/>`,
-};
 
 /** openUni = apre il Catalogo su un universo (da App) */
 export function Home({ openUni }: { openUni: (uni: string) => void }) {
@@ -69,6 +42,12 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
   const { data } = useStore();
   const name = useDisplayName();
   const p = data.profile ?? {};
+  const { handle } = useHandle();
+  const { friends, incoming } = useFriends();
+  // badge conquistati (solo per il riepilogo nella scheda del profilo su PC)
+  const badges = useMemo(() => computeBadges(data), [data]);
+  const badgesWon = badges.filter((b) => b.level > 0).length;
+  const badgesGold = badges.filter((b) => b.level === 3).length;
 
   // --- 1. quanto ho visto in tutto ---
   const seenN = DATA.filter((d) => data.seen[d.id]).length;
@@ -77,8 +56,12 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
   // --- 3. continua a guardare ---
   const started = DATA.filter((d) => hasEps(d) && !data.seen[d.id] && epsSeen(data, d.id) > 0);
   const prefs = prefsToHome(p);
-  // prossimo = il primo non visto DOPO l'ultimo visto della lista (vedi nextUp)
-  const next = nextUp(buildGroups(prefs, lang, t).flatMap((g) => g.items), (d) => !!data.seen[d.id], (d) => started.includes(d));
+  // Massimo 3 titoli in tutto: prima le serie iniziate, poi i "da guardare"
+  // (i primi non visti DOPO l'ultimo visto della lista, vedi nextUp; il primo è il "prossimo")
+  const MAX_CW = 3;
+  const startedShown = started.slice(0, MAX_CW);
+  const nexts = nextUp(buildGroups(prefs, lang, t).flatMap((g) => g.items), (d) => !!data.seen[d.id], (d) => started.includes(d), MAX_CW - startedShown.length);
+  const next = nexts[0];
   const uni = UNIVERSES.find((u) => u.k === prefs.uni);
   // Ordine usato per il "prossimo", es. "Cronologico · MCU" o "Percorsi · Iron Man"
   const orderLabel = prefs.order === "paths"
@@ -101,21 +84,67 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
         </button>
         <div className="home-who">
           <h1>{name}</h1>
+          {handle && <span className="home-tag mono">@{handle}</span>}
           <p>
             {p.bio ? <>{p.bio} · </> : null}
             <span className="mono">{seenN}/{DATA.length}</span> {t("titles")} · <span className="mono">{fmtMin(minutes)}</span>
           </p>
-        </div>
-        {up && (
-          <button className="home-next" onClick={() => go({ page: "prep" })}>
-            <small>{up.t}</small>
-            <b className="mono">{up.approx ? "~" : ""}{days} <span>{t("d")}</span></b>
-            {upItems.length > 0 && <small>{t("officialList")} {upDone}/{upItems.length} →</small>}
+          {/* solo su PC: riepilogo dei badge, porta al Profilo */}
+          <button className="home-badges" onClick={() => go({ page: "profile" })}>
+            <span className="mono">{badgesWon}/{badges.length}</span> {t("badgesWon")} · <span className="mono">{badgesGold}</span> {t("lvlGold")} →
           </button>
-        )}
+        </div>
       </header>
 
-      {/* 2. PORTE DEGLI UNIVERSI (la prima, l'MCU, è più grande) */}
+      {/* AMICI (solo su PC, colonna di sinistra): richieste in arrivo e i
+          primi amici; ricerca e lista completa sono nel Profilo */}
+      <section className="home-friends panel">
+        <h2 className="home-h2">{t("friends")} <small className="mono muted">{friends.length}</small></h2>
+        {incoming.length > 0 && (
+          <button className="hf-req" onClick={() => go({ page: "profile" })}>{incoming.length} {t("frNewRequests")} →</button>
+        )}
+        {friends.length === 0 ? <p className="muted-p">{t("frNoneHome")}</p> : (
+          <div className="hf-list">
+            {friends.slice(0, 6).map((f) => (
+              <button key={f.id} className="hf-item" onClick={() => go({ page: "friend", tag: f.handle })}>
+                <Avatar k={f.avatar ?? undefined} size={34} fallback={f.name || f.handle} />
+                <span>{f.name || `@${f.handle}`}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        <button className="link-btn" onClick={() => go({ page: "profile" })}>{handle ? t("frManage") : t("pickHandle")} →</button>
+      </section>
+
+      {/* 2. IN ALTO: CONTINUA A GUARDARE (a sinistra) + PREPARAZIONE (a destra) */}
+      {(started.length > 0 || next || up) && (
+        <section className="home-top">
+          {(started.length > 0 || next) && (
+            <div className="home-cw">
+              <h2 className="home-h2">{t("continue")}</h2>
+              <ScrollRow>
+                {startedShown.map((d) => <ContinueCard key={d.id} d={d} />)}
+                {nexts.map((d, i) => (
+                  <ContinueCard key={d.id} d={d}
+                    tag={i === 0 ? `${t("nextUp")} · ${orderLabel}` : `${t("thenUp")} · ${i + 1}°`} />
+                ))}
+              </ScrollRow>
+            </div>
+          )}
+          {up && (
+            <div className="home-prep">
+              <h2 className="home-h2">{t("prep")}</h2>
+              <button className="home-next" onClick={() => go({ page: "prep" })}>
+                <small>{up.t}</small>
+                <b className="mono">{up.approx ? "~" : ""}{days} <span>{t("d")}</span></b>
+                {upItems.length > 0 && <small>{t("officialList")} {upDone}/{upItems.length} →</small>}
+              </button>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* 3. PORTE DEGLI UNIVERSI (la prima, l'MCU, è più grande) */}
       <section className="doors">
         {UNIVERSES.filter((u) => u.k !== "all").map((u) => {
           const items = DATA.filter((d) => d.uni === u.k);
@@ -126,17 +155,6 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
           );
         })}
       </section>
-
-      {/* 3. CONTINUA A GUARDARE */}
-      {(started.length > 0 || next) && (
-        <section className="block">
-          <h2 className="home-h2">{t("continue")}</h2>
-          <div className="cw-row">
-            {started.map((d) => <ContinueCard key={d.id} d={d} />)}
-            {next && <ContinueCard d={next} tag={`${t("nextUp")} · ${orderLabel}`} />}
-          </div>
-        </section>
-      )}
     </div>
   );
 }
@@ -183,5 +201,42 @@ function ContinueCard({ d, tag }: { d: Title; tag?: string }) {
         {isSeries && <div className="progress" style={{ "--w": `${(n / (d.eps as number)) * 100}%`, marginTop: 8 } as React.CSSProperties}><i /></div>}
       </div>
     </button>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   FILA CHE SCORRE DI LATO con una barra sotto che mostra dove sei.
+   La barra è disegnata da noi: quella del browser sul telefono (soprattutto
+   iPhone) sparisce da sola. Se tutto ci sta, la barra non si vede.
+   --------------------------------------------------------------------------- */
+function ScrollRow({ children }: { children: React.ReactNode }) {
+  const row = useRef<HTMLDivElement>(null);
+  // size = larghezza del cursore (0–1), pos = posizione (0–1)
+  const [bar, setBar] = useState({ size: 1, pos: 0 });
+
+  useEffect(() => {
+    const el = row.current;
+    if (!el) return;
+    const update = () => {
+      const size = el.scrollWidth > 0 ? Math.min(1, el.clientWidth / el.scrollWidth) : 1;
+      const max = el.scrollWidth - el.clientWidth;
+      setBar({ size, pos: max > 0 ? el.scrollLeft / max : 0 });
+    };
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update); // cambia la larghezza (rotazione, finestra) o il contenuto
+    ro.observe(el);
+    return () => { el.removeEventListener("scroll", update); ro.disconnect(); };
+  }, []);
+
+  return (
+    <div className="cw-wrap">
+      <div className="cw-row" ref={row}>{children}</div>
+      {bar.size < 1 && (
+        <div className="cw-bar" aria-hidden="true">
+          <i style={{ width: `${bar.size * 100}%`, left: `${bar.pos * (1 - bar.size) * 100}%` }} />
+        </div>
+      )}
+    </div>
   );
 }
