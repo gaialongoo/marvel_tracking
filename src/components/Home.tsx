@@ -35,27 +35,24 @@ const DOOR_COLOR: Record<string, string> = {
 };
 
 /** Simbolo in filigrana di ogni porta (viewBox 100x100, linee bianche).
-    Disegni nostri: richiamano l'universo con un oggetto o un personaggio
-    riconoscibile, senza copiare i loghi ufficiali. */
+    Disegni nostri: richiamano l'universo con un oggetto, un personaggio
+    o il suo segno più noto (la X degli X-Men, la scritta MARVEL). */
 const DOOR_SYMBOL: Record<string, string> = {
   // MCU: lo scudo di Captain America (anelli + stella piena)
   mcu: `<circle cx="50" cy="50" r="43"/><circle cx="50" cy="50" r="31"/><circle cx="50" cy="50" r="19"/>`
     + `<path d="M50.0 33.0 L54.1 44.3 L66.2 44.7 L56.7 52.2 L60.0 63.8 L50.0 57.0 L40.0 63.8 L43.3 52.2 L33.8 44.7 L45.9 44.3Z" fill="#fff" stroke-width="2"/>`,
-  // X-Men: i tre artigli di Wolverine che escono dal pugno, a ventaglio
-  xmen: `<path d="M28.5 76 L35.5 76 L34.5 22 L32 2 L29.5 22Z" transform="rotate(-12 50 96)"/>`
-    + `<path d="M46.5 76 L53.5 76 L52.5 22 L50 2 L47.5 22Z"/>`
-    + `<path d="M64.5 76 L71.5 76 L70.5 22 L68 2 L65.5 22Z" transform="rotate(12 50 96)"/>`
-    + `<path d="M18 98 V84 Q18 76 27 76 H73 Q82 76 82 84 V98 M36 76 V84 M50 76 V84 M64 76 V84"/>`,
+  // X-Men: la "X" con le punte allargate dentro il cerchio
+  xmen: `<circle cx="50" cy="50" r="43"/><path d="M24 20 H40 L50 38 L60 20 H76 L58 50 L76 80 H60 L50 62 L40 80 H24 L42 50Z"/>`,
   // Fantastici 4: un "4" pieno e squadrato, con il buco a triangolo
   f4fox: `<path d="M56 10 H71 V56 H82 V70 H71 V90 H56 V70 H16 V57Z M56 33 L33 56 H56Z" fill-rule="evenodd"/>`,
   // Spider-Man: ragno con testa, addome a goccia e otto zampe piegate
   sony: `<ellipse cx="50" cy="36" rx="6" ry="7"/><path d="M50 45 Q60 49 58 65 Q55 82 50 87 Q45 82 42 65 Q40 49 50 45Z"/>`
     + `<path d="M45 38 L31 25 L27 6 M44 45 L24 39 L11 24 M44 55 L24 61 L11 77 M46 63 L32 77 L28 95`
     + ` M55 38 L69 25 L73 6 M56 45 L76 39 L89 24 M56 55 L76 61 L89 77 M54 63 L68 77 L72 95"/>`,
-  // Altri film: teschio in fiamme (Ghost Rider)
-  other: `<path d="M30 34 Q22 18 32 6 Q35 18 41 21 Q41 9 50 2 Q55 14 59 21 Q64 11 70 8 Q77 20 70 34"/>`
-    + `<path d="M28 52 Q28 26 50 26 Q72 26 72 52 Q72 62 64 66 V78 H36 V66 Q28 62 28 52Z"/>`
-    + `<circle cx="40" cy="50" r="7"/><circle cx="60" cy="50" r="7"/><path d="M50 57 L46 64 H54Z M43 67 V78 M50 67 V78 M57 67 V78"/>`,
+  // Altri film: la scritta MARVEL nel riquadro (testo pieno, senza contorno)
+  other: `<rect x="5" y="31" width="90" height="38" rx="3"/>`
+    + `<text x="50" y="60" text-anchor="middle" textLength="78" lengthAdjust="spacingAndGlyphs" fill="#fff" stroke="none"`
+    + ` font-family="Impact, 'Arial Black', sans-serif" font-weight="900" font-size="30">MARVEL</text>`,
   // Serie TV: vecchio televisore con le antenne
   tv: `<rect x="12" y="30" width="76" height="54" rx="10"/><rect x="21" y="39" width="45" height="36" rx="6"/>`
     + `<circle cx="77" cy="47" r="3.5"/><circle cx="77" cy="62" r="3.5"/><path d="M44 30 L30 10 M56 30 L70 10 M28 84 V92 M72 84 V92"/>`,

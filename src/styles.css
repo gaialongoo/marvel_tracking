@@ -508,6 +508,8 @@ main{display:block}
 .door-sym{position:absolute;right:-6%;top:50%;height:125%;width:auto;aspect-ratio:1;transform:translateY(-50%) rotate(-8deg);z-index:-2;
   fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.17;transition:transform .5s,opacity .3s}
 .door-mcu .door-sym{right:4%;height:140%}
+/* la scritta MARVEL è larga: più dentro, così si legge intera */
+.door-other .door-sym{right:3%;height:110%}
 /* Velo scuro in basso a sinistra, dove sta il testo */
 .door::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(15deg,rgba(8,9,11,.92) 10%,rgba(8,9,11,.35) 55%,transparent 80%)}
 .door:hover{transform:translateY(-3px);border-color:rgba(201,162,75,.6)}
