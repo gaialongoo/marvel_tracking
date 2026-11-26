@@ -14,3 +14,11 @@ export const CONTACT_EMAIL = "info@marveltracker.com";
  * consenso dei genitori per i servizi online)
  */
 export const MIN_AGE = 14;
+
+/**
+ * Chiave pubblica ("Site Key") del controllo anti-bot Cloudflare Turnstile
+ * (Cloudflare -> Turnstile). È fatta per stare nel sito. La chiave segreta
+ * invece va solo in Supabase (Authentication -> Attack Protection).
+ * Vuota = controllo spento.
+ */
+export const TURNSTILE_SITE_KEY = "0x4AAAAAAGU6JoIk_f26ef8H";

@@ -933,6 +933,8 @@ main{display:block}
 /* casella "ho almeno 14 anni…": non larga come i campi di testo (.auth-form input), sennò spinge fuori la frase */
 .auth-form .auth-agree input{width:16px;height:16px;padding:0;margin:2px 0 0;flex:none;cursor:pointer}
 .auth-form .auth-agree span{flex:1;min-width:0}
+/* Controllo anti-bot di Cloudflare: di solito invisibile, compare solo se chiede un clic */
+.auth-form .turnstile:empty{display:none}
 
 /* Scelta del titolo preferito (TitlePicker): ricerca + universi a tendina */
 .tp-field{grid-column:1/-1;display:grid;gap:6px;min-width:0}

@@ -20,6 +20,7 @@ import { ArcReactor } from "./ArcReactor";
 import { SiteFooter } from "./Legal";
 import { Avatar } from "./Avatar";
 import { ThemeButton } from "./ThemeButton";
+import { Turnstile, captchaOn } from "./Turnstile";
 import { posterPath, posterUrl } from "../poster";
 
 /** Password lunga almeno 8 caratteri (stessa regola da impostare su Supabase) */
@@ -132,6 +133,10 @@ function AuthPage() {
   const [info, setInfo] = useState<"infoConfirm" | "infoReset" | null>(null);
   // Arrivata da un link di invito? (il @tag di chi ha invitato)
   const [invite] = useState(() => rememberInvite());
+  // Controllo anti-bot: gettone di Cloudflare e "key" per rifare il widget
+  // dopo ogni tentativo (ogni gettone vale una volta sola)
+  const [captcha, setCaptcha] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
 
   /** Cambia modalità tenendo l'email già scritta */
   const switchTo = (m: Mode) => { setMode(m); setErr(null); setInfo(null); setPw(""); setPw2(""); clearLinkErr(); };
@@ -144,21 +149,25 @@ function AuthPage() {
     if (mode === "signup" && pw.length < MIN_PW) return setErr("err_short");
     if (mode === "signup" && pw !== pw2) return setErr("err_mismatch");
     if (mode === "signup" && !agree) return setErr("err_agree");
+    if (captchaOn && !captcha) return setErr("err_captcha");
+    const token = captcha ?? undefined;
     setBusy(true);
     if (mode === "signin") {
-      setErr(await signIn(mail, pw)); // se va bene, AuthGate mostra l'app da solo
+      setErr(await signIn(mail, pw, token)); // se va bene, AuthGate mostra l'app da solo
     } else if (mode === "signup") {
-      const r = await signUp(mail, pw);
+      const r = await signUp(mail, pw, token);
       setErr(r.err);
       if (!r.err && r.needsConfirm) { setInfo("infoConfirm"); setMode("signin"); setPw(""); setPw2(""); }
     } else {
       clearLinkErr();
-      const r = await sendReset(mail);
+      const r = await sendReset(mail, token);
       setErr(r);
       // dopo l'invio (o se Supabase dice di aspettare) parte il conto alla rovescia
       if (!r || r === "err_emailRate" || r === "err_rate") setWait(RESEND_WAIT);
       if (!r) setInfo("infoReset");
     }
+    // gettone usato: ne serve uno nuovo per il prossimo tentativo
+    if (captchaOn) { setCaptcha(null); setCaptchaKey((k) => k + 1); }
     setBusy(false);
   };
 
@@ -196,6 +205,9 @@ function AuthPage() {
             <span>{t("agree1")} {MIN_AGE} {t("agree2")} <a href="#/privacy">{t("agreePrivacy")}</a>.</span>
           </label>
         )}
+
+        {/* Controllo anti-bot di Cloudflare (solo se attivo, vedi config.ts) */}
+        <Turnstile key={captchaKey} onToken={(tk) => { setCaptcha(tk); if (tk && err === "err_captcha") setErr(null); }} />
 
         {/* Messaggi: errore in rosso, informazione in oro */}
         {/* Il link dell'email non ha funzionato (vale per conferma e per password) */}

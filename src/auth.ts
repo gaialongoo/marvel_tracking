@@ -76,12 +76,13 @@ export const clearLinkErr = () => setState({ linkErr: false });
 // Errori - Supabase risponde con codici in inglese; li riduco a poche chiavi
 // che i18n.ts traduce (err_…).
 export type AuthErr = "err_credentials" | "err_notConfirmed" | "err_exists" | "err_weak" | "err_rate" | "err_emailRate"
-  | "err_samePw" | "err_network" | "err_generic";
+  | "err_samePw" | "err_network" | "err_captcha" | "err_generic";
 
 function toErr(e: { code?: string; message?: string; status?: number } | null): AuthErr | null {
   if (!e) return null;
   const c = e.code || "";
   if (c === "invalid_credentials") return "err_credentials";
+  if (c === "captcha_failed") return "err_captcha";                  // controllo anti-bot non passato o scaduto
   if (c === "email_not_confirmed") return "err_notConfirmed";
   if (c === "user_already_exists" || c === "email_exists") return "err_exists";
   if (c === "weak_password") return "err_weak";
@@ -92,9 +93,11 @@ function toErr(e: { code?: string; message?: string; status?: number } | null): 
   return "err_generic";
 }
 
+// captcha = gettone del controllo anti-bot (components/Turnstile.tsx), se attivo
+
 /** Accedi con email e password */
-export async function signIn(email: string, password: string): Promise<AuthErr | null> {
-  const { error } = await supabase!.auth.signInWithPassword({ email, password });
+export async function signIn(email: string, password: string, captcha?: string): Promise<AuthErr | null> {
+  const { error } = await supabase!.auth.signInWithPassword({ email, password, options: { captchaToken: captcha } });
   return toErr(error);
 }
 
@@ -102,8 +105,8 @@ export async function signIn(email: string, password: string): Promise<AuthErr |
  * Crea un account. Supabase manda un'email con il link di conferma;
  * "needsConfirm" è true finché il link non viene cliccato.
  */
-export async function signUp(email: string, password: string): Promise<{ err: AuthErr | null; needsConfirm: boolean }> {
-  const { data, error } = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: redirectUrl() } });
+export async function signUp(email: string, password: string, captcha?: string): Promise<{ err: AuthErr | null; needsConfirm: boolean }> {
+  const { data, error } = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: redirectUrl(), captchaToken: captcha } });
   // Email già registrata e confermata: per privacy Supabase non dà errore
   // ma restituisce un utente senza "identities"
   if (!error && data.user && data.user.identities?.length === 0) return { err: "err_exists", needsConfirm: false };
@@ -111,8 +114,8 @@ export async function signUp(email: string, password: string): Promise<{ err: Au
 }
 
 /** Manda l'email con il link per scegliere una nuova password */
-export async function sendReset(email: string): Promise<AuthErr | null> {
-  const { error } = await supabase!.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl() });
+export async function sendReset(email: string, captcha?: string): Promise<AuthErr | null> {
+  const { error } = await supabase!.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl(), captchaToken: captcha });
   return toErr(error);
 }
 
