@@ -7,7 +7,7 @@ export const SITE_URL = "https://marveltracker.com/";
  * Email per le richieste sulla privacy (copia o cancellazione dei dati,
  * segnalazioni). Vuota = la pagina Privacy mostra "contatto in arrivo".
  */
-export const CONTACT_EMAIL = "";
+export const CONTACT_EMAIL = "info@marveltracker.com";
 
 /**
  * Età minima per creare un account (in Italia sotto i 14 anni serve il
