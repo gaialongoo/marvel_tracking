@@ -21,4 +21,4 @@ export const MIN_AGE = 14;
  * invece va solo in Supabase (Authentication -> Attack Protection).
  * Vuota = controllo spento.
  */
-export const TURNSTILE_SITE_KEY = "0x4AAAAAAGU6JoIk_f26ef8H";
+export const TURNSTILE_SITE_KEY: string = "0x4AAAAAAGU6JoIk_f26ef8H";
