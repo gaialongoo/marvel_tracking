@@ -61,7 +61,15 @@ const clean = (d: SavedData): SavedData => ({
   seen: d.seen, rating: d.rating, eps: d.eps || {},
   ...(d.profile && typeof d.profile === "object" ? { profile: d.profile } : {}),
   ...(typeof d.back === "number" && d.back > 0 ? { back: d.back } : {}),
+  ...(cleanWatch(d.watch) ? { watch: cleanWatch(d.watch) } : {}),
 });
+
+/** Lista "Da vedere" pulita: solo id → numero; vuota = assente */
+function cleanWatch(w: unknown): Record<string, number> | undefined {
+  if (!w || typeof w !== "object") return undefined;
+  const out = Object.fromEntries(Object.entries(w as Record<string, unknown>).filter(([, v]) => typeof v === "number")) as Record<string, number>;
+  return Object.keys(out).length ? out : undefined;
+}
 
 /** true se non c'è niente di segnato (nessun visto, voto o episodio) */
 const isEmpty = (d: SavedData) =>
@@ -255,7 +263,9 @@ function mergeData(account: SavedData, browser: SavedData): SavedData {
     if (epsOf(id) && eps[id].length >= epsOf(id)) seen[id] = true;
   }
   const back = Math.max(account.back ?? 0, browser.back ?? 0); // il conteggio più alto dei due
-  return { seen, rating, eps, ...(account.profile ? { profile: account.profile } : {}), ...(back ? { back } : {}) };
+  const watch = { ...browser.watch, ...account.watch };          // le due liste "Da vedere" insieme
+  return { seen, rating, eps, ...(account.profile ? { profile: account.profile } : {}), ...(back ? { back } : {}),
+    ...(Object.keys(watch).length ? { watch } : {}) };
 }
 
 /** Risposta alla domanda sui dati del browser. Dopo la scelta i dati del
@@ -299,7 +309,23 @@ export function setSeen(id: string, on: boolean) {
     back: on && !d.seen[id] ? backAfter(d, id) : d.back,
     seen: { ...d.seen, [id]: on },
     eps: n ? { ...d.eps, [id]: on ? Array.from({ length: n }, (_, i) => i + 1) : [] } : d.eps,
+    // visto → esce dalla lista "Da vedere"
+    watch: on ? withoutWatch(d.watch, id) : d.watch,
   });
+}
+
+/** La lista "Da vedere" senza un titolo (undefined se resta vuota) */
+function withoutWatch(w: Record<string, number> | undefined, id: string) {
+  if (!w?.[id]) return w;
+  const rest = { ...w };
+  delete rest[id];
+  return Object.keys(rest).length ? rest : undefined;
+}
+
+/** Aggiunge/toglie un titolo dalla lista "Da vedere" */
+export function toggleWatch(id: string) {
+  const d = state.data;
+  setData({ ...d, watch: d.watch?.[id] ? withoutWatch(d.watch, id) : { ...d.watch, [id]: Date.now() } });
 }
 export const toggleSeen = (id: string) => setSeen(id, !state.data.seen[id]);
 

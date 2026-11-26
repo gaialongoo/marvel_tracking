@@ -72,4 +72,6 @@ export interface SavedData {
   profile?: Profile;               // profilo (assente nei salvataggi più vecchi)
   back?: number;                   // quante volte hai recuperato un titolo "saltato"
                                    // (uscito prima dell'ultimo che avevi visto): badge "Ritorno al passato"
+  watch?: Record<string, number>;  // lista "Da vedere": id → quando l'hai aggiunto (millisecondi).
+                                   // Un titolo esce dalla lista quando lo segni come visto.
 }

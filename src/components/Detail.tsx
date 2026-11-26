@@ -11,12 +11,12 @@ import { disneyUrl } from "../data/disneyLinks";
 import { GEMS, UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";
 import { go, goBack } from "../router";
-import { rate, setSeen, toggleEp, toggleSeen, useStore } from "../store";
+import { rate, setSeen, toggleEp, toggleSeen, toggleWatch, useStore } from "../store";
 import type { Link, Title } from "../types";
-import { epsSeen, hasEps } from "../utils";
+import { epsSeen, hasEps, isNew } from "../utils";
 import { ConnectionMap } from "./ConnectionMap";
 import { Gem } from "./Gem";
-import { IconCheckText, IconExternal, IconLock } from "./Icons";
+import { IconBookmark, IconCheckText, IconExternal, IconLock } from "./Icons";
 import { Thumb } from "./Thumb";
 
 export function Detail({ id }: { id: string }) {
@@ -74,6 +74,7 @@ function Head({ d, ctx }: { d: Title; ctx: string }) {
   const { t, lang } = useT();
   const { data } = useStore();
   const seen = !!data.seen[d.id];
+  const inList = !!data.watch?.[d.id];
   return (
     <div className="d-head">
       <Thumb d={d} large />
@@ -86,6 +87,7 @@ function Head({ d, ctx }: { d: Title; ctx: string }) {
           <span>{t("year")} <b>{d.y}</b></span>
           <span>{t("duration")} <b>{hasEps(d) ? `${d.eps} ${t("eps")}` : `${d.min} ${t("min")}`}</b></span>
           <span><b>{t(d.type)}</b></span>
+          {isNew(d.id) && <span className="new-fact">{t("newTag")}</span>}
           {/* Campi non ancora confermati da una fonte ufficiale */}
           {d.unverified.length > 0 && (
             <span style={{ color: "var(--red)" }} title={t("sample")}>
@@ -97,6 +99,12 @@ function Head({ d, ctx }: { d: Title; ctx: string }) {
           <button className={`btn ${seen ? "done" : "primary"}`} onClick={() => toggleSeen(d.id)}>
             <IconCheckText /> {seen ? t("isSeen") : t("markSeen")}
           </button>
+          {/* Lista "Da vedere": solo per i titoli non ancora visti */}
+          {!seen && (
+            <button className={`btn${inList ? " in-list" : ""}`} aria-pressed={inList} onClick={() => toggleWatch(d.id)}>
+              <IconBookmark on={inList} /> {inList ? t("inWatch") : t("addWatch")}
+            </button>
+          )}
           <a className="btn" href={disneyUrl(d.id) ?? d.officialUrl ?? "https://www.marvel.com/"} target="_blank" rel="noopener noreferrer">
             {t("official")} <IconExternal />
           </a>
@@ -202,14 +210,23 @@ function PostCredits({ d }: { d: Title }) {
     <div className="block">
       <span className="eyebrow">{t("postcredits")} · {d.pc}</span>
       <div className="card">
-        {d.pc ? Array.from({ length: d.pc }, (_, i) => (
-          <div key={i} className="pc-item">
-            <span className="n">{i + 1}</span>
-            <Spoiler>
-              {pcs[i] ? <p>{pcs[i][lang]}</p> : <p className="placeholder">{t("notWritten")}</p>}
-            </Spoiler>
-          </div>
-        )) : <div className="empty">{t("noPc")}</div>}
+        {d.pc ? Array.from({ length: d.pc }, (_, i) => {
+          // Nelle serie il testo inizia con "Episodio N · …": l'episodio non è
+          // uno spoiler, quindi lo mostro fuori dalla sfocatura come etichetta
+          const txt = pcs[i]?.[lang];
+          const m = txt?.match(/^(?:Episodio|Episode) (\d+) · (.*)$/s);
+          return (
+            <div key={i} className="pc-item">
+              <span className="n">{i + 1}</span>
+              <div className="pc-body">
+                {m && <span className="pc-ep">{t("epN")} {m[1]}</span>}
+                <Spoiler>
+                  {txt ? <p>{m ? m[2] : txt}</p> : <p className="placeholder">{t("notWritten")}</p>}
+                </Spoiler>
+              </div>
+            </div>
+          );
+        }) : <div className="empty">{t("noPc")}</div>}
       </div>
     </div>
   );

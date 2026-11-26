@@ -36,3 +36,7 @@ export const IconDown = () => (
 export const IconUp = () => (
   <svg {...base}><path d="M8 10V2M4.5 5.5L8 2l3.5 3.5M2.5 13.5h11" /></svg>
 );
+/** Segnalibro (lista "Da vedere"); pieno = titolo in lista */
+export const IconBookmark = ({ on = false }: { on?: boolean }) => (
+  <svg {...base} width={14} height={14}><path d="M4 2h8v12l-4-3-4 3z" fill={on ? "currentColor" : "none"} strokeLinejoin="round" /></svg>
+);

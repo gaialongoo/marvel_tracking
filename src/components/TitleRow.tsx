@@ -8,7 +8,9 @@ import { useT } from "../i18n";
 import { go } from "../router";
 import { useStore } from "../store";
 import type { Title } from "../types";
+import { isNew } from "../utils";
 import { GemsRow } from "./Gem";
+import { IconBookmark } from "./Icons";
 import { SeenButton } from "./SeenButton";
 import { Thumb } from "./Thumb";
 
@@ -23,7 +25,13 @@ export function TitleRow({ d, n, added = false }: { d: Title; n?: number; added?
       {n !== undefined && <span className="n">{String(n).padStart(2, "0")}</span>}
       <Thumb d={d} />
       <div className="t">
-        <b>{d.t[lang]}{added && <span className="added" title={t("addedNote")}>{t("added")}</span>}</b>
+        <b>
+          {d.t[lang]}
+          {added && <span className="added" title={t("addedNote")}>{t("added")}</span>}
+          {/* «Nuovo»: uscito da poco · segnalibro: è nella lista "Da vedere" */}
+          {isNew(d.id) && <span className="added new" title={t("newNote")}>{t("newTag")}</span>}
+          {data.watch?.[d.id] && !seen && <span className="row-wl" title={t("watchlist")}><IconBookmark on /></span>}
+        </b>
         <small>{meta(d)}</small>
       </div>
       <GemsRow n={data.rating[d.id] || 0} />

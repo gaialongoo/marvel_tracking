@@ -15,6 +15,24 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Ogni episodio imita una sitcom di un decennio diverso. Fuori da Westview, l'agente dello S.W.O.R.D. Monica Rambeau, la scienziata Darcy Lewis e l'agente Jimmy Woo scoprono che Wanda, distrutta dal dolore per la morte di Visione, ha avvolto la città in un campo di energia, controllando la mente degli abitanti e creando una versione di Visione e due gemelli, Billy e Tommy. Il direttore Hayward ha riattivato il corpo di Visione come arma, un «Visione bianco». La vicina Agnes si rivela Agatha Harkness, una strega che vuole il potere di Wanda e le mostra i ricordi del suo dolore, rivelando che Wanda è Scarlet Witch, capace di magia del caos. Nello scontro finale Visione bianco recupera i ricordi e se ne va; Wanda intrappola Agatha nel ruolo di «Agnes», poi scioglie il campo, sapendo che Visione e i figli spariranno con esso, e lascia Westview.",
       en: "Each episode imitates a sitcom from a different decade. Outside Westview, S.W.O.R.D. agent Monica Rambeau, scientist Darcy Lewis and agent Jimmy Woo discover that Wanda, crushed by grief over Vision's death, has wrapped the town in an energy field, controlling the residents' minds and creating a version of Vision and twin sons, Billy and Tommy. Director Hayward has reactivated Vision's body as a weapon, a \"White Vision\". Neighbor Agnes turns out to be Agatha Harkness, a witch who wants Wanda's power and shows her the memories of her grief, revealing that Wanda is the Scarlet Witch, capable of chaos magic. In the final showdown White Vision recovers his memories and flies off; Wanda traps Agatha in the role of \"Agnes\", then lifts the field, knowing Vision and the boys will vanish with it, and leaves Westview.",
     },
+    pc: [
+      {
+        it: "Episodio 7 · Monica Rambeau scopre il covo segreto di Agatha nel seminterrato e viene sorpresa da «Pietro».",
+        en: "Episode 7 · Monica Rambeau finds Agatha's secret lair in the basement and is caught by \"Pietro\".",
+      },
+      {
+        it: "Episodio 8 · Lo S.W.O.R.D. di Tyler Hayward riattiva Visione in un corpo ricostruito e tutto bianco.",
+        en: "Episode 8 · Tyler Hayward's S.W.O.R.D. reactivates the Vision in a rebuilt, all-white body.",
+      },
+      {
+        it: "Episodio 9 · Uno Skrull travestito da agente dell'FBI dice a Monica che un'amica di sua madre vuole incontrarla nello spazio.",
+        en: "Episode 9 · A Skrull disguised as an FBI agent tells Monica that a friend of her mother wants to meet her in space.",
+      },
+      {
+        it: "Episodio 9 · In una baita isolata Wanda studia il Darkhold e sente i suoi figli Billy e Tommy chiedere aiuto.",
+        en: "Episode 9 · In a remote cabin Wanda studies the Darkhold and hears her sons Billy and Tommy calling for help.",
+      },
+    ],
   },
 
   fatws: {
@@ -26,6 +44,16 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Sam consegna lo scudo al governo, che lo affida a un nuovo Capitan America, John Walker. Sam e Bucky indagano sui Flag Smashers di Karli Morgenthau, rivoluzionari potenziati con il siero del supersoldato, contrari al ritorno dei confini dopo il Blip. Per trovarli liberano Helmut Zemo, che li porta a Madripoor da Sharon Carter, ora ricettatrice. Sam incontra Isaiah Bradley, supersoldato nero imprigionato e usato come cavia dal governo. Walker, che ha preso il siero, uccide un Flag Smasher in pubblico e viene privato del titolo; la contessa Valentina Allegra de Fontaine lo recluta come U.S. Agent. Sam decide di indossare lo scudo e un nuovo costume, ferma i Flag Smashers a New York e tiene un discorso ai politici. Karli viene uccisa da Sharon, che si rivela la misteriosa Power Broker. Bucky fa ammenda per il suo passato.",
       en: "Sam hands the shield to the government, which gives it to a new Captain America, John Walker. Sam and Bucky investigate Karli Morgenthau's Flag Smashers, revolutionaries enhanced with the super-soldier serum, who oppose the return of borders after the Blip. To find them they free Helmut Zemo, who takes them to Madripoor and to Sharon Carter, now a fence. Sam meets Isaiah Bradley, a Black super-soldier imprisoned and experimented on by the government. Walker, who has taken the serum, kills a Flag Smasher in public and is stripped of the title; Contessa Valentina Allegra de Fontaine recruits him as U.S. Agent. Sam decides to wear the shield and a new suit, stops the Flag Smashers in New York and gives a speech to the politicians. Karli is killed by Sharon, who turns out to be the mysterious Power Broker. Bucky makes amends for his past.",
     },
+    pc: [
+      {
+        it: "Episodio 5 · John Walker si costruisce da solo un nuovo scudo, saldando rottami e la sua medaglia d'onore.",
+        en: "Episode 5 · John Walker forges a new shield himself from scrap metal and his Medal of Honor.",
+      },
+      {
+        it: "Episodio 6 · Sharon Carter, perdonata e reintegrata nella CIA, si rivela il Power Broker: promette di vendere segreti del governo.",
+        en: "Episode 6 · Sharon Carter, pardoned and reinstated in the CIA, is revealed as the Power Broker: she plans to sell government secrets.",
+      },
+    ],
   },
 
   loki1: {
@@ -37,6 +65,12 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "La Time Variance Authority arresta Loki per aver creato un ramo temporale. L'agente Mobius gli mostra il futuro che lo attendeva e gli chiede aiuto per catturare una variante di Loki che uccide gli agenti TVA. La variante è Sylvie, che fa esplodere bombe temporali per creare migliaia di rami. Loki e Sylvie restano bloccati su un pianeta in fiamme e si innamorano. Scoprono che gli agenti TVA sono varianti con la memoria cancellata e che i Custodi del Tempo sono solo automi. Finiti nel Vuoto alla fine del tempo, incontrano altre varianti di Loki. Dietro tutto c'è Colui che Rimane, uno scienziato che ha posto fine alla guerra multiversale tra le sue varianti creando un'unica linea temporale. Sylvie lo uccide nonostante l'avvertimento di Loki: la linea temporale si dirama in un multiverso. Loki torna alla TVA, ma Mobius non lo riconosce e nella sala c'è la statua di un'altra variante di Colui che Rimane.",
       en: "The Time Variance Authority arrests Loki for creating a branch in time. Agent Mobius shows him the future that awaited him and asks for his help catching a Loki variant who is killing TVA agents. The variant is Sylvie, who sets off time bombs to create thousands of branches. Loki and Sylvie get stuck on a burning planet and fall in love. They discover TVA agents are variants with erased memories and that the Time-Keepers are just androids. Sent to the Void at the end of time, they meet other Loki variants. Behind everything is He Who Remains, a scientist who ended the multiversal war among his variants by creating a single timeline. Sylvie kills him despite Loki's warning: the timeline branches into a multiverse. Loki returns to the TVA, but Mobius doesn't recognize him and the hall has a statue of another variant of He Who Remains.",
     },
+    pc: [
+      {
+        it: "Episodio 4 · Loki, «potato» dalla TVA, si risveglia nel Vuoto alla fine del tempo e incontra quattro sue varianti.",
+        en: "Episode 4 · Loki, \"pruned\" by the TVA, wakes up in the Void at the end of time and meets four of his variants.",
+      },
+    ],
   },
 
   bw: {
@@ -63,6 +97,12 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Ogni episodio è un universo diverso: Peggy Carter diventa Captain Carter al posto di Steve; T'Challa diventa Star-Lord; Doctor Strange perde Christine e distrugge il proprio universo nel tentativo di salvarla; un virus trasforma gli eroi in zombi; Killmonger salva Tony Stark e manipola tutti; Thor, figlio unico, fa festa sulla Terra; Ultron vince, prende le Gemme e scopre l'esistenza dell'Osservatore. Nel finale l'Osservatore infrange il suo giuramento di non intervenire e riunisce i Guardiani del Multiverso (Captain Carter, Star-Lord T'Challa, Strange Supremo, Killmonger, Thor, Gamora) per fermare Ultron. Natasha di un altro universo inserisce Arnim Zola nell'intelligenza di Ultron e lo sconfigge. Strange Supremo imprigiona Killmonger e Zola in una dimensione tascabile; Natasha prende il posto di quella del mondo di Loki.",
       en: "Each episode is a different universe: Peggy Carter becomes Captain Carter instead of Steve; T'Challa becomes Star-Lord; Doctor Strange loses Christine and destroys his own universe trying to save her; a virus turns heroes into zombies; Killmonger saves Tony Stark and manipulates everyone; Thor, an only child, parties on Earth; Ultron wins, takes the Stones and discovers the Watcher exists. In the finale the Watcher breaks his oath of non-interference and assembles the Guardians of the Multiverse (Captain Carter, Star-Lord T'Challa, Strange Supreme, Killmonger, Thor, Gamora) to stop Ultron. A Natasha from another universe uploads Arnim Zola into Ultron's mind and defeats him. Strange Supreme imprisons Killmonger and Zola in a pocket dimension; Natasha takes the place of the one in Loki's world.",
     },
+    pc: [
+      {
+        it: "Episodio 9 · Peggy Carter e Natasha Romanoff aprono l'armatura Hydra Stomper e scoprono che dentro c'è qualcuno.",
+        en: "Episode 9 · Peggy Carter and Natasha Romanoff open the Hydra Stomper armour and find someone inside.",
+      },
+    ],
   },
 
   shangchi: {
@@ -116,6 +156,12 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Kate Bishop, che ammira Occhio di Falco fin dalla battaglia di New York, indossa il costume di Ronin trovato a un'asta e attira la Tracksuit Mafia. Clint la aiuta e la addestra, mentre la madre di Kate, Eleanor, sta per sposare Jack Duquesne. La mafia è guidata da Maya Lopez (Echo), che vuole vendicare il padre ucciso da Ronin. Arriva anche Yelena Belova, convinta che Clint abbia ucciso Natasha. Si scopre che Eleanor lavora per Wilson Fisk, il Kingpin, capo della mafia. Alla festa di Natale al Rockefeller Center, Clint convince Yelena della verità sul sacrificio di Natasha, Kate sconfigge Fisk ed Eleanor viene arrestata. Clint torna dalla famiglia la mattina di Natale e brucia il costume di Ronin.",
       en: "Kate Bishop, who has admired Hawkeye since the Battle of New York, puts on the Ronin suit she found at an auction and draws the attention of the Tracksuit Mafia. Clint helps and trains her, while Kate's mother Eleanor is about to marry Jack Duquesne. The mafia is led by Maya Lopez (Echo), who wants to avenge her father, killed by Ronin. Yelena Belova also arrives, convinced Clint killed Natasha. It turns out Eleanor works for Wilson Fisk, the Kingpin, the mafia's boss. At the Christmas party at Rockefeller Center, Clint convinces Yelena of the truth about Natasha's sacrifice, Kate defeats Fisk and Eleanor is arrested. Clint gets home to his family on Christmas morning and burns the Ronin suit.",
     },
+    pc: [
+      {
+        it: "Episodio 6 · Il cast dello spettacolo «Rogers: The Musical» esegue per intero la canzone «Save the City».",
+        en: "Episode 6 · The cast of \"Rogers: The Musical\" performs the full song \"Save the City\".",
+      },
+    ],
   },
 
   nwh: {
@@ -148,6 +194,12 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Marc Spector, che soffre di disturbo dissociativo dell'identità, è l'avatar del dio egizio della luna Khonshu, e Steven è un'altra delle sue personalità. Arthur Harrow, ex avatar di Khonshu, vuole risvegliare la dea Ammit, che punirebbe le persone per i crimini che commetteranno. Con Layla, moglie di Marc, i due inseguono Harrow in Egitto in cerca della tomba di Ammit. Harrow spara a Marc, che si risveglia in un ospedale psichiatrico: è l'aldilà, dove incontra la dea ippopotamo Taweret. Marc e Steven affrontano il trauma d'infanzia della morte del fratello; Steven muore e poi viene salvato. Tornati in vita, combattono Harrow, mentre Layla diventa l'avatar di Taweret, Scarlet Scarab. Ammit viene imprigionata nel corpo di Harrow. Nella scena dopo i titoli dell'ultima puntata si scopre una terza personalità, Jake Lockley, che uccide Harrow per conto di Khonshu.",
       en: "Marc Spector, who has dissociative identity disorder, is the avatar of the Egyptian moon god Khonshu, and Steven is another of his personalities. Arthur Harrow, a former avatar of Khonshu, wants to awaken the goddess Ammit, who would punish people for crimes they will commit. With Layla, Marc's wife, they chase Harrow to Egypt in search of Ammit's tomb. Harrow shoots Marc, who wakes up in a psychiatric hospital: it is the afterlife, where he meets the hippo goddess Taweret. Marc and Steven face the childhood trauma of his brother's death; Steven dies and is then saved. Back in life, they fight Harrow, while Layla becomes Taweret's avatar, Scarlet Scarab. Ammit is imprisoned in Harrow's body. In the final episode's post-credits scene a third personality is revealed, Jake Lockley, who kills Harrow on Khonshu's behalf.",
     },
+    pc: [
+      {
+        it: "Episodio 6 · Si scopre una terza personalità, Jake Lockley, che al servizio di Khonshu uccide Arthur Harrow in una limousine.",
+        en: "Episode 6 · A third personality, Jake Lockley, is revealed: serving Khonshu, he kills Arthur Harrow in a limousine.",
+      },
+    ],
   },
 
   dsmom: {
@@ -180,6 +232,16 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Il braccialetto della bisnonna dà a Kamala il potere di creare luce solida. Attira i Clandestini, esseri di un'altra dimensione (i Noor) guidati da Najma, che vogliono usarlo per tornare a casa, e il Dipartimento di Controllo dei Danni. Kamala va con la madre a Karachi dalla nonna e, durante la Partizione del 1947, viaggia nel tempo: scopre di essere stata lei a guidare la bisnonna verso il treno che salvò la famiglia. Najma si sacrifica per chiudere il velo tra i mondi. Tornata nel New Jersey, Kamala protegge il ragazzo Kamran dal Controllo dei Danni, aiutata dalla comunità. Si scopre che il suo DNA ha una mutazione. Nella scena dopo i titoli dell'ultima puntata, Kamala viene scambiata di posto con Captain Marvel.",
       en: "Her great-grandmother's bangle gives Kamala the power to create hard light. It draws the Clandestines, beings from another dimension (the Noor) led by Najma, who want to use it to go home, as well as the Department of Damage Control. Kamala travels with her mother to Karachi to see her grandmother and, during the 1947 Partition, travels back in time: she discovers she was the one who guided her great-grandmother to the train that saved the family. Najma sacrifices herself to close the veil between worlds. Back in New Jersey, Kamala protects the boy Kamran from Damage Control, helped by the community. It turns out her DNA carries a mutation. In the final episode's post-credits scene, Kamala swaps places with Captain Marvel.",
     },
+    pc: [
+      {
+        it: "Episodio 1 · Gli agenti del Controllo Danni trovano il video di Kamala all'AvengerCon e decidono di catturarla.",
+        en: "Episode 1 · Damage Control agents find footage of Kamala at AvengerCon and decide to capture her.",
+      },
+      {
+        it: "Episodio 6 · Il bracciale di Kamala si illumina e lei si scambia di posto con Carol Danvers. Anteprima di The Marvels.",
+        en: "Episode 6 · Kamala's bangle glows and she swaps places with Carol Danvers. A teaser for The Marvels.",
+      },
+    ],
   },
 
   lat: {
@@ -212,6 +274,12 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Cinque corti senza dialoghi ambientati tra Guardiani della Galassia e Vol. 2. Groot, appena rinato, si specchia in una pozza d'acqua, affronta un gruppo di minuscoli alieni, combatte con una goccia di sapone, cerca di dipingere e scopre una strana creatura. Ogni episodio è una piccola gag in sé, senza una trama comune.",
       en: "Five dialogue-free shorts set between Guardians of the Galaxy and Vol. 2. Groot, freshly regrown, looks at his reflection in a puddle, faces a group of tiny aliens, fights a soap bubble, tries his hand at painting and discovers a strange creature. Each episode is a small standalone gag, with no common storyline.",
     },
+    pc: [
+      {
+        it: "Episodio 5 · Il disegno dei Guardiani fatto da Groot fluttua nello spazio.",
+        en: "Episode 5 · Groot's drawing of the Guardians drifts through space.",
+      },
+    ],
   },
 
   shehulk: {
@@ -223,6 +291,28 @@ export const MCU3: Record<string, TitleTexts> = {
       it: "Dopo un incidente d'auto, il sangue di Bruce contamina Jennifer, che diventa una Hulk capace di mantenere il controllo. Assunta da uno studio legale che vuole sfruttare la sua fama, guida un reparto di diritto dei superumani, con clienti come Emil Blonsky, Wong e Matt Murdock, con cui ha una relazione. Il gruppo online Intelligencia, guidato da Todd, la odia e vuole il suo sangue; durante una premiazione diffonde un video intimo che la umilia, facendola trasformare in pubblico. Nel finale, insoddisfatta della piega che prende la storia, Jennifer rompe la quarta parete, esce dalla sua serie e va negli uffici di Marvel Studios a parlare con K.E.V.I.N., l'intelligenza che decide le trame, per cambiare il finale. Bruce torna con un figlio, Skaar.",
       en: "After a car accident, Bruce's blood contaminates Jennifer, who becomes a Hulk able to keep control. Hired by a law firm that wants to exploit her fame, she leads a superhuman law division, with clients like Emil Blonsky, Wong and Matt Murdock, with whom she starts a relationship. The online group Intelligencia, led by Todd, hates her and wants her blood; at an awards gala it leaks an intimate video that humiliates her, making her transform in public. In the finale, unhappy with where the story is going, Jennifer breaks the fourth wall, leaves her own show and goes to the Marvel Studios offices to talk to K.E.V.I.N., the AI that decides the plots, to change the ending. Bruce returns with a son, Skaar.",
     },
+    pc: [
+      {
+        it: "Episodio 1 · Al bar Bruce conferma a Jen che Steve Rogers ha perso la verginità nel 1943, durante il tour per le truppe.",
+        en: "Episode 1 · At a bar Bruce confirms to Jen that Steve Rogers lost his virginity in 1943, during the USO tour.",
+      },
+      {
+        it: "Episodio 2 · Jen usa la forza di She-Hulk per le faccende di casa.",
+        en: "Episode 2 · Jen uses She-Hulk's strength for household chores.",
+      },
+      {
+        it: "Episodio 3 · Jen balla con Megan Thee Stallion.",
+        en: "Episode 3 · Jen dances with Megan Thee Stallion.",
+      },
+      {
+        it: "Episodio 4 · Wong e Madisynn guardano la TV insieme a Kamar-Taj.",
+        en: "Episode 4 · Wong and Madisynn watch TV together at Kamar-Taj.",
+      },
+      {
+        it: "Episodio 9 · Wong fa evadere di nuovo Emil Blonsky dal carcere.",
+        en: "Episode 9 · Wong breaks Emil Blonsky out of prison once again.",
+      },
+    ],
   },
 
   wbn: {

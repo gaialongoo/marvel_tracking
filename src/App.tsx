@@ -50,7 +50,13 @@ export default function App() {
 
   /** Dalla Home: apre il Catalogo su un universo (ordine e tipi restano quelli scelti) */
   const openUni = (uni: string) => {
-    setHomePart({ uni });
+    setHomePart({ uni, watch: false });
+    go({ page: "catalog" });
+  };
+
+  /** Dalla Home: apre il Catalogo con il filtro "Da vedere" (tutti gli universi e i tipi) */
+  const openWatch = () => {
+    setHomePart({ uni: "all", types: [], watch: true });
     go({ page: "catalog" });
   };
 
@@ -72,7 +78,7 @@ export default function App() {
       <AuthGate>
         <TopBar route={route} />
         <main>
-          {route.page === "home" && <Home openUni={openUni} />}
+          {route.page === "home" && <Home openUni={openUni} openWatch={openWatch} />}
           {route.page === "catalog" && <Catalog s={home} set={setHomePart} />}
           {route.page === "prep" && <Prep />}
           {route.page === "profile" && <Profile openPath={openPath} />}

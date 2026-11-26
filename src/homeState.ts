@@ -20,6 +20,7 @@ export interface HomeState {
   order: Order;
   path: string;           // percorso scelto (order = "paths")
   types: TitleType[];     // tipi mostrati (scelta multipla; vuoto = tutti)
+  watch?: boolean;        // solo i titoli della lista "Da vedere" (filtro del Catalogo)
 }
 
 export const defaultHome: HomeState = { uni: "all", order: "release", path: "ironman", types: [] };
@@ -34,6 +35,7 @@ export function sanitize(raw: Partial<HomeState>): HomeState {
     path: PATHS.some((p) => p.key === raw.path) ? raw.path! : defaultHome.path,
     // solo tipi validi; se sono accesi tutti equivale a "Tutti" (lista vuota)
     types: cleanTypes(raw.types),
+    watch: !!raw.watch,
   };
 }
 

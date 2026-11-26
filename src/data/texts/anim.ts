@@ -512,5 +512,10 @@ export const ANIM: Record<string, TitleTexts> = {
       it: "Le avventure di Jeff, il piccolo squalo di terra, insieme ai suoi amici supereroi.",
       en: "The adventures of Jeff, the little land shark, with his superhero friends.",
     },
+    // Fonte: scheda ufficiale Disney+ (descrizioni degli episodi 2-6)
+    full: {
+      it: "Corti per i più piccoli in cui Jeff, lo squalo di terra, fa squadra con gli Avengers e Spider-Man in avventure caotiche contro i cattivi. Un impostore prende il posto di Jeff all'Avengers Campus; il Quinjet si guasta e tocca a Jeff salvare la situazione; con Spider-Man passa una giornata al luna park e poi volteggia tra i palazzi di New York appeso alle sue ragnatele; infine, con Black Panther, libera Hulk dal covo sotterraneo di Ultron. Compaiono anche Iron Man e Venom.",
+      en: "Shorts for young viewers in which Jeff the Land Shark teams up with the Avengers and Spider-Man in chaotic adventures against villains. An impostor takes Jeff's place at Avengers Campus; the Avenjet breaks down and Jeff has to save the day; he spends a day at an amusement park with Spider-Man and then swings through New York on his webs; finally, with Black Panther, he rescues Hulk from Ultron's underground lair. Iron Man and Venom appear too.",
+    },
   },
 };

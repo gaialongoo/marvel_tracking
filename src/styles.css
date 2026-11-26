@@ -363,7 +363,7 @@ label.btn{cursor:pointer}
    ========================================================================== */
 @media (max-width:1000px){
   .grid4{grid-template-columns:repeat(2,1fr)}
-  .detail-grid{grid-template-columns:1fr}
+  .detail-grid{grid-template-columns:minmax(0,1fr)} /* minmax: niente può allargare la colonna oltre lo schermo */
 }
 @media (max-width:760px){
   /* Barra in alto su tre righe: logo + lingua + account sopra, ricerca larga
@@ -776,3 +776,69 @@ main{display:block}
 /* Suggerimento sotto il campo password (pagina di accesso e nuova password) */
 .pw-hint{font-size:11.5px;color:var(--muted);font-family:var(--mono)}
 .pw-hint.ok{color:#5fbf7a}
+
+/* Scene dopo i titoli: etichetta dell'episodio (serie) sopra il testo sfocato.
+   min-height: il pulsante "sblocca" non deve uscire da un testo di una riga */
+.pc-body{min-width:0;display:grid;gap:4px}
+.pc-ep{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.pc-item .spoiler.locked{min-height:38px}
+.pc-item .spoiler p,.card .spoiler p{overflow-wrap:anywhere}
+@media (max-width:760px){
+  .pc-item{grid-template-columns:24px 1fr;gap:8px}
+  .card{padding:12px 13px}
+  .d-head h1{overflow-wrap:anywhere}
+  .facts{flex-wrap:wrap}
+}
+
+/* ==========================================================================
+   HOME — porte che si adattano alla colonna in cui stanno
+   Su PC (3 colonne) la colonna centrale può essere stretta: le colonne
+   laterali si restringono un po' e le porte piccole, se strette, mostrano solo
+   nome e barra (il sottotitolo sparisce), così il testo non esce dal bordo.
+   ========================================================================== */
+.doors{container-type:inline-size}
+.door:not(.door-mcu){min-height:96px}
+@media (min-width:1100px){
+  .page.home{grid-template-columns:clamp(210px,19vw,280px) minmax(0,1fr) clamp(250px,23vw,320px)}
+}
+/* colonna delle porte sotto i 680px: porte piccole compatte */
+@container (max-width:680px){
+  .door:not(.door-mcu) .door-txt{left:12px;right:12px;bottom:10px}
+  .door:not(.door-mcu) .door-txt b{font-size:16px;line-height:1.2}
+  .door:not(.door-mcu) .door-txt small{display:none}
+  .door:not(.door-mcu) .door-prog{margin-top:6px;gap:8px}
+  .door-mcu .door-txt b{font-size:28px}
+}
+
+/* ==========================================================================
+   NOVITÀ («Nuovo») E LISTA "DA VEDERE"
+   ========================================================================== */
+/* etichetta «Nuovo»: come "aggiunto" ma azzurra */
+.added.new{color:#6fd3ff;border-color:rgba(111,211,255,.5)}
+.new-fact{padding:0 6px;border:1px solid rgba(111,211,255,.5);border-radius:3px;color:#6fd3ff;text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+/* segnalibro nella riga del Catalogo */
+.row-wl{display:inline-flex;margin-left:8px;color:var(--gold);vertical-align:middle}
+/* pulsante "Da vedere" nella scheda: oro quando il titolo è in lista */
+.btn.in-list{border-color:var(--gold);color:var(--gold)}
+/* filtro "Da vedere" del Catalogo */
+.chip-wl{display:inline-flex;align-items:center;gap:5px}
+.chip-wl small{font-size:10.5px;opacity:.8}
+/* Home: riquadri "Appena usciti" e "Da vedere" (sotto Continua a guardare e Preparazione) */
+.home-extra{grid-column:1/-1;display:grid;gap:4px;justify-items:start}
+.home-extra .home-h2{margin-bottom:8px}
+.mini-list{display:grid;gap:6px;width:100%}
+.mini-row{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;width:100%;text-align:left;
+  padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface);transition:.15s}
+.mini-row:hover{border-color:var(--gold)}
+.mini-row .thumb{width:32px;height:44px;padding:3px}.mini-row .thumb span{font-size:8px}.mini-row .thumb .type{display:none}
+.mini-row > span:nth-child(2){min-width:0;display:grid}
+.mini-row b{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-row small{color:var(--muted);font-size:11.5px}
+.mini-row .added{margin:0;padding:1px 6px;border:1px solid;border-radius:3px;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+@media (min-width:760px) and (max-width:1099px){
+  /* tablet: Appena usciti e Da vedere affiancati */
+  .home-top{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 240px}
+  .home-cw{grid-column:1/3}
+  .home-prep{grid-column:3}
+  .home-extra{grid-column:auto}
+}

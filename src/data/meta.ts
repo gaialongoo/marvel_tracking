@@ -98,3 +98,22 @@ export const GEMS: (I18nText & { k: string })[] = [
   { k: "time", it: "Tempo", en: "Time" },
   { k: "soul", it: "Anima", en: "Soul" },
 ];
+
+/* ============================================================================
+   DATE DI USCITA IN ITALIA dei titoli più recenti (AAAA-MM-GG).
+   Servono solo per l'etichetta «Nuovo» (vedi isNew in utils.ts): un titolo è
+   "nuovo" per NEW_DAYS giorni dall'uscita. Quando esce un titolo nuovo basta
+   aggiungere qui la sua data.
+   Fonti:
+   - VisionQuest: Disney+, 14/10/2026 (annuncio Marvel all'Upfront Disney 2026)
+   - Spider-Man: Brand New Day: cinema italiani, 29/07/2026 (Sony Pictures Italia)
+   - The Punisher: One Last Kill: Disney+, 12/05/2026 alle 18 ora del Pacifico
+     → in Italia è il 13/05 (annuncio su marvel.com)
+   ============================================================================ */
+export const RELEASE_DATES: Record<string, string> = {
+  visionquest: "2026-10-14",
+  bnd: "2026-07-29",
+  punolk: "2026-05-13",
+};
+/** Per quanti giorni dall'uscita un titolo resta «Nuovo» */
+export const NEW_DAYS = 90;

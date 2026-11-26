@@ -30,14 +30,14 @@ import { useT } from "../i18n";
 import { go } from "../router";
 import { useStore } from "../store";
 import type { Title } from "../types";
-import { epsSeen, fmtMin, hasEps, watchedMin } from "../utils";
+import { epsSeen, fmtMin, hasEps, isNew, watchIds, watchedMin } from "../utils";
 import { Avatar } from "./Avatar";
 import { Thumb } from "./Thumb";
 
 
 
 /** openUni = apre il Catalogo su un universo (da App) */
-export function Home({ openUni }: { openUni: (uni: string) => void }) {
+export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; openWatch: () => void }) {
   const { t, lang } = useT();
   const { data } = useStore();
   const name = useDisplayName();
@@ -67,6 +67,11 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
   const orderLabel = prefs.order === "paths"
     ? `${t("paths")} · ${PATHS.find((x) => x.key === prefs.path)?.[lang] ?? ""}`
     : `${t(prefs.order)}${prefs.uni !== "all" && uni ? ` · ${uni.short || uni[lang]}` : ""}`;
+
+  // --- novità (usciti da poco) e lista "Da vedere" ---
+  const fresh = DATA.filter((d) => isNew(d.id));
+  const wl = watchIds(data).map((id) => BY_ID[id]).filter(Boolean);
+  const MAX_WL = 4;
 
   // --- prossima uscita: la prima con data futura ---
   const today = new Date().toISOString().slice(0, 10);
@@ -117,8 +122,7 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
       </section>
 
       {/* 2. IN ALTO: CONTINUA A GUARDARE (a sinistra) + PREPARAZIONE (a destra) */}
-      {(started.length > 0 || next || up) && (
-        <section className="home-top">
+      <section className="home-top">
           {(started.length > 0 || next) && (
             <div className="home-cw">
               <h2 className="home-h2">{t("continue")}</h2>
@@ -141,8 +145,22 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
               </button>
             </div>
           )}
-        </section>
-      )}
+          {/* APPENA USCITI: titoli usciti da poco (solo se ce ne sono) */}
+          {fresh.length > 0 && (
+            <div className="home-extra">
+              <h2 className="home-h2">{t("newTitles")}</h2>
+              <div className="mini-list">{fresh.map((d) => <MiniRow key={d.id} d={d} tag={t("newTag")} />)}</div>
+            </div>
+          )}
+          {/* DA VEDERE: i primi titoli della lista (aggiunti dalla scheda) */}
+          <div className="home-extra">
+            <h2 className="home-h2">{t("watchlist")} <small className="mono muted">{wl.length}</small></h2>
+            {wl.length === 0 ? <p className="muted-p">{t("watchEmpty")}</p> : (
+              <div className="mini-list">{wl.slice(0, MAX_WL).map((d) => <MiniRow key={d.id} d={d} />)}</div>
+            )}
+            {wl.length > MAX_WL && <button className="link-btn" onClick={openWatch}>{t("watchAll")} →</button>}
+          </div>
+      </section>
 
       {/* 3. PORTE DEGLI UNIVERSI (la prima, l'MCU, è più grande) */}
       <section className="doors">
@@ -156,6 +174,21 @@ export function Home({ openUni }: { openUni: (uni: string) => void }) {
         })}
       </section>
     </div>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   RIGA PICCOLA (Appena usciti, Da vedere): miniatura, titolo, anno e tipo.
+   tag = etichetta a destra (es. «Nuovo»)
+   --------------------------------------------------------------------------- */
+function MiniRow({ d, tag }: { d: Title; tag?: string }) {
+  const { t, lang } = useT();
+  return (
+    <button className="mini-row" onClick={() => go({ page: "title", id: d.id })}>
+      <Thumb d={d} />
+      <span><b>{d.t[lang]}</b><small>{d.y} · {t(d.type)}</small></span>
+      {tag && <span className="added new">{tag}</span>}
+    </button>
   );
 }
 

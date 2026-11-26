@@ -24,8 +24,8 @@ export const MCU4: Record<string, TitleTexts> = {
         en: "Three Kang variants gather thousands of others in the Council of Kangs: their exile has been defeated and the Avengers are starting to meddle in the multiverse.",
       },
       {
-        it: "Nel 1901 Loki e Mobius assistono a uno spettacolo dell'inventore Victor Timely, un'altra variante di Kang. Anteprima di Loki stagione 2.",
-        en: "In 1901 Loki and Mobius watch a show by inventor Victor Timely, another Kang variant. A teaser for Loki season 2.",
+        it: "In un'altra epoca Loki e Mobius assistono a uno spettacolo dell'inventore Victor Timely, un'altra variante di Kang. Anteprima di Loki stagione 2.",
+        en: "In another era Loki and Mobius watch a show by inventor Victor Timely, another Kang variant. A teaser for Loki season 2.",
       },
     ],
   },
@@ -71,6 +71,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Cinque corti senza dialoghi. Groot esplora strani pianeti, combatte con un alieno per una pianta, festeggia un compleanno, cerca di sfuggire a un mostro e incontra creature che lo trattano come un dio. Ogni episodio è una gag a sé.",
       en: "Five dialogue-free shorts. Groot explores strange planets, fights an alien over a plant, celebrates a birthday, tries to escape a monster and meets creatures who treat him like a god. Each episode is a standalone gag.",
     },
+    pc: [
+      {
+        it: "Episodio 3 · Groot rovescia una tazza di cioccolata calda e Rocket urla.",
+        en: "Episode 3 · Groot knocks over a mug of hot chocolate and Rocket shouts.",
+      },
+    ],
   },
 
   loki2: {
@@ -82,6 +88,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Loki «scivola» nel tempo; Mobius e il tecnico Ouroboros (O.B.) lo stabilizzano. Il Telaio Temporale, la macchina che tiene in piedi la linea temporale, rischia di essere distrutto dai rami in eccesso. Loki e Mobius trovano Victor Timely, variante giovane di Colui che Rimane, e lo portano alla TVA per riparare il Telaio. Ravonna Renslayer e Miss Minutes tradiscono la TVA. Il Telaio esplode e Timely muore. Loki impara a viaggiare nel tempo volontariamente e rivive più volte gli eventi, senza trovare una soluzione. Alla fine capisce che il suo destino è un sacrificio: va alla fine del tempo, distrugge il Telaio e tiene insieme con le sue mani tutte le linee temporali, che diventano i rami di un albero intorno al suo trono. Sylvie e Mobius tornano alla loro vita, mentre la TVA veglia sulle varianti di Kang.",
       en: "Loki is \"time-slipping\"; Mobius and technician Ouroboros (O.B.) stabilize him. The Temporal Loom, the machine holding the timeline together, risks being destroyed by too many branches. Loki and Mobius find Victor Timely, a young variant of He Who Remains, and bring him to the TVA to repair the Loom. Ravonna Renslayer and Miss Minutes betray the TVA. The Loom explodes and Timely dies. Loki learns to time-travel at will and relives events several times without finding a solution. In the end he realizes his destiny is a sacrifice: he goes to the end of time, destroys the Loom and holds all the timelines together with his own hands; they become the branches of a tree around his throne. Sylvie and Mobius return to their lives, while the TVA keeps watch over Kang's variants.",
     },
+    pc: [
+      {
+        it: "Episodio 1 · Sylvie esce da un portale temporale nell'Oklahoma del 1982 ed entra in un McDonald's.",
+        en: "Episode 1 · Sylvie steps out of a time portal in 1982 Oklahoma and walks into a McDonald's.",
+      },
+    ],
   },
 
   marvels: {
@@ -108,6 +120,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Tra gli episodi: Nebula diventa un'agente di polizia di Nova Prime; Happy Hogan affronta Justin Hammer alla festa di Natale dei Vendicatori; Peter Quill diventa un gigante cresciuto da Ego; Hela, senza poteri, finisce a Kamar-Taj; Kahhori, giovane Mohawk, ottiene poteri dal Tesseract caduto in America nel '600; Captain Carter affronta una versione di sé. Nel finale Strange Supremo sta rapendo persone di universi diversi; l'Osservatore manda Captain Carter e Kahhori a fermarla. Con l'aiuto degli eroi rapiti, Strange viene sconfitta e il multiverso torna stabile.",
       en: "Among the episodes: Nebula becomes a police officer on Nova Prime; Happy Hogan faces Justin Hammer at the Avengers' Christmas party; Peter Quill becomes a giant raised by Ego; Hela, without her powers, ends up at Kamar-Taj; Kahhori, a young Mohawk woman, gets powers from the Tesseract that fell in 17th-century America; Captain Carter faces a version of herself. In the finale Strange Supreme is abducting people from different universes; the Watcher sends Captain Carter and Kahhori to stop her. With help from the abducted heroes, Strange is defeated and the multiverse is stable again.",
     },
+    pc: [
+      {
+        it: "Episodio 4 · Il Gran Maestro, ridotto a una pozzanghera, chiede a Topaz di raccoglierlo.",
+        en: "Episode 4 · The Grandmaster, reduced to a puddle, asks Topaz to scoop him up.",
+      },
+    ],
   },
 
   echo: {
@@ -119,6 +137,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Dopo Hawkeye, Maya torna a Tamaha e cerca di distruggere l'organizzazione di Fisk nella zona, scatenando la sua ira. In flashback si scopre la storia delle antenate Choctaw che hanno trasmesso un potere alla famiglia di Maya, compresa la prima, Chafa. Fisk arriva in città per riprendersi Maya, che considera una figlia. Durante un festival, Maya attinge al potere delle antenate e, insieme alla nonna e alla madre, entra nella mente di Fisk e gli fa rivivere i suoi traumi d'infanzia, spingendolo ad andarsene. Fisk, rientrato a New York, vede un notiziario che lo spinge a candidarsi sindaco.",
       en: "After Hawkeye, Maya returns to Tamaha and tries to destroy Fisk's organization in the area, unleashing his anger. Flashbacks reveal the story of the Choctaw ancestors who passed a power down to Maya's family, starting with the first, Chafa. Fisk comes to town to take back Maya, whom he sees as a daughter. During a festival, Maya draws on her ancestors' power and, with her grandmother and mother, enters Fisk's mind and makes him relive his childhood traumas, driving him away. Back in New York, Fisk sees a news report that pushes him to run for mayor.",
     },
+    pc: [
+      {
+        it: "Episodio 5 · Wilson Fisk convoca i boss del crimine e vede al telegiornale la corsa a sindaco di New York, che lo spinge a candidarsi.",
+        en: "Episode 5 · Wilson Fisk calls a meeting of crime bosses and watches a news report on the New York mayoral race, which pushes him to run.",
+      },
+    ],
   },
 
   dpw: {
@@ -167,6 +191,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Nel primo episodio Bullseye uccide Foggy Nelson; Matt lo getta da un palazzo e smette di essere Daredevil. Un anno dopo Fisk, eletto sindaco, sostiene di voler cambiare e chiede a Matt una tregua. Matt difende in tribunale Hector Ayala (la Tigre Bianca), poi ucciso. Un serial killer chiamato Muse terrorizza la città: Daredevil torna in azione e lo affronta. Vanessa, moglie di Fisk, aveva assoldato Bullseye per uccidere Foggy. Fisk crea una task force anti-vigilanti con poliziotti corrotti. Bullseye evade e cerca di uccidere Fisk, ma Matt lo ferma. Nel finale Fisk dichiara la legge marziale a New York; Matt riunisce Karen e altri alleati per formare una resistenza.",
       en: "In the first episode Bullseye kills Foggy Nelson; Matt throws him off a building and stops being Daredevil. A year later Fisk, elected mayor, claims to have changed and asks Matt for a truce. Matt defends Hector Ayala (White Tiger) in court, who is later killed. A serial killer called Muse terrorizes the city: Daredevil returns and confronts him. Fisk's wife Vanessa had hired Bullseye to kill Foggy. Fisk creates an anti-vigilante task force with corrupt cops. Bullseye escapes and tries to kill Fisk, but Matt stops him. In the finale Fisk declares martial law in New York; Matt brings together Karen and other allies to form a resistance.",
     },
+    pc: [
+      {
+        it: "Episodio 9 · Frank Castle inganna una guardia con una stretta di mano, le rompe il braccio ed evade dalla prigione segreta di Fisk.",
+        en: "Episode 9 · Frank Castle tricks a guard into a handshake, breaks his arm and escapes from Fisk's secret prison.",
+      },
+    ],
   },
 
   bnw: {
@@ -215,6 +245,12 @@ export const MCU4: Record<string, TitleTexts> = {
       it: "Espulsa dal MIT, Riri torna a Chicago, segnata dalla morte della migliore amica Natalie e del patrigno in una sparatoria. Si unisce alla banda di Parker Robbins, detto Hood, per finanziare la sua armatura, e ricrea Natalie come intelligenza artificiale della tuta, N.A.T.A.L.I.E. Durante un colpo Parker uccide un dirigente; il suo mantello, dono del demone Mefisto, lo corrompe. Riri lo inganna con un ologramma e gli strappa il mantello. La strega Zelma Stanton alimenta con la magia la nuova armatura di Riri, ma N.A.T.A.L.I.E. viene cancellata. Nel finale Mefisto offre a Riri di riportare in vita Natalie se lei accetterà un patto; Riri accetta, Natalie torna, ma il segno di Mefisto si estende sul braccio di Riri.",
       en: "Expelled from MIT, Riri returns to Chicago, scarred by the deaths of her best friend Natalie and her stepfather in a shooting. She joins the crew of Parker Robbins, known as the Hood, to fund her armor, and recreates Natalie as the suit's AI, N.A.T.A.L.I.E. During a heist Parker kills an executive; his cloak, a gift from the demon Mephisto, corrupts him. Riri tricks him with a hologram and rips the cloak away. The witch Zelma Stanton powers Riri's new armor with magic, but N.A.T.A.L.I.E. is deleted. In the finale Mephisto offers to bring Natalie back to life if Riri agrees to a deal; Riri accepts, Natalie returns, but Mephisto's mark spreads across Riri's arm.",
     },
+    pc: [
+      {
+        it: "Episodio 6 · Parker Robbins, rimasto senza mantello e senza poteri, chiede aiuto a Zelma Stanton per la magia.",
+        en: "Episode 6 · Parker Robbins, left without his cloak and powers, asks Zelma Stanton for help with magic.",
+      },
+    ],
   },
 
   /* ===== FASE 6 ===== */

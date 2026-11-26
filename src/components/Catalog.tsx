@@ -10,6 +10,8 @@ import { PATHS, UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";
 import { useStore } from "../store";
 import { ALL_TYPES, ORDERS, buildGroups, sanitize, type HomeState } from "../homeState";
+import { watchIds } from "../utils";
+import { IconBookmark } from "./Icons";
 import { TitleRow } from "./TitleRow";
 
 /** Posizione di scorrimento del Catalogo, ricordata quando apri una scheda */
@@ -26,7 +28,11 @@ export function Catalog({ s: raw, set }: { s: HomeState; set: (p: Partial<HomeSt
     return () => { savedScroll = window.scrollY; };
   }, []);
 
-  const groups = buildGroups(s, lang, t);
+  // Filtro "Da vedere": restano solo i titoli in lista (e i gruppi che ne hanno)
+  const wl = new Set(watchIds(data));
+  const groups = s.watch
+    ? buildGroups(s, lang, t).map((g) => ({ ...g, items: g.items.filter((d) => wl.has(d.id)) })).filter((g) => g.items.length)
+    : buildGroups(s, lang, t);
   // Titoli della vista corrente (senza doppioni): per il conteggio "visti" in alto
   const visible = [...new Map(groups.flatMap((g) => g.items).map((d) => [d.id, d])).values()];
   const seenN = visible.filter((d) => data.seen[d.id]).length;
@@ -62,6 +68,10 @@ export function Catalog({ s: raw, set }: { s: HomeState; set: (p: Partial<HomeSt
           )}
           <div className="chips" style={{ marginLeft: "auto" }}>
             {/* Filtri tipo a scelta multipla: "Tutti" azzera, gli altri si accendono/spengono */}
+            {/* Lista "Da vedere": si combina con universo, ordine e tipi */}
+            <button className={`chip chip-wl${s.watch ? " on" : ""}`} aria-pressed={!!s.watch} onClick={() => set({ watch: !s.watch })}>
+              <IconBookmark on={!!s.watch} /> {t("watchlist")} <small className="mono">{wl.size}</small>
+            </button>
             <button className={`chip${s.types.length === 0 ? " on" : ""}`} onClick={() => set({ types: [] })}>{t("all")}</button>
             {ALL_TYPES.map((ty) => (
               <button key={ty} className={`chip${s.types.includes(ty) ? " on" : ""}`} aria-pressed={s.types.includes(ty)}
@@ -74,6 +84,7 @@ export function Catalog({ s: raw, set }: { s: HomeState; set: (p: Partial<HomeSt
         </div>
       </div>
 
+      {s.watch && groups.length === 0 && <p className="empty" style={{ padding: "16px 2px" }}>{wl.size ? t("watchNone") : t("watchEmpty")}</p>}
       {groups.map((g, gi) => (
         <div key={gi}>
           {g.h && (

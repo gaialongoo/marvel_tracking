@@ -204,9 +204,21 @@ const REL4: typeof REL = {
   invincibleim: { pc: 0 }, drstrange07: { pc: 0 }, thortales: { pc: 0 },
 };
 
-/** Verifiche unite: per ogni titolo i campi di REL, REL2, REL3 e REL4 insieme */
+/* Quinto giro (26/11/2026): SERIE e speciali.
+   en.wikipedia "Mid-credits and post-credits scenes in the Marvel Cinematic
+   Universe" letta per intero, confrontata con le recensioni degli episodi.
+   Per le serie "pc" = totale delle scene in tutta la stagione (l'episodio è
+   scritto nella descrizione, vedi texts/). Le serie e gli speciali usciti che
+   la pagina non elenca non hanno scene → 0. */
+const REL5: typeof REL = {
+  wv: { pc: 4 }, fatws: { pc: 2 }, loki1: { pc: 1 }, loki2: { pc: 1 }, whatif1: { pc: 1 }, whatif2: { pc: 1 }, hawkeye: { pc: 1 }, moonknight: { pc: 1 }, msmarvel: { pc: 2 }, shehulk: { pc: 5 }, echo: { pc: 1 }, ironheart: { pc: 1 }, ddba1: { pc: 1 }, groot1: { pc: 1 }, groot2: { pc: 1 },
+  si: { pc: 0 }, agatha: { pc: 0 }, wonderman: { pc: 0 }, ddba2: { pc: 0 }, whatif3: { pc: 0 },
+  wbn: { pc: 0 }, eow: { pc: 0 }, zombies: { pc: 0 }, fnsm: { pc: 0 }, punolk: { pc: 0 },
+};
+
+/** Verifiche unite: per ogni titolo i campi di REL, REL2, REL3, REL4 e REL5 insieme */
 const VER: typeof REL = { ...REL };
-for (const extra of [REL2, REL3, REL4]) for (const [id, f] of Object.entries(extra)) VER[id] = { ...VER[id], ...f };
+for (const extra of [REL2, REL3, REL4, REL5]) for (const [id, f] of Object.entries(extra)) VER[id] = { ...VER[id], ...f };
 
 /* Valori aggiornati da un riassunto delle fonti affidabili, NON ancora
    confermati parola per parola: si usano ma restano "da verificare". */
