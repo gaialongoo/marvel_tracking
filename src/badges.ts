@@ -1,13 +1,11 @@
-/* ============================================================================
-   BADGE — traguardi che si conquistano guardando (sezione del Profilo).
-   - Ogni badge ha 3 livelli: Bronzo, Argento, Oro. Per ognuno c'è una
-     soglia (es. 10 / 50 / 100 titoli): il livello è quante soglie hai superato.
-   - I badge "di completamento" (una Fase, un universo, un percorso…) hanno
-     come soglie un terzo, due terzi e tutti i titoli.
-   - Tutto si calcola dai dati già salvati (visti, episodi, voti, profilo),
-     più il contatore "back" per Ritorno al passato (vedi store.ts).
-   - I badge segreti mostrano "???" finché non conquisti il Bronzo.
-   ============================================================================ */
+// Badge - traguardi che si conquistano guardando (sezione del Profilo).
+// - Ogni badge ha 3 livelli: Bronzo, Argento, Oro. Per ognuno c'è una
+//   soglia (es. 10 / 50 / 100 titoli): il livello è quante soglie hai superato.
+// - I badge "di completamento" (una Fase, un universo, un percorso…) hanno
+//   come soglie un terzo, due terzi e tutti i titoli.
+// - Tutto si calcola dai dati già salvati (visti, episodi, voti, profilo),
+//   più il contatore "back" per Ritorno al passato (vedi store.ts).
+// - I badge segreti mostrano "???" finché non conquisti il Bronzo.
 import { AVATARS, AVATAR_BY_KEY } from "./data/avatars";
 import { BADGE_ART, phaseArt } from "./data/badgeArt";
 import { PATHS, UNIVERSES, UPCOMING } from "./data/meta";
@@ -42,7 +40,7 @@ const thirds = (tot: number): [number, number, number] =>
 /** Quanti titoli di questa lista hai visto */
 const seenOf = (list: Title[], d: SavedData) => list.filter((t) => d.seen[t.id]).length;
 
-/** Cattivi degli avatar → i film in cui compaiono (per "Cattivo dentro") */
+/** Cattivi degli avatar -> i film in cui compaiono (per "Cattivo dentro") */
 const VILLAIN_TITLES: Record<string, string[]> = {
   thanos: ["avg", "gotg", "aou", "iw", "eg"],
   ultron: ["aou"],
@@ -81,7 +79,7 @@ export function computeBadges(d: SavedData): Badge[] {
   const seenList = DATA.filter((t) => d.seen[t.id]);
   const mcu = DATA.filter((t) => t.uni === "mcu");
 
-  /* ---------- 1. QUANTITÀ ---------- */
+  // 1. Quantità
   add({ key: "first", group: "qty", name: { it: "Primo passo", en: "First Step" },
     how: { it: "Guarda {n} titoli", en: "Watch {n} titles" }, art: BADGE_ART.popcorn, tint: "#ffe9b8",
     value: seenList.length, levels: [1, 5, 10] });
@@ -95,7 +93,7 @@ export function computeBadges(d: SavedData): Badge[] {
     how: { it: "Guarda {n} episodi", en: "Watch {n} episodes" }, art: BADGE_ART.tvface, tint: "#d6f0ff",
     value: Object.values(d.eps).reduce((a, e) => a + e.length, 0), levels: [50, 200, 500] });
 
-  /* ---------- 2. MCU ---------- */
+  // 2. MCU
   for (let p = 1; p <= 6; p++) {
     complete({ key: `phase${p}`, group: "mcu", name: { it: `Fase ${p}`, en: `Phase ${p}` },
       how: { it: `Guarda {n} titoli della Fase ${p} (su {tot})`, en: `Watch {n} Phase ${p} titles (of {tot})` },
@@ -119,7 +117,7 @@ export function computeBadges(d: SavedData): Badge[] {
       up.list.map((id) => DATA.find((t) => t.id === id)).filter((t): t is Title => !!t));
   }
 
-  /* ---------- 3. UNIVERSI ---------- */
+  // 3. Universi
   const unis = UNIVERSES.filter((u) => u.k !== "all");
   add({ key: "explorer", group: "uni", name: { it: "Esploratore del Multiverso", en: "Multiverse Explorer" },
     how: { it: "Guarda almeno un titolo in {n} universi diversi", en: "Watch at least one title in {n} different universes" },
@@ -136,7 +134,7 @@ export function computeBadges(d: SavedData): Badge[] {
     how: { it: "Guarda {n} titoli dei Defenders (su {tot})", en: "Watch {n} Defenders titles (of {tot})" },
     art: BADGE_ART.skyline, tint: "#dfe2ff" }, DATA.filter((t) => t.themes.includes("defenders")));
 
-  /* ---------- 4. PERCORSI (uno per personaggio) ---------- */
+  // 4. Percorsi (uno per personaggio)
   PATHS.filter((p) => p.kind === "chars").forEach((p, i) => {
     const av = AVATARS.find((a) => a.path === p.key);
     complete({ key: `path-${p.key}`, group: "paths", name: { it: p.it, en: p.en },
@@ -146,7 +144,7 @@ export function computeBadges(d: SavedData): Badge[] {
       tint: "#eef0f4" }, DATA.filter((t) => t.chars.includes(p.key)));
   });
 
-  /* ---------- 5. MODO DI GUARDARE ---------- */
+  // 5. Modo di guardare
   // Cronologista: la fila più lunga di titoli MCU consecutivi (in ordine cronologico) tutti visti
   let run = 0, best = 0;
   for (const t of [...mcu].sort((a, b) => a.chrono - b.chrono)) { run = d.seen[t.id] ? run + 1 : 0; best = Math.max(best, run); }
@@ -172,7 +170,7 @@ export function computeBadges(d: SavedData): Badge[] {
     how: { it: "Guarda {n} titoli d'animazione", en: "Watch {n} animated titles" },
     art: BADGE_ART.cereal, tint: "#d6f0ff", value: seenList.filter((t) => t.type === "anim").length, levels: [5, 15, 30] });
 
-  /* ---------- 6. SEGRETI ---------- */
+  // 6. Segreti
   add({ key: "back", group: "secret", secret: true, name: { it: "Ritorno al passato", en: "Back in Time" },
     how: { it: "Recupera {n} titoli che avevi saltato", en: "Catch up on {n} titles you had skipped" },
     art: BADGE_ART.rewind, tint: "#d9f0dc", value: d.back ?? 0, levels: [1, 5, 10] });

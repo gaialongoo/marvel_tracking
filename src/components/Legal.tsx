@@ -1,11 +1,9 @@
-/* ============================================================================
-   PRIVACY, CONDIZIONI D'USO E NOTA LEGALE
-   - Privacy (#/privacy): si apre anche SENZA aver fatto l'accesso (serve
-     prima di registrarsi). Testi in italiano e inglese qui sotto.
-   - SiteFooter: in fondo a ogni pagina, con la nota "progetto di fan, non
-     affiliato a Marvel o Disney" e il link alla Privacy.
-   Contatto ed età minima arrivano da config.ts.
-   ============================================================================ */
+// Privacy, condizioni d'uso e nota legale
+// - Privacy (#/privacy): si apre anche senza aver fatto l'accesso (serve
+//   prima di registrarsi). Testi in italiano e inglese qui sotto.
+// - SiteFooter: in fondo a ogni pagina, con la nota "progetto di fan, non
+//   affiliato a Marvel o Disney" e il link alla Privacy.
+// Contatto ed età minima arrivano da config.ts.
 import { CONTACT_EMAIL, MIN_AGE } from "../config";
 import { useT } from "../i18n";
 import { goBack } from "../router";
@@ -24,8 +22,10 @@ function Contact() {
     : <em>{lang === "it" ? "(indirizzo email in arrivo)" : "(email address coming soon)"}</em>;
 }
 
-/** Citazione obbligatoria di TMDB (condizioni d'uso delle sue API): logo
-    ufficiale (public/tmdb.svg) + frase "usa TMDB ma non è approvato da TMDB" */
+/**
+ * Citazione obbligatoria di TMDB (condizioni d'uso delle sue API): logo
+ * ufficiale (public/tmdb.svg) + frase "usa TMDB ma non è approvato da TMDB"
+ */
 function TmdbCredit({ it }: { it: boolean }) {
   return (
     <p className="tmdb-credit">
@@ -37,9 +37,7 @@ function TmdbCredit({ it }: { it: boolean }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   PAGINA PRIVACY
-   --------------------------------------------------------------------------- */
+// Pagina privacy
 export function Privacy() {
   const { t, lang } = useT();
   const it = lang === "it";
@@ -168,9 +166,7 @@ export function Privacy() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   PIÈ DI PAGINA (tutte le pagine, anche quella di accesso)
-   --------------------------------------------------------------------------- */
+// Piè di pagina (tutte le pagine, anche quella di accesso)
 export function SiteFooter() {
   const { lang } = useT();
   return (

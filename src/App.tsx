@@ -1,10 +1,8 @@
-/* ============================================================================
-   APP — struttura generale: barra in alto + pagina attiva + messaggi.
-   La pagina dipende dall'indirizzo (vedi router.ts):
-   Home (bacheca) · Catalogo · Preparazione · Profilo · Scheda del titolo.
-   Tutto è dentro AuthGate: senza aver fatto l'accesso si vede solo la
-   pagina di login (vedi components/Auth.tsx).
-   ============================================================================ */
+// App - struttura generale: barra in alto + pagina attiva + messaggi.
+// La pagina dipende dall'indirizzo (vedi router.ts):
+// Home (bacheca) · Catalogo · Preparazione · Profilo · Scheda del titolo.
+// Tutto è dentro AuthGate: senza aver fatto l'accesso si vede solo la
+// pagina di login (vedi components/Auth.tsx).
 import { useEffect, useState } from "react";
 import { AuthGate } from "./components/Auth";
 import { Detail } from "./components/Detail";

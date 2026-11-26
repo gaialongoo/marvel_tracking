@@ -1,13 +1,11 @@
-/* ============================================================================
-   ACCOUNT — tutto quello che riguarda l'accesso:
-   - AuthGate: decide cosa mostrare (configurazione mancante, caricamento,
-     pagina di accesso, nuova password, oppure l'app vera)
-   - AuthPage: Accedi / Registrati / Password dimenticata
-   - NewPassword: dopo il link "password dimenticata" ricevuto via email
-   - BrowserDataDialog: cosa fare dei dati salvati nel browser prima degli account
-   - AccountMenu: avatar nella barra in alto (nome, email, Profilo,
-     stato salvataggio, Esci)
-   ============================================================================ */
+// Account - tutto quello che riguarda l'accesso:
+// - AuthGate: decide cosa mostrare (configurazione mancante, caricamento,
+//   pagina di accesso, nuova password, oppure l'app vera)
+// - AuthPage: Accedi / Registrati / Password dimenticata
+// - NewPassword: dopo il link "password dimenticata" ricevuto via email
+// - BrowserDataDialog: cosa fare dei dati salvati nel browser prima degli account
+// - AccountMenu: avatar nella barra in alto (nome, email, Profilo,
+//   stato salvataggio, Esci)
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { clearLinkErr, signIn, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
 import { useHandle } from "../handle";
@@ -27,9 +25,7 @@ import { posterPath, posterUrl } from "../poster";
 /** Password lunga almeno 8 caratteri (stessa regola da impostare su Supabase) */
 const MIN_PW = 8;
 
-/* ---------------------------------------------------------------------------
-   AUTH GATE — avvolge l'app: senza accesso non si vede niente
-   --------------------------------------------------------------------------- */
+// Auth gate - avvolge l'app: senza accesso non si vede niente
 export function AuthGate({ children }: { children: ReactNode }) {
   const { ready, user, recovery } = useAuth();
   const { loaded, sync } = useStore();
@@ -43,12 +39,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
   return <>{children}<BrowserDataDialog /></>;
 }
 
-/* ---------------------------------------------------------------------------
-   MURO DI LOCANDINE — sfondo della pagina di accesso: 4 file di locandine
-   inclinate che scorrono piano (a file alterne in direzioni opposte), coperte
-   da un velo del colore del tema. Ogni fila è ripetuta due volte, così lo
-   scorrimento ricomincia senza salti. Fermo se il sistema chiede meno animazioni.
-   --------------------------------------------------------------------------- */
+// Muro di locandine - sfondo della pagina di accesso: 4 file di locandine
+// inclinate che scorrono piano (a file alterne in direzioni opposte), coperte
+// da un velo del colore del tema. Ogni fila è ripetuta due volte, così lo
+// scorrimento ricomincia senza salti. Fermo se il sistema chiede meno animazioni.
 const WALL_ROWS = [
   ["im", "avg", "gotg", "tws", "bp", "iw", "eg", "nwh", "dpw"],
   ["wv", "loki1", "ragnarok", "ds", "cm", "shangchi", "ff", "thunderbolts", "msmarvel"],
@@ -112,9 +106,7 @@ function SetupHelp() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   PAGINA DI ACCESSO — tre modalità nello stesso riquadro
-   --------------------------------------------------------------------------- */
+// Pagina di accesso - tre modalità nello stesso riquadro
 type Mode = "signin" | "signup" | "forgot";
 
 /** Secondi di attesa prima di poter chiedere un altro link (limite di Supabase) */
@@ -241,9 +233,7 @@ function PwHint({ pw }: { pw: string }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   NUOVA PASSWORD — si apre dal link dell'email "password dimenticata"
-   --------------------------------------------------------------------------- */
+// Nuova password - si apre dal link dell'email "password dimenticata"
 function NewPassword() {
   const { t } = useT();
   const [pw, setPw] = useState("");
@@ -282,10 +272,8 @@ function NewPassword() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   DATI DEL BROWSER — compare dopo l'accesso se in questo browser ci sono
-   dati salvati prima degli account. Si sceglie una volta per dispositivo.
-   --------------------------------------------------------------------------- */
+// Dati del browser - compare dopo l'accesso se in questo browser ci sono
+// dati salvati prima degli account. Si sceglie una volta per dispositivo.
 function BrowserDataDialog() {
   const { t } = useT();
   const { browserData, data } = useStore();
@@ -315,11 +303,9 @@ function BrowserDataDialog() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   MENU ACCOUNT — nella barra in alto: l'avatar del profilo con un anello
-   che indica lo stato del salvataggio; al clic mostra nome, email,
-   "Profilo" ed "Esci"
-   --------------------------------------------------------------------------- */
+// Menu account - nella barra in alto: l'avatar del profilo con un anello
+// che indica lo stato del salvataggio; al clic mostra nome, email,
+// "Profilo" ed "Esci"
 export function AccountMenu() {
   const { t } = useT();
   const { user } = useAuth();

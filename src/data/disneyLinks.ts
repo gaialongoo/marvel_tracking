@@ -1,11 +1,9 @@
-/* ============================================================================
-   PAGINE UFFICIALI DISNEY+ ITALIA dei titoli (lette il 18/11/2026)
-   id del catalogo → codice della pagina disneyplus.com/it-it/browse/entity-<codice>
-   Il pulsante "Pagina ufficiale" della scheda apre questo indirizzo.
-   Per le serie divise in stagioni, ogni stagione punta alla pagina della serie.
-   ============================================================================ */
+// Pagine ufficiali Disney+ Italia dei titoli (lette il 18/11/2026)
+// id del catalogo -> codice della pagina disneyplus.com/it-it/browse/entity-<codice>
+// Il pulsante "Pagina ufficiale" della scheda apre questo indirizzo.
+// Per le serie divise in stagioni, ogni stagione punta alla pagina della serie.
 const E: Record<string, string> = {
-  // ----- MCU: film -----
+  // MCU: film
   im: "0c520152-b81f-4c20-9310-003debd1947e", im2: "85c5529d-c053-4fa4-9957-4906eb5aedc6",
   thor: "479d41e3-8438-4ba4-b93d-8223220e069c", ca: "8e68c43a-117c-4f4d-b217-0db106a1a614",
   avg: "d2ab699b-67da-4906-a7a4-5bc542c953cf", im3: "e8569c2d-85ec-42a4-8811-b2618d494a40",
@@ -24,12 +22,12 @@ const E: Record<string, string> = {
   gotg3: "820f0ded-3254-42c5-a7e4-7c044ff6dd65", marvels: "75c90eca-8969-4edb-ac1a-7165cff2671c",
   dpw: "120ae1e6-2240-4924-a4ce-f8de6e28b0b1", bnw: "3064ac7f-ef4d-4f89-b92f-b5524da92a72",
   thunderbolts: "f51dce23-7d8f-490a-9f0c-be1b5432c2a9", ff: "2142a7a9-4c49-438d-a492-296c4e08b714",
-  // ----- MCU: corti e speciali -----
+  // MCU: corti e speciali
   "os-consultant": "cad91b86-ab50-4fce-882f-ae71c86c2938", "os-item47": "2cd46937-17fe-4ada-8de4-0972f2763f1c",
   "os-carter": "5e7f5aa1-b3ea-4cd3-983f-c5cda970fb0a", "os-king": "14988369-345c-4984-9c16-59428bd70609",
   "os-hammer": "b45838e2-aa7a-4985-923d-9fe949e40ece", wbn: "ad2fd4e8-062b-45b9-b2c5-8b8779873e48",
   holiday: "1a15fe60-3236-4242-a699-a4e3392cf112", punolk: "c5b69f75-f159-4749-873d-9a1d1a4eb878",
-  // ----- MCU: serie (ogni stagione → pagina della serie) -----
+  // MCU: serie (ogni stagione -> pagina della serie)
   wv: "90affd1f-0851-48bc-9cab-c142d5c9c20c", fatws: "3c08a31a-2350-4aaf-90d0-88def4c551bf",
   loki1: "8f8c5cbb-e5ba-4285-9e2c-86abcac9fd50", loki2: "8f8c5cbb-e5ba-4285-9e2c-86abcac9fd50",
   whatif1: "fc588cfe-ff2b-4a44-abbd-d76359ce778f", whatif2: "fc588cfe-ff2b-4a44-abbd-d76359ce778f", whatif3: "fc588cfe-ff2b-4a44-abbd-d76359ce778f",
@@ -47,7 +45,7 @@ const E: Record<string, string> = {
   if1: "d251acf8-4a1a-48d1-b3b7-d9513afeaac0", if2: "d251acf8-4a1a-48d1-b3b7-d9513afeaac0",
   defenders: "61687bed-4a66-4657-9252-df80ca1d1fbc",
   pun1: "bbe154ae-af21-49dd-8129-90077e61c991", pun2: "bbe154ae-af21-49dd-8129-90077e61c991",
-  // ----- Fuori MCU: film -----
+  // Fuori MCU: film
   xmen: "e9f59c82-de76-4a18-a849-192532ff9b2d", x2: "54748282-5bf7-496c-8db9-a9aa3b7f57ac",
   x3: "e0f6bbed-cea5-41c1-b787-478f21255898", xow: "82480f3f-6f11-4feb-8c4e-b32c0aca2c53",
   xfc: "9f9e9ae3-88d8-467b-8969-28d253cc4687", wolv13: "0f3b4bfe-aa16-43f2-8a11-d5586c6e6c8f",
@@ -57,7 +55,7 @@ const E: Record<string, string> = {
   ff2005: "d6592baa-0dc6-4549-a0cb-3b93a3b0e260", ff2007: "06810fd3-a12e-4185-829b-36b3c814ce97",
   fant4stic: "f7f1d27d-6d5a-479d-8a06-fa53689bf61c", tasm: "f43ffe63-2c96-4b6c-8fae-84d0d22d6466",
   tasm2: "c21c733a-18f4-4cdc-b1e8-1ff6b996c0a3", spiderverse: "e4cd7619-7c84-4b4d-acf0-f53ca1b442a3",
-  // ----- Fuori MCU: serie e animazione -----
+  // Fuori MCU: serie e animazione
   aos: "63516dff-91f8-4deb-b110-d22552f329cb", agentcarter: "e4cbebda-a890-4e99-9a29-40d2162f7d46",
   inhumans: "f93e8212-c6c0-4a2f-a147-ad220f3481c8", xmen92: "8eaac297-16fe-4d83-bb0f-ca0a280b8b82",
   xmen97: "8dc91ed4-cdca-4fab-9723-d3d42f382d34", sm2017: "9a45dce7-ab64-4da8-8089-47a87d5db9ec",

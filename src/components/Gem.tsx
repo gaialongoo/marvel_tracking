@@ -1,12 +1,10 @@
-/* ============================================================================
-   GEMME DELL'INFINITO — forme ispirate ai film
-   Spazio = cubo (Tesseract) · Mente = goccia · Realtà = forma fluida (Aether)
-   Potere = sfera con anelli (Orb) · Tempo = occhio (Occhio di Agamotto) · Anima = ovale
-   Nel disegno: .f = forma principale, .hl = riflessi (visibili solo se accesa).
-   ============================================================================ */
+// Gemme dell'Infinito - forme ispirate ai film
+// Spazio = cubo (Tesseract) · Mente = goccia · Realtà = forma fluida (Aether)
+// Potere = sfera con anelli (Orb) · Tempo = occhio (Occhio di Agamotto) · Anima = ovale
+// Nel disegno: .f = forma principale, .hl = riflessi (visibili solo se accesa).
 import { GEMS } from "../data/meta";
 
-/* Disegni SVG (viewBox 24x24): stringhe costanti, scritte da noi */
+// Disegni SVG (viewBox 24x24): stringhe costanti, scritte da noi
 const SHAPES: Record<string, string> = {
   space: `<path class="f" d="M12 2.5l8.5 4.8v9.4L12 21.5l-8.5-4.8V7.3z"/>
     <path class="hl" d="M12 2.5l8.5 4.8L12 12 3.5 7.3z" fill="#fff" opacity=".35"/>

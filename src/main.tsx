@@ -1,6 +1,4 @@
-/* ============================================================================
-   PUNTO DI INGRESSO — monta l'app React nella pagina (index.html → #root)
-   ============================================================================ */
+// Punto di ingresso - monta l'app React nella pagina (index.html -> #root)
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 // Font inclusi nell'app (prima arrivavano da Google Fonts: così il browser

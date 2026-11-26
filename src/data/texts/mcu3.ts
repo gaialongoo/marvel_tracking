@@ -1,8 +1,6 @@
-/* ============================================================================
-   TESTI — BLOCCO MCU 3: Fase 4 (film, serie, speciali)
-   Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
-   Per le serie, "full" riassume l'intera stagione.
-   ============================================================================ */
+// Testi - blocco MCU 3: Fase 4 (film, serie, speciali)
+// Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
+// Per le serie, "full" riassume l'intera stagione.
 import type { TitleTexts } from "./types";
 
 export const MCU3: Record<string, TitleTexts> = {

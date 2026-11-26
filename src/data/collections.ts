@@ -1,31 +1,28 @@
-/* ============================================================================
-   COLLEZIONI DISNEY+ — le schede in alto nella Home
-   ----------------------------------------------------------------------------
-   Fonte: Disney+ Italia, pagina "Film e show Marvel"
-   (disneyplus.com/it-it/browse/page-60f4707d-…) e le 10 pagine dei
-   "Grandi personaggi", lette il 18/11/2026.
-
-   Ogni collezione ha DUE versioni:
-   - official: i titoli che mostra Disney+, nel suo ordine (Disney+ ne mostra
-     al massimo 10 per riga, quindi spesso è incompleta);
-   - completa: official + "add" (titoli aggiunti da noi, segnati nell'elenco)
-     oppure, se c'è "match", tutti i titoli che rispettano la regola.
-
-   Regole di conversione dai riquadri Disney+ ai titoli del catalogo:
-   - un riquadro di una serie con più stagioni (es. "Loki", "Daredevil")
-     = tutte le sue stagioni;
-   - le VERSIONI ALTERNATIVE contano come il titolo base:
-     "Avengers: Endgame Extra" → Avengers: Endgame,
-     "Licantropus a colori" → Licantropus;
-   - ESCLUSI (scelta dell'utente): extra, documentari, podcast
-     (Marvel Studios LEGENDS, Assembled…) e animazione per bambini
-     (Spidey e i suoi fantastici amici, LEGO, Phineas e Ferb,
-     Super Hero Adventures, Squadra di Halloween, A Merry Marvel Christmas
-     Carol…).
-   Righe non usate: "In primo piano" (cambia spesso), "Amici Marvel"
-   (bambini), "Documentari Marvel", "IMAX Enhanced" (è un formato video).
-   La riga del conto alla rovescia per Doomsday è in Preparazione.
-   ============================================================================ */
+// Collezioni Disney+ - le schede in alto nella Home
+// Fonte: Disney+ Italia, pagina "Film e show Marvel"
+// (disneyplus.com/it-it/browse/page-60f4707d-…) e le 10 pagine dei
+// "Grandi personaggi", lette il 18/11/2026.
+//
+// Ogni collezione ha due versioni:
+// - official: i titoli che mostra Disney+, nel suo ordine (Disney+ ne mostra
+//   al massimo 10 per riga, quindi spesso è incompleta);
+// - completa: official + "add" (titoli aggiunti da noi, segnati nell'elenco)
+//   oppure, se c'è "match", tutti i titoli che rispettano la regola.
+//
+// Regole di conversione dai riquadri Disney+ ai titoli del catalogo:
+// - un riquadro di una serie con più stagioni (es. "Loki", "Daredevil")
+//   = tutte le sue stagioni;
+// - le versioni alternative contano come il titolo base:
+//   "Avengers: Endgame Extra" -> Avengers: Endgame,
+//   "Licantropus a colori" -> Licantropus;
+// - Esclusi (scelta dell'utente): extra, documentari, podcast
+//   (Marvel Studios Legends, Assembled…) e animazione per bambini
+//   (Spidey e i suoi fantastici amici, LEGO, Phineas e Ferb,
+//   Super Hero Adventures, Squadra di Halloween, A Merry Marvel Christmas
+//   Carol…).
+// Righe non usate: "In primo piano" (cambia spesso), "Amici Marvel"
+// (bambini), "Documentari Marvel", "IMAX Enhanced" (è un formato video).
+// La riga del conto alla rovescia per Doomsday è in Preparazione.
 import type { I18nText, Title } from "../types";
 
 export interface Collection extends I18nText {
@@ -36,7 +33,7 @@ export interface Collection extends I18nText {
   match?: (d: Title) => boolean; // oppure: versione completa = tutti i titoli che rispettano la regola
 }
 
-/* Serie con più stagioni: un riquadro Disney+ = tutte le stagioni */
+// Serie con più stagioni: un riquadro Disney+ = tutte le stagioni
 const LOKI = ["loki1", "loki2"];
 const WHATIF = ["whatif1", "whatif2", "whatif3"];
 const DD = ["dd1", "dd2", "dd3"];
@@ -44,7 +41,7 @@ const DDBA = ["ddba1", "ddba2"];
 const GROOT = ["groot1", "groot2"];
 
 export const COLLECTIONS: Collection[] = [
-  /* ----- Righe della pagina "Film e show Marvel" ----- */
+  // Righe della pagina "Film e show Marvel"
   { k: "mcu", group: "dp", it: "MCU · Film e serie in ordine cronologico", en: "MCU · Movies and series in timeline order",
     official: ["eow", "ca", "os-carter", "cm", "im", "im2", "os-hammer", "thor", "os-consultant", "avg"],
     match: (d) => d.uni === "mcu" },
@@ -80,7 +77,7 @@ export const COLLECTIONS: Collection[] = [
     official: ["bp", "wf", "eow"],
     add: ["cw", "iw", "eg"] },
 
-  /* ----- Pagine dei "Grandi personaggi" ----- */
+  // Pagine dei "Grandi personaggi"
   { k: "h-daredevil", group: "hero", it: "Daredevil", en: "Daredevil",
     official: [...DDBA, ...DD, "defenders", "shehulk", "punolk", "echo", "hawkeye", "fnsm", "pun1", "pun2"],
     add: ["nwh"] },
@@ -110,8 +107,10 @@ export const COLLECTIONS: Collection[] = [
     add: ["xfc", "apocalypse"] },
 ];
 
-/** Titoli di una collezione nella versione scelta.
-    Restituisce gli id e l'insieme di quelli aggiunti da noi (non su Disney+). */
+/**
+ * Titoli di una collezione nella versione scelta.
+ * Restituisce gli id e l'insieme di quelli aggiunti da noi (non su Disney+).
+ */
 export function collectionIds(c: Collection, full: boolean, all: Title[]): { ids: string[]; added: Set<string> } {
   if (!full) return { ids: [...new Set(c.official)], added: new Set() };
   const extra = c.match ? all.filter(c.match).map((d) => d.id) : c.add ?? [];

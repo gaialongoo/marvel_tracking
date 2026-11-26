@@ -1,11 +1,9 @@
-/* ============================================================================
-   BADGE — sezione del Profilo con tutti i traguardi, divisi per gruppo.
-   I gruppi sono tendine (chiuse all'inizio) con la frazione di completamento.
-   Ogni badge è una medaglia rotonda con il suo disegno: il bordo è di
-   bronzo, argento o oro secondo il livello; se non l'hai ancora conquistato
-   è grigia e sbiadita. Sotto: nome, livello, stelline e cosa manca.
-   I calcoli sono in badges.ts.
-   ============================================================================ */
+// Badge - sezione del Profilo con tutti i traguardi, divisi per gruppo.
+// I gruppi sono tendine (chiuse all'inizio) con la frazione di completamento.
+// Ogni badge è una medaglia rotonda con il suo disegno: il bordo è di
+// bronzo, argento o oro secondo il livello; se non l'hai ancora conquistato
+// è grigia e sbiadita. Sotto: nome, livello, stelline e cosa manca.
+// I calcoli sono in badges.ts.
 import { useMemo, useState } from "react";
 import { BADGE_GROUPS, computeBadges, howText, type Badge, type BadgeGroup } from "../badges";
 import { BADGE_ART } from "../data/badgeArt";

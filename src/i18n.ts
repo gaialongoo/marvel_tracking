@@ -1,7 +1,5 @@
-/* ============================================================================
-   TRADUZIONI — tutti i testi dell'interfaccia in italiano e inglese.
-   Uso nei componenti:  const { t, lang } = useT();  t("home")
-   ============================================================================ */
+// Traduzioni - tutti i testi dell'interfaccia in italiano e inglese.
+// Uso nei componenti:  const { t, lang } = useT();  t("home")
 import { useStore } from "./store";
 
 const it = {
@@ -61,7 +59,7 @@ const it = {
   // nomi dei campi "da verificare"
   f_it: "titolo italiano", f_y: "anno", f_min: "durata", f_eps: "episodi", f_phase: "Fase", f_chrono: "posizione cronologica", f_pc: "post-credits",
   notFound: "Titolo non trovato",
-  // --- bacheca, catalogo e profilo ---
+  // bacheca, catalogo e profilo
   catalog: "Catalogo", profile: "Profilo", continue: "Continua a guardare", nextUp: "Prossimo", thenUp: "Poi",
  
   favChar: "Personaggio preferito", favTitle: "Titolo preferito", openPath: "Apri il suo percorso nel Catalogo",
@@ -71,7 +69,7 @@ const it = {
   displayName: "Nome", namePh: "Come vuoi essere chiamato/a", bio: "Frase", bioPh: "Es. Team Cap dal 2011",
   prefs: "Preferenze di visione", prefsSub: "Universo, ordine e cosa guardare: il Catalogo si apre così. In Home il \"prossimo\" è il titolo dopo l'ultimo che hai visto in questa lista (quelli saltati non contano).",
   back: "← Indietro",
-  // --- badge (components/Badges.tsx) e tag utente ---
+  // badge (components/Badges.tsx) e tag utente
   badges: "Badge", badgesWon: "badge conquistati", levelsWon: "livelli", onlyWon: "Solo conquistati",
   lvlNone: "Da conquistare", lvlBronze: "Bronzo", lvlSilver: "Argento", lvlGold: "Oro",
   badgeDone: "Completato!", secretHow: "Badge segreto: lo scopri guardando",
@@ -92,7 +90,7 @@ const it = {
   frRemoveAsk: "Vuoi togliere questa persona dagli amici?", frOnlyFriends: "Diventate amici per vedere i suoi progressi, cosa sta guardando e i suoi voti.",
   frNoData: "Non ha ancora segnato niente.", frWatching: "Sta guardando", frNotWatching: "Nessuna serie in corso.",
   frRatings: "I suoi voti", frNoRatings: "Non ha ancora votato nessun titolo.",
-  // --- account (components/Auth.tsx) ---
+  // account (components/Auth.tsx)
   account: "Account", signIn: "Accedi", signUp: "Crea un account", signOut: "Esci", createAccount: "Registrati",
   authTag: "Il tuo multiverso Marvel, in tasca. Guarda, segna, colleziona badge.",
   authSub: "I tuoi visti, voti ed episodi sono salvati nel tuo account: li ritrovi su ogni dispositivo.",
@@ -181,7 +179,7 @@ const en: Record<keyof typeof it, string> = {
   sample: "To verify",
   f_it: "Italian title", f_y: "year", f_min: "runtime", f_eps: "episodes", f_phase: "Phase", f_chrono: "timeline position", f_pc: "post-credits",
   notFound: "Title not found",
-  // --- dashboard, catalogue and profile ---
+  // dashboard, catalogue and profile
   catalog: "Catalogue", profile: "Profile", continue: "Continue watching", nextUp: "Next", thenUp: "Then",
  
   favChar: "Favourite character", favTitle: "Favourite title", openPath: "Open their path in the Catalogue",
@@ -191,7 +189,7 @@ const en: Record<keyof typeof it, string> = {
   displayName: "Name", namePh: "What should we call you", bio: "Tagline", bioPh: "E.g. Team Cap since 2011",
   prefs: "Viewing preferences", prefsSub: "Universe, order and what to watch: the Catalogue opens like this. On Home, \"next\" is the title after the last one you watched in this list (skipped ones don't count).",
   back: "← Back",
-  // --- badges (components/Badges.tsx) and user tag ---
+  // badges (components/Badges.tsx) and user tag
   badges: "Badges", badgesWon: "badges earned", levelsWon: "levels", onlyWon: "Earned only",
   lvlNone: "Not earned yet", lvlBronze: "Bronze", lvlSilver: "Silver", lvlGold: "Gold",
   badgeDone: "Completed!", secretHow: "Secret badge: discover it by watching",
@@ -212,7 +210,7 @@ const en: Record<keyof typeof it, string> = {
   frRemoveAsk: "Remove this person from your friends?", frOnlyFriends: "Become friends to see their progress, what they're watching and their ratings.",
   frNoData: "Nothing marked yet.", frWatching: "Watching", frNotWatching: "No series in progress.",
   frRatings: "Their ratings", frNoRatings: "No titles rated yet.",
-  // --- account (components/Auth.tsx) ---
+  // account (components/Auth.tsx)
   account: "Account", signIn: "Sign in", signUp: "Create an account", signOut: "Sign out", createAccount: "Sign up",
   authTag: "Your Marvel multiverse, in your pocket. Watch, check off, collect badges.",
   authSub: "Your seen titles, ratings and episodes are saved to your account: you'll find them on every device.",

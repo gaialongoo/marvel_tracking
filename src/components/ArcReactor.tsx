@@ -1,8 +1,6 @@
-/* ============================================================================
-   LOGO — il reattore arc (il "cuore" di Iron Man), disegno SVG nostro:
-   anello esterno d'oro, 10 bobine di rame tutto intorno, anello interno
-   azzurro e il nucleo che si illumina (pulsa piano, vedi .arc in styles.css).
-   ============================================================================ */
+// Logo - il reattore arc (il "cuore" di Iron Man), disegno SVG nostro:
+// anello esterno d'oro, 10 bobine di rame tutto intorno, anello interno
+// azzurro e il nucleo che si illumina (pulsa piano, vedi .arc in styles.css).
 
 /** Le 10 bobine di rame, ruotate intorno al centro (32, 32) */
 const COILS = Array.from({ length: 10 }, (_, i) =>

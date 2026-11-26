@@ -1,11 +1,9 @@
-/* ============================================================================
-   MAPPA DEI COLLEGAMENTI
-   Tre colonne di riquadri: Prima | Questo titolo | Dopo.
-   Dopo il disegno misuro dove sono finiti i riquadri e traccio le frecce:
-   - orizzontali se le colonne sono affiancate (PC)
-   - verticali se sono impilate (telefono)
-   Linea continua = l'altro titolo è già visto; tratteggiata = da vedere.
-   ============================================================================ */
+// Mappa dei collegamenti
+// Tre colonne di riquadri: Prima | Questo titolo | Dopo.
+// Dopo il disegno misuro dove sono finiti i riquadri e traccio le frecce:
+// - orizzontali se le colonne sono affiancate (PC)
+// - verticali se sono impilate (telefono)
+// Linea continua = l'altro titolo è già visto; tratteggiata = da vedere.
 import { useLayoutEffect, useRef, useState } from "react";
 import { BY_ID } from "../data/titles";
 import { useT } from "../i18n";
@@ -40,10 +38,10 @@ export function ConnectionMap({ d }: { d: Title }) {
         const N = rel(n.getBoundingClientRect());
         const [A, B] = n.dataset.side === "before" ? [N, C] : [C, N]; // la freccia va da "prima" a "dopo"
         let path: string;
-        if (A.r <= B.l + 1) {           // colonne affiancate → curva orizzontale
+        if (A.r <= B.l + 1) {           // colonne affiancate -> curva orizzontale
           const mx = (A.r + B.l) / 2;
           path = `M${A.r} ${A.cy} C${mx} ${A.cy}, ${mx} ${B.cy}, ${B.l - 4} ${B.cy}`;
-        } else {                        // colonne impilate → curva verticale
+        } else {                        // colonne impilate -> curva verticale
           const my = (A.b + B.t) / 2;
           path = `M${A.cx} ${A.b} C${A.cx} ${my}, ${B.cx} ${my}, ${B.cx} ${B.t - 4}`;
         }

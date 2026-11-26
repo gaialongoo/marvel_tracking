@@ -1,10 +1,8 @@
-/* ============================================================================
-   BARRA IN ALTO
-   [logo: reattore arc + nome]   [Home | Catalogo | Preparazione]   [ricerca] [IT | EN] [avatar]
-   L'avatar apre il menu: Profilo, stato del salvataggio, Esci.
-   La scheda di un titolo NON è nel selettore: si apre solo cliccando un
-   titolo o dalla ricerca.
-   ============================================================================ */
+// Barra in alto
+// [logo: reattore arc + nome]   [Home | Catalogo | Preparazione]   [ricerca] [IT | EN] [avatar]
+// L'avatar apre il menu: Profilo, stato del salvataggio, Esci.
+// La scheda di un titolo non è nel selettore: si apre solo cliccando un
+// titolo o dalla ricerca.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DATA } from "../data/titles";
 import { useT } from "../i18n";
@@ -49,11 +47,9 @@ export function TopBar({ route }: { route: Route }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   RICERCA — cerca nel titolo italiano, inglese e nella sigla.
-   Frecce su/giù per scegliere, Invio per aprire, Esc per chiudere,
-   "/" da qualsiasi punto porta il cursore qui.
-   --------------------------------------------------------------------------- */
+// Ricerca - cerca nel titolo italiano, inglese e nella sigla.
+// Frecce su/giù per scegliere, Invio per aprire, Esc per chiudere,
+// "/" da qualsiasi punto porta il cursore qui.
 function Search() {
   const { t, lang } = useT();
   const [q, setQ] = useState("");

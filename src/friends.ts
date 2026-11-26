@@ -1,14 +1,12 @@
-/* ============================================================================
-   AMICI — ricerca per @tag, richieste di amicizia, lista degli amici.
-   Tabelle su Supabase (vedi supabase/schema.sql):
-   - handles: @tag + nome e avatar "pubblici" (per riconoscersi nella ricerca)
-   - friendships: una riga per coppia, 'pending' (richiesta) o 'accepted' (amici)
-   - progress: i dati di un amico si possono LEGGERE solo se siete amici
-   - blocks: le persone che hai bloccato (non possono mandarti richieste)
-   - reports: segnalazioni (si possono solo inviare; le legge chi gestisce il sito)
-   useFriends() dà ai componenti la situazione aggiornata; le funzioni qui
-   sotto la modificano e poi la ricaricano.
-   ============================================================================ */
+// Amici - ricerca per @tag, richieste di amicizia, lista degli amici.
+// Tabelle su Supabase (vedi supabase/schema.sql):
+// - handles: @tag + nome e avatar "pubblici" (per riconoscersi nella ricerca)
+// - friendships: una riga per coppia, 'pending' (richiesta) o 'accepted' (amici)
+// - progress: i dati di un amico si possono leggere solo se siete amici
+// - blocks: le persone che hai bloccato (non possono mandarti richieste)
+// - reports: segnalazioni (si possono solo inviare; le legge chi gestisce il sito)
+// useFriends() dà ai componenti la situazione aggiornata; le funzioni qui
+// sotto la modificano e poi la ricaricano.
 import { useSyncExternalStore } from "react";
 import { currentUser, onUserChange } from "./auth";
 import { supabase } from "./supabase";
@@ -82,8 +80,8 @@ export async function reloadFriends(): Promise<void> {
   });
 }
 
-/* All'accesso carico amici e richieste; tornando sulla pagina li ricarico
-   (così si vedono le richieste arrivate nel frattempo) */
+// All'accesso carico amici e richieste; tornando sulla pagina li ricarico
+// (così si vedono le richieste arrivate nel frattempo)
 onUserChange((user) => { setState(EMPTY); if (user) void reloadFriends(); });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && currentUser()) void reloadFriends(); });
 
@@ -116,8 +114,10 @@ const done = async (error: { code?: string; message?: string } | null): Promise<
   return error ? (isMissing(error) ? "missing" : "error") : null;
 };
 
-/** Manda una richiesta di amicizia. Se l'altra persona me l'aveva già
-    mandata, invece la accetto (così non si incrociano due richieste). */
+/**
+ * Manda una richiesta di amicizia. Se l'altra persona me l'aveva già
+ * mandata, invece la accetto (così non si incrociano due richieste).
+ */
 export async function sendRequest(id: string): Promise<ActErr> {
   const me = currentUser();
   if (!supabase || !me) return "error";
@@ -134,8 +134,10 @@ export async function acceptRequest(id: string): Promise<ActErr> {
   return done(error);
 }
 
-/** Rifiuta una richiesta, ritira la propria o toglie un'amicizia:
-    in tutti i casi si cancella la riga della coppia */
+/**
+ * Rifiuta una richiesta, ritira la propria o toglie un'amicizia:
+ * in tutti i casi si cancella la riga della coppia
+ */
 export async function removeFriendship(id: string): Promise<ActErr> {
   const me = currentUser();
   if (!supabase || !me) return "error";
@@ -144,8 +146,10 @@ export async function removeFriendship(id: string): Promise<ActErr> {
   return done(error);
 }
 
-/** Blocca una persona: toglie l'amicizia (o la richiesta) e la blocca.
-    Da quel momento non può più mandarti richieste. */
+/**
+ * Blocca una persona: toglie l'amicizia (o la richiesta) e la blocca.
+ * Da quel momento non può più mandarti richieste.
+ */
 export async function blockPerson(id: string): Promise<ActErr> {
   const me = currentUser();
   if (!supabase || !me) return "error";
@@ -175,8 +179,10 @@ export async function reportPerson(id: string, reason: ReportReason, note: strin
   return error ? (isMissing(error) ? "missing" : "error") : null;
 }
 
-/** Dati di un amico (visti, episodi, voti, profilo). null = non siete
-    amici, oppure non ha ancora salvato niente */
+/**
+ * Dati di un amico (visti, episodi, voti, profilo). null = non siete
+ * amici, oppure non ha ancora salvato niente
+ */
 export async function fetchFriendData(id: string): Promise<SavedData | null> {
   if (!supabase) return null;
   const { data, error } = await supabase.from("progress").select("data").eq("user_id", id).maybeSingle();

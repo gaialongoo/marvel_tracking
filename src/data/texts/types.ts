@@ -1,4 +1,4 @@
-/* Forma dei testi di un titolo (vedi texts/index.ts) */
+// Forma dei testi di un titolo (vedi texts/index.ts)
 import type { I18nText } from "../../types";
 
 export interface TitleTexts {

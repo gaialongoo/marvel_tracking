@@ -1,9 +1,7 @@
-/* ============================================================================
-   SCHEDA DEL TITOLO — pagina a sé (#/t/<id>), con pulsante Home.
-   Sinistra: voto, episodi, sinossi/riassunto, post-credits
-   Destra:   collegamenti prima/dopo
-   Sotto:    mappa dei collegamenti a tutta larghezza
-   ============================================================================ */
+// Scheda del titolo - pagina a sé (#/t/<id>), con pulsante Home.
+// Sinistra: voto, episodi, sinossi/riassunto, post-credits
+// Destra:   collegamenti prima/dopo
+// Sotto:    mappa dei collegamenti a tutta larghezza
 import { useState } from "react";
 import { BY_ID } from "../data/titles";
 import { TEXTS } from "../data/texts";
@@ -69,7 +67,7 @@ export function Detail({ id }: { id: string }) {
   );
 }
 
-/* ----- Testata: miniatura, titoli, dati, pulsanti ----- */
+// Testata: miniatura, titoli, dati, pulsanti
 function Head({ d, ctx }: { d: Title; ctx: string }) {
   const { t, lang } = useT();
   const { data } = useStore();
@@ -114,7 +112,7 @@ function Head({ d, ctx }: { d: Title; ctx: string }) {
   );
 }
 
-/* ----- Voto a Gemme: clic = voto; riclic sulla stessa gemma = azzera ----- */
+// Voto a Gemme: clic = voto; riclic sulla stessa gemma = azzera
 function Rating({ d }: { d: Title }) {
   const { t, lang } = useT();
   const { data } = useStore();
@@ -138,7 +136,7 @@ function Rating({ d }: { d: Title }) {
   );
 }
 
-/* ----- Episodi (serie e animazione) ----- */
+// Episodi (serie e animazione)
 function Episodes({ d }: { d: Title }) {
   const { t } = useT();
   const { data } = useStore();
@@ -167,7 +165,7 @@ function Episodes({ d }: { d: Title }) {
   );
 }
 
-/* ----- Spoiler: testo sfocato finché non lo sblocchi ----- */
+// Spoiler: testo sfocato finché non lo sblocchi
 function Spoiler({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
@@ -179,7 +177,7 @@ function Spoiler({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ----- Sinossi (senza spoiler) / riassunto completo (testi in data/texts) ----- */
+// Sinossi (senza spoiler) / riassunto completo (testi in data/texts)
 function Texts({ d }: { d: Title }) {
   const { t, lang } = useT();
   const [tab, setTab] = useState<"syn" | "full">("syn");
@@ -202,7 +200,7 @@ function Texts({ d }: { d: Title }) {
   );
 }
 
-/* ----- Scene post-credits (ognuna nascosta come spoiler) ----- */
+// Scene post-credits (ognuna nascosta come spoiler)
 function PostCredits({ d }: { d: Title }) {
   const { t, lang } = useT();
   const pcs = TEXTS[d.id]?.pc ?? [];
@@ -232,7 +230,7 @@ function PostCredits({ d }: { d: Title }) {
   );
 }
 
-/* ----- Elenco dei collegamenti: cliccabili, con pallino "visto" ----- */
+// Elenco dei collegamenti: cliccabili, con pallino "visto"
 function LinkList({ links }: { links: Link[] }) {
   const { t, lang } = useT();
   const { data } = useStore();

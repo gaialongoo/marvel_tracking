@@ -1,35 +1,32 @@
-/* ============================================================================
-   COPERTINE DA TMDB — script da lanciare a mano sul PC (non fa parte del sito)
-   ----------------------------------------------------------------------------
-   Uso:   node scripts/tmdb-posters.mjs
-   Serve: il file .env.local con la riga  TMDB_TOKEN=eyJ...  (token "API Read
-          Access Token" di themoviedb.org). Il file NON va su GitHub (.gitignore)
-          e il token non finisce mai nel sito: lo usa solo questo script.
-
-   Cosa fa:
-   1. legge l'elenco dei titoli (scripts/titles.json, generato dallo script
-      stesso a partire da src/data/titles.ts);
-   2. per ognuno cerca su TMDB il film o la serie (titolo originale + anno);
-      per le stagioni "(Season N)" prende la locandina della stagione;
-   3. scrive src/data/posters.ts: per ogni id del catalogo il percorso della
-      locandina in italiano e in inglese (es. "/abc123.jpg"). Le immagini si
-      caricano poi dal server di TMDB (image.tmdb.org), noi non le ospitiamo.
-   4. stampa un resoconto: i titoli senza copertina e gli abbinamenti dubbi
-      (titolo diverso da quello cercato) da ricontrollare a occhio.
-
-   Abbinamenti sbagliati o mancanti si correggono in FORCE qui sotto.
-   Condizioni TMDB: uso non commerciale, citazione di TMDB, dati tenuti al
-   massimo 6 mesi → rilanciare lo script almeno ogni 6 mesi.
-   ============================================================================ */
+// Copertine da TMDB - script da lanciare a mano sul PC (non fa parte del sito)
+// Uso:   node scripts/tmdb-posters.mjs
+// Serve: il file .env.local con la riga  TMDB_TOKEN=eyJ...  (token "API Read
+//        Access Token" di themoviedb.org). Il file non va su GitHub (.gitignore)
+//        e il token non finisce mai nel sito: lo usa solo questo script.
+//
+// Cosa fa:
+// 1. legge l'elenco dei titoli (scripts/titles.json, generato dallo script
+//    stesso a partire da src/data/titles.ts);
+// 2. per ognuno cerca su TMDB il film o la serie (titolo originale + anno);
+//    per le stagioni "(Season N)" prende la locandina della stagione;
+// 3. scrive src/data/posters.ts: per ogni id del catalogo il percorso della
+//    locandina in italiano e in inglese (es. "/abc123.jpg"). Le immagini si
+//    caricano poi dal server di TMDB (image.tmdb.org), noi non le ospitiamo.
+// 4. stampa un resoconto: i titoli senza copertina e gli abbinamenti dubbi
+//    (titolo diverso da quello cercato) da ricontrollare a occhio.
+//
+// Abbinamenti sbagliati o mancanti si correggono in FORCE qui sotto.
+// Condizioni TMDB: uso non commerciale, citazione di TMDB, dati tenuti al
+// massimo 6 mesi -> rilanciare lo script almeno ogni 6 mesi.
 import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 
-/* ---------- token (da .env.local) ---------- */
+// token (da .env.local)
 const env = readFileSync(".env.local", "utf8");
 const TOKEN = /^TMDB_TOKEN=(.+)$/m.exec(env)?.[1]?.trim();
 if (!TOKEN) throw new Error("Manca TMDB_TOKEN in .env.local");
 
-/* ---------- elenco dei titoli dal catalogo dell'app ---------- */
+// elenco dei titoli dal catalogo dell'app
 // impacchetto titles.ts al volo con esbuild (già installato con Vite) e stampo i campi utili
 writeFileSync("scripts/.dump.ts",
   'import { DATA } from "../src/data/titles";\n' +
@@ -38,9 +35,9 @@ const titles = JSON.parse(execSync(
   "npx esbuild scripts/.dump.ts --bundle --platform=node --log-level=error | node", { encoding: "utf8" }));
 execSync(process.platform === "win32" ? "del scripts\\.dump.ts" : "rm scripts/.dump.ts");
 
-/* ---------- correzioni a mano ----------
-   id del catalogo → { kind: "movie" | "tv", tmdb: id TMDB, season?: numero }
-   (l'id TMDB è il numero nell'indirizzo della pagina, es. themoviedb.org/tv/1403) */
+// correzioni a mano
+// id del catalogo -> { kind: "movie" | "tv", tmdb: id TMDB, season?: numero }
+// (l'id TMDB è il numero nell'indirizzo della pagina, es. themoviedb.org/tv/1403)
 const FORCE = {
   ultavengers: { kind: "movie", tmdb: 14609 },   // trovava il 2
   invincibleim: { kind: "movie", tmdb: 13647 },  // è un film, non la serie del 1966
@@ -56,7 +53,7 @@ const FORCE = {
 /** Titoli che su TMDB non ci sono: restano con la miniatura colorata */
 const SKIP = new Set(["smshorts", "jeff"]);
 
-/* ---------- chiamate a TMDB ---------- */
+// chiamate a TMDB
 async function api(path, params = {}) {
   const url = new URL("https://api.themoviedb.org/3" + path);
   for (const [k, v] of Object.entries(params)) if (v !== undefined) url.searchParams.set(k, String(v));
@@ -94,7 +91,7 @@ async function posters(kind, id, season) {
   return { it, en };
 }
 
-/* ---------- giro su tutti i titoli ---------- */
+// giro su tutti i titoli
 const out = {};
 const report = [];
 for (const d of titles) {
@@ -106,7 +103,7 @@ for (const d of titles) {
       const m = /^(.*) \(Season (\d+)\)$/.exec(d.en);
       const query = (m ? m[1] : d.en).replace(/^Marvel One-Shot: /, "").replace("…", "");
       season = m ? Number(m[2]) : undefined;
-      // ordine di ricerca: film → movie poi tv; serie/animazione → tv poi movie
+      // ordine di ricerca: film -> movie poi tv; serie/animazione -> tv poi movie
       const order = d.type === "film" || d.type === "short" || d.type === "special" ? ["movie", "tv"] : ["tv", "movie"];
       // per le stagioni non filtro per anno (la serie è iniziata prima)
       for (const k of season ? ["tv"] : order) {
@@ -125,7 +122,7 @@ for (const d of titles) {
   }
 }
 
-/* ---------- scrivo il file per l'app ---------- */
+// scrivo il file per l'app
 const today = new Date().toISOString().slice(0, 10);
 writeFileSync("src/data/posters.ts",
 `/* ============================================================================

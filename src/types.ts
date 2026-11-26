@@ -1,6 +1,4 @@
-/* ============================================================================
-   TIPI DI DATI — descrivono la forma di titoli, collegamenti e dati salvati.
-   ============================================================================ */
+// Tipi di dati - descrivono la forma di titoli, collegamenti e dati salvati.
 
 /** Lingue dell'interfaccia */
 export type Lang = "it" | "en";
@@ -34,7 +32,7 @@ export interface Title {
   eps?: number;          // numero di episodi (solo serie/animazione)
   phase?: number;        // Fase MCU (assente per le serie Netflix)
   saga?: "inf" | "multi";// Saga MCU
-  chrono: number;        // posizione nella linea temporale DEL SUO universo
+  chrono: number;        // posizione nella linea temporale del suo universo
   c: string;             // colore della miniatura generata
   abbr: string;          // sigla nella miniatura
   poster: string | null; // in futuro: URL della locandina
@@ -44,14 +42,16 @@ export interface Title {
   after: Link[];         // cosa viene dopo
   pc: number;            // numero di scene post-credits
   officialUrl?: string;  // pagina ufficiale (marvel.com / Disney+)
-  unverified: Field[];   // campi NON ancora confermati da una fonte ufficiale (vuoto = tutto verificato)
+  unverified: Field[];   // campi non ancora confermati da una fonte ufficiale (vuoto = tutto verificato)
 }
 
 /** Ordini di visione del Catalogo */
 export type Order = "release" | "chrono" | "phase" | "paths";
 
-/** Profilo dell'utente (pagina Profilo). Tutti i campi sono facoltativi:
-    se mancano si usano i valori predefiniti (nome = parte dell'email prima di "@"). */
+/**
+ * Profilo dell'utente (pagina Profilo). Tutti i campi sono facoltativi:
+ * se mancano si usano i valori predefiniti (nome = parte dell'email prima di "@").
+ */
 export interface Profile {
   name?: string;      // nome mostrato nella bacheca e nel menu
   avatar?: string;    // chiave dell'avatar (vedi components/Avatar.tsx)
@@ -59,8 +59,8 @@ export interface Profile {
   favTitle?: string;  // id del titolo preferito (scelto a mano)
   bio?: string;       // frase breve
   prefUni?: string;   // preferenze di visione: universo con cui si apre il Catalogo
-  prefOrder?: Order;  //   … ordine
-  prefPath?: string;  //   … percorso (se l'ordine è "paths")
+  prefOrder?: Order;  //  … ordine
+  prefPath?: string;  //  … percorso (se l'ordine è "paths")
   prefTypes?: TitleType[]; // … tipi da guardare (film, serie…); mancante = tutti
   introDone?: boolean; // guida di benvenuto già vista (components/Welcome.tsx)
 }
@@ -73,6 +73,6 @@ export interface SavedData {
   profile?: Profile;               // profilo (assente nei salvataggi più vecchi)
   back?: number;                   // quante volte hai recuperato un titolo "saltato"
                                    // (uscito prima dell'ultimo che avevi visto): badge "Ritorno al passato"
-  watch?: Record<string, number>;  // lista "Da vedere": id → quando l'hai aggiunto (millisecondi).
+  watch?: Record<string, number>;  // lista "Da vedere": id -> quando l'hai aggiunto (millisecondi).
                                    // Un titolo esce dalla lista quando lo segni come visto.
 }

@@ -1,14 +1,12 @@
-/* ============================================================================
-   TAG UTENTE (@nome) — unico tra tutti gli utenti, per la futura community.
-   Sta in una tabella a parte su Supabase ("handles", vedi supabase/schema.sql)
-   perché solo il database può garantire che due persone non abbiano lo
-   stesso tag. Formato: 3–20 caratteri tra a-z, 0-9 e "_". Si può cambiare.
-   - useHandle(): il tag dell'utente collegato (si carica da solo all'accesso)
-   - checkHandle(): il tag è libero?
-   - saveHandle(): salva o cambia il tag
-   - syncCard(): copia nome e avatar accanto al tag (la "scheda pubblica"
-     che vedono gli altri nella ricerca amici; visti e voti restano privati)
-   ============================================================================ */
+// Tag utente (@nome) - unico tra tutti gli utenti, per la futura community.
+// Sta in una tabella a parte su Supabase ("handles", vedi supabase/schema.sql)
+// perché solo il database può garantire che due persone non abbiano lo
+// stesso tag. Formato: 3–20 caratteri tra a-z, 0-9 e "_". Si può cambiare.
+// - useHandle(): il tag dell'utente collegato (si carica da solo all'accesso)
+// - checkHandle(): il tag è libero?
+// - saveHandle(): salva o cambia il tag
+// - syncCard(): copia nome e avatar accanto al tag (la "scheda pubblica"
+//   che vedono gli altri nella ricerca amici; visti e voti restano privati)
 import { useSyncExternalStore } from "react";
 import { currentUser, onUserChange } from "./auth";
 import { supabase } from "./supabase";
@@ -38,7 +36,7 @@ export const normHandle = (s: string) => s.toLowerCase().replace(/^@+/, "").repl
 const isMissing = (e: { code?: string; message?: string }) =>
   e.code === "42P01" || e.code === "PGRST205" || /does not exist|schema cache/i.test(e.message || "");
 
-/* All'accesso (o cambio account) leggo il tag dell'utente */
+// All'accesso (o cambio account) leggo il tag dell'utente
 onUserChange(async (user) => {
   setState({ handle: null, loading: !!user && !!supabase, missing: false });
   if (!user || !supabase) return;
@@ -80,8 +78,10 @@ export async function saveHandle(h: string, card?: { name?: string; avatar?: str
 /** Ultima scheda inviata (per non rimandarla uguale) */
 let lastCard = "";
 
-/** Copia nome e avatar del profilo nella riga del tag, così gli altri li
-    vedono nella ricerca amici. Solo se il tag c'è già. */
+/**
+ * Copia nome e avatar del profilo nella riga del tag, così gli altri li
+ * vedono nella ricerca amici. Solo se il tag c'è già.
+ */
 export async function syncCard(name: string | undefined, avatar: string | undefined) {
   const me = currentUser();
   if (!supabase || !me || !state.handle) return;

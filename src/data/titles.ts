@@ -1,38 +1,33 @@
-/* ============================================================================
-   CATALOGO DEI TITOLI
-   ----------------------------------------------------------------------------
-   BLOCCO 1 — MCU COMPLETO (raccolto il 18/11/2026)
-
-   Fonti ufficiali usate:
-   [T]  marvel.com — "See the Complete MCU Timeline on Disney+" (MCU Complete
-        Timeline, 81 voci con le stagioni separate) → ORDINE CRONOLOGICO.
-        Testo incollato dall'utente (il sito blocca la lettura automatica).
-        Ricontrollato il 23/11/2026 (articolo aggiornato al 22/10/2026): stesse
-        81 voci nello stesso ordine; Spider-Man: Brand New Day NON è in elenco,
-        quindi la sua posizione cronologica resta "da verificare".
-   [R]  disneyplus.com — "How to Watch the Marvel Movies in Order" (4/11/2026)
-        → ordine di USCITA, ANNO e FASE dei film; elenco di serie/speciali/corti.
-   [IT] disneyplus.com/it-it "Film e show Marvel" + disney.it (Universo Marvel,
-        Marvel su Disney+) → TITOLI ITALIANI ufficiali.
-   [M]  marvel.com — Spider-Man: Brand New Day: al cinema dal 31/07/2026.
-   [D]  Disney (D23 2026, articoli Disney+) → Wonder Man (27/01/2026, 8 ep.),
-        VisionQuest (14/10/2026, 8 ep.), Avengers: Doomsday (18/12/2026).
-
-   Ogni titolo ha "unverified": l'elenco dei campi NON ancora confermati da
-   una fonte ufficiale (durate, episodi, post-credits… non comparivano nelle
-   pagine leggibili). L'app li mostra come "da verificare".
-
-   BLOCCO 2 (in fondo al file): film e animazione fuori MCU presenti su
-   Disney+ Italia. Quelli non su Disney+ arriveranno nei blocchi successivi.
-   ============================================================================ */
+// Catalogo dei titoli
+// Blocco 1 - MCU completo (raccolto il 18/11/2026)
+//
+// Fonti ufficiali usate:
+// [T]  marvel.com - "See the Complete MCU Timeline on Disney+" (MCU Complete
+//      Timeline, 81 voci con le stagioni separate) -> ordine cronologico.
+//      Testo incollato dall'utente (il sito blocca la lettura automatica).
+//      Ricontrollato il 23/11/2026 (articolo aggiornato al 22/10/2026): stesse
+//      81 voci nello stesso ordine; Spider-Man: Brand New Day non è in elenco,
+//      quindi la sua posizione cronologica resta "da verificare".
+// [R]  disneyplus.com - "How to Watch the Marvel Movies in Order" (4/11/2026)
+//      -> ordine di uscita, anno e fase dei film; elenco di serie/speciali/corti.
+// [IT] disneyplus.com/it-it "Film e show Marvel" + disney.it (Universo Marvel,
+//      Marvel su Disney+) -> titoli italiani ufficiali.
+// [M]  marvel.com - Spider-Man: Brand New Day: al cinema dal 31/07/2026.
+// [D]  Disney (D23 2026, articoli Disney+) -> Wonder Man (27/01/2026, 8 ep.),
+//      VisionQuest (14/10/2026, 8 ep.), Avengers: Doomsday (18/12/2026).
+//
+// Ogni titolo ha "unverified": l'elenco dei campi non ancora confermati da
+// una fonte ufficiale (durate, episodi, post-credits… non comparivano nelle
+// pagine leggibili). L'app li mostra come "da verificare".
+//
+// Blocco 2 (in fondo al file): film e animazione fuori MCU presenti su
+// Disney+ Italia. Quelli non su Disney+ arriveranno nei blocchi successivi.
 import type { Field, Link, Title, TitleType } from "../types";
 
 /** Scorciatoia per un collegamento: L(id, motivo IT, motivo EN) */
 const L = (id: string, it: string, en: string): Link => ({ id, why: { it, en } });
 
-/* ----------------------------------------------------------------------------
-   ORDINE CRONOLOGICO UFFICIALE [T] — la posizione nell'elenco = "chrono"
-   ---------------------------------------------------------------------------- */
+// Ordine cronologico ufficiale [T] - la posizione nell'elenco = "chrono"
 const TIMELINE = [
   "eow", "ca", "os-carter", "cm", "im", "im2", "hulk", "os-hammer", "thor", "os-consultant",
   "avg", "os-item47", "tdw", "im3", "os-king", "tws", "gotg", "gotg2", "groot1", "groot2",
@@ -45,12 +40,10 @@ const TIMELINE = [
   "visionquest",
 ];
 
-/* ----------------------------------------------------------------------------
-   COSTRUTTORE — scrive i titoli in forma compatta e calcola il resto:
-   - saga dalla Fase (1–3 Infinito, 4+ Multiverso)
-   - chrono dalla TIMELINE (se il titolo non c'è: in fondo, da verificare)
-   - unverified = campi rilevanti MENO quelli confermati (ok)
-   ---------------------------------------------------------------------------- */
+// Costruttore - scrive i titoli in forma compatta e calcola il resto:
+// - saga dalla Fase (1–3 Infinito, 4+ Multiverso)
+// - chrono dalla TIMELINE (se il titolo non c'è: in fondo, da verificare)
+// - unverified = campi rilevanti meno quelli confermati (ok)
 interface Spec {
   id: string; type: TitleType; it: string; en: string; y: number; min: number;
   eps?: number; ph?: number; c: string; ab: string;
@@ -59,13 +52,11 @@ interface Spec {
   uni?: string;   // universo (predefinito "mcu")
   cr?: number;    // posizione cronologica per i titoli fuori MCU (= ordine di uscita, da verificare)
 }
-/* ----------------------------------------------------------------------------
-   VERIFICHE DALLE PAGINE DISNEY+ ITALIA DEI SINGOLI TITOLI (18/11/2026)
-   disneyplus.com/it-it/browse/entity-… → durata (film/corti/speciali),
-   anno, numero di episodi. Le pagine delle serie NON mostrano la durata
-   degli episodi: per le serie la durata totale resta "da verificare".
-   min = durata ufficiale · eps = episodi confermati · y = anno confermato
-   ---------------------------------------------------------------------------- */
+// Verifiche dalle pagine Disney+ Italia dei singoli titoli (18/11/2026)
+// disneyplus.com/it-it/browse/entity-… -> durata (film/corti/speciali),
+// anno, numero di episodi. Le pagine delle serie non mostrano la durata
+// degli episodi: per le serie la durata totale resta "da verificare".
+// min = durata ufficiale · eps = episodi confermati · y = anno confermato
 const DPV: Record<string, { min?: number; eps?: boolean; y?: boolean }> = {
   // Film
   im: { min: 127 }, im2: { min: 124 }, thor: { min: 117 }, ca: { min: 126 }, avg: { min: 146 },
@@ -92,18 +83,16 @@ const DPV: Record<string, { min?: number; eps?: boolean; y?: boolean }> = {
   defenders: { eps: true, y: true }, pun1: { eps: true, y: true }, pun2: { eps: true, y: true },
 };
 
-/* ----------------------------------------------------------------------------
-   VERIFICHE DA FONTI NON UFFICIALI MA AFFIDABILI (18/11/2026)
-   it.wikipedia.org / en.wikipedia.org (voci dei film e delle serie, "List of
-   television series based on Marvel Comics publications", "Mid-credits and
-   post-credits scenes in the Marvel Cinematic Universe").
-   Usate SOLO dove le pagine ufficiali non dicono nulla. Se Disney+ e
-   Wikipedia non coincidono (es. numero di episodi), vale Disney+.
-   it = titolo italiano (stringa = corregge il nostro) · y = anno confermato ·
-   min / eps = valore confermato · pc = numero di scene dopo i titoli
-   ---------------------------------------------------------------------------- */
+// Verifiche da fonti non ufficiali ma affidabili (18/11/2026)
+// it.wikipedia.org / en.wikipedia.org (voci dei film e delle serie, "List of
+// television series based on Marvel Comics publications", "Mid-credits and
+// post-credits scenes in the Marvel Cinematic Universe").
+// Usate solo dove le pagine ufficiali non dicono nulla. Se Disney+ e
+// Wikipedia non coincidono (es. numero di episodi), vale Disney+.
+// it = titolo italiano (stringa = corregge il nostro) · y = anno confermato ·
+// min / eps = valore confermato · pc = numero di scene dopo i titoli
 const REL: Record<string, { it?: string | true; y?: true; min?: number; eps?: number; pc?: number }> = {
-  // MCU — scene dopo i titoli (voce Wikipedia letta per intero fino a Captain Marvel)
+  // MCU - scene dopo i titoli (voce Wikipedia letta per intero fino a Captain Marvel)
   im: { pc: 1 }, hulk: { pc: 0, min: 112, it: true, y: true }, im2: { pc: 1 }, thor: { pc: 1 }, ca: { pc: 1 },
   avg: { pc: 2 }, im3: { pc: 1 }, tdw: { pc: 2 }, tws: { pc: 2 }, gotg: { pc: 2 }, aou: { pc: 1 },
   antman: { pc: 2 }, cw: { pc: 2 }, ds: { pc: 2 }, gotg2: { pc: 5 }, homecoming: { pc: 2 }, ragnarok: { pc: 2 },
@@ -128,7 +117,7 @@ const REL: Record<string, { it?: string | true; y?: true; min?: number; eps?: nu
   assemble: { eps: 127 },
 };
 
-/* Secondo giro di verifiche (stesse fonti): si FONDE con REL campo per campo */
+// Secondo giro di verifiche (stesse fonti): si fonde con REL campo per campo
 const REL2: typeof REL = {
   // MCU: scene dopo i titoli dei One-Shot (voce "Mid-credits and post-credits scenes…")
   "os-item47": { pc: 1 }, "os-carter": { pc: 1 }, "os-king": { pc: 1 },
@@ -157,21 +146,23 @@ const REL2: typeof REL = {
   dd2: { y: true }, jj2: { y: true }, whatif2: { y: true }, wonderman: { it: true, y: true, eps: 8 },
 };
 
-/** Fasi MCU confermate (en.wikipedia: "Marvel Cinematic Universe: Phase Four/Five/Six",
-    titoli di sezione della voce sulle scene dopo i titoli per Fase 1–3) */
+/**
+ * Fasi MCU confermate (en.wikipedia: "Marvel Cinematic Universe: Phase Four/Five/Six",
+ * titoli di sezione della voce sulle scene dopo i titoli per Fase 1–3)
+ */
 const PHASE_OK = new Set([
   "wv", "fatws", "loki1", "loki2", "whatif1", "whatif2", "whatif3", "hawkeye", "moonknight", "msmarvel", "shehulk",
   "groot1", "groot2", "wbn", "holiday", "si", "echo", "agatha", "ddba1", "ddba2", "ironheart", "eow", "zombies",
   "wonderman", "punolk", "visionquest", "homecoming", "ffh", "nwh", "bnd", "os-item47", "os-carter", "os-king",
-  // 23/11/2026 — en.wikipedia "Marvel Cinematic Universe: Phase One", introduzione:
+  // 23/11/2026 - en.wikipedia "Marvel Cinematic Universe: Phase One", introduzione:
   // «the phase also includes three short films … Marvel One-Shots» (The Consultant,
   // A Funny Thing Happened on the Way to Thor's Hammer, Item 47)
   "os-consultant", "os-hammer",
 ]);
 
-/* Terzo giro (en/it.wikipedia lette parola per parola).
-   Scene dopo i titoli: confermate solo se il testo letto coincide con le altre
-   fonti. Se la trama non ne parla ma altre fonti sì, il valore resta in SOFT. */
+// Terzo giro (en/it.wikipedia lette parola per parola).
+// Scene dopo i titoli: confermate solo se il testo letto coincide con le altre
+// fonti. Se la trama non ne parla ma altre fonti sì, il valore resta in SOFT.
 const REL3: typeof REL = {
   // MCU (sezione Trama delle voci dei film)
   ffh: { pc: 2 }, bw: { pc: 1 }, shangchi: { pc: 2 }, eternals: { pc: 2 }, lat: { pc: 2 }, wf: { pc: 1 },
@@ -190,12 +181,12 @@ const REL3: typeof REL = {
   "anime-im": { it: true }, "anime-wolv": { it: true, y: true }, "anime-xmen": { it: true, y: true }, "anime-blade": { it: true, y: true },
 };
 
-/* Quarto giro (23/11/2026).
-   MCU: en.wikipedia "Mid-credits and post-credits scenes in the Marvel
-   Cinematic Universe", tabelle delle Fasi 4–6 lette per intero: i numeri
-   coincidono con quelli che erano in SOFT → confermati.
-   Fuori MCU: trama letta per intero (en.wikipedia; per i film animati
-   it.wikipedia), nessuna scena durante o dopo i titoli → 0. */
+// Quarto giro (23/11/2026).
+// MCU: en.wikipedia "Mid-credits and post-credits scenes in the Marvel
+// Cinematic Universe", tabelle delle Fasi 4–6 lette per intero: i numeri
+// coincidono con quelli che erano in SOFT -> confermati.
+// Fuori MCU: trama letta per intero (en.wikipedia; per i film animati
+// it.wikipedia), nessuna scena durante o dopo i titoli -> 0.
 const REL4: typeof REL = {
   nwh: { pc: 2 }, dsmom: { pc: 2 }, holiday: { pc: 1 }, gotg3: { pc: 2 }, dpw: { pc: 1 },
   thunderbolts: { pc: 2 }, ff: { pc: 2 }, bnd: { pc: 1 },
@@ -204,12 +195,12 @@ const REL4: typeof REL = {
   invincibleim: { pc: 0 }, drstrange07: { pc: 0 }, thortales: { pc: 0 },
 };
 
-/* Quinto giro (26/11/2026): SERIE e speciali.
-   en.wikipedia "Mid-credits and post-credits scenes in the Marvel Cinematic
-   Universe" letta per intero, confrontata con le recensioni degli episodi.
-   Per le serie "pc" = totale delle scene in tutta la stagione (l'episodio è
-   scritto nella descrizione, vedi texts/). Le serie e gli speciali usciti che
-   la pagina non elenca non hanno scene → 0. */
+// Quinto giro (26/11/2026): serie e speciali.
+// en.wikipedia "Mid-credits and post-credits scenes in the Marvel Cinematic
+// Universe" letta per intero, confrontata con le recensioni degli episodi.
+// Per le serie "pc" = totale delle scene in tutta la stagione (l'episodio è
+// scritto nella descrizione, vedi texts/). Le serie e gli speciali usciti che
+// la pagina non elenca non hanno scene -> 0.
 const REL5: typeof REL = {
   wv: { pc: 4 }, fatws: { pc: 2 }, loki1: { pc: 1 }, loki2: { pc: 1 }, whatif1: { pc: 1 }, whatif2: { pc: 1 }, hawkeye: { pc: 1 }, moonknight: { pc: 1 }, msmarvel: { pc: 2 }, shehulk: { pc: 5 }, echo: { pc: 1 }, ironheart: { pc: 1 }, ddba1: { pc: 1 }, groot1: { pc: 1 }, groot2: { pc: 1 },
   si: { pc: 0 }, agatha: { pc: 0 }, wonderman: { pc: 0 }, ddba2: { pc: 0 }, whatif3: { pc: 0 },
@@ -223,8 +214,8 @@ const REL5: typeof REL = {
 const VER: typeof REL = { ...REL };
 for (const extra of [REL2, REL3, REL4, REL5]) for (const [id, f] of Object.entries(extra)) VER[id] = { ...VER[id], ...f };
 
-/* Valori aggiornati da un riassunto delle fonti affidabili, NON ancora
-   confermati parola per parola: si usano ma restano "da verificare". */
+// Valori aggiornati da un riassunto delle fonti affidabili, non ancora
+// confermati parola per parola: si usano ma restano "da verificare".
 const SOFT: Record<string, { pc?: number }> = {
   // TASM2: la scena a metà titoli (anteprima di X-Men: Giorni di un futuro passato)
   // è citata nella sezione Release di en.wikipedia, non ancora letta parola per parola
@@ -254,11 +245,11 @@ function mk(s: Spec): Title {
   if (PHASE_OK.has(s.id)) ok.add("phase");
   const soft = SOFT[s.id];
   if (soft?.pc !== undefined) s = { ...s, pc: soft.pc };
-  // Serie: la durata totale è sempre una stima (episodi × durata media) → non si segnala.
-  // Fuori MCU l'ordine "cronologico" è per definizione l'anno di uscita → non si segnala.
+  // Serie: la durata totale è sempre una stima (episodi × durata media) -> non si segnala.
+  // Fuori MCU l'ordine "cronologico" è per definizione l'anno di uscita -> non si segnala.
   if (s.eps) { ok.add("min"); ok.add("pc"); } // serie: niente conteggio unico delle scene dopo i titoli
   if (uni !== "mcu") ok.add("chrono");
-  if (pos >= 0) ok.add("chrono");                          // in [T] → ordine confermato
+  if (pos >= 0) ok.add("chrono");                          // in [T] -> ordine confermato
   const relevant: Field[] = ["it", "y", "min", "pc", "chrono"];
   if (s.eps) relevant.push("eps");
   if (s.ph) relevant.push("phase");
@@ -266,7 +257,7 @@ function mk(s: Spec): Title {
     id: s.id, uni, type: s.type, t: { it: s.it, en: s.en }, y: s.y, min: s.min, eps: s.eps,
     phase: s.ph, saga: s.ph ? (s.ph <= 3 ? "inf" : "multi") : undefined,
     // MCU: posizione nella timeline ufficiale (fuori timeline = in fondo);
-    // altri universi: nessuna timeline ufficiale → anno di uscita (da verificare)
+    // altri universi: nessuna timeline ufficiale -> anno di uscita (da verificare)
     chrono: pos >= 0 ? pos + 1 : uni === "mcu" ? TIMELINE.length + 1 : s.y,
     c: s.c, abbr: s.ab, poster: null, chars: s.ch ?? [], themes: s.th ?? [],
     before: s.b ?? [], after: s.a ?? [], pc: s.pc ?? 0,
@@ -274,15 +265,13 @@ function mk(s: Spec): Title {
   };
 }
 
-/* Insiemi di campi confermati ricorrenti */
+// Insiemi di campi confermati ricorrenti
 const FILM: Field[] = ["it", "y", "phase"];   // film presenti in [R] con titolo italiano in [IT]
 const IT: Field[] = ["it"];                   // solo titolo italiano confermato
 
-/* ----------------------------------------------------------------------------
-   MCU — scritto in ordine di uscita
-   ---------------------------------------------------------------------------- */
+// MCU - scritto in ordine di uscita
 const MCU: Title[] = [
-  /* ===== FASE 1 ===== */
+  // Fase 1
   mk({ id: "im", type: "film", it: "Iron Man", en: "Iron Man", y: 2008, min: 126, ph: 1, c: "#8c1d26", ab: "IM", ch: ["ironman"], pc: 1, ok: FILM,
     a: [L("im2", "Continua la storia di Tony", "Continues Tony's story"), L("avg", "Tony entra negli Avengers", "Tony joins the Avengers")] }),
   mk({ id: "hulk", type: "film", it: "L'incredibile Hulk", en: "The Incredible Hulk", y: 2008, min: 112, ph: 1, c: "#2f5d3a", ab: "HK", ch: ["hulk"], ok: FILM,
@@ -303,7 +292,7 @@ const MCU: Title[] = [
     b: [L("im", "Presenta Tony Stark", "Introduces Tony Stark"), L("hulk", "Presenta Bruce Banner", "Introduces Bruce Banner"), L("thor", "Presenta Thor e Loki", "Introduces Thor and Loki"), L("ca", "Presenta Steve Rogers", "Introduces Steve Rogers")],
     a: [L("im3", "Tony dopo New York", "Tony after New York"), L("tws", "Steve allo S.H.I.E.L.D.", "Steve at S.H.I.E.L.D."), L("aou", "Il ritorno della squadra", "The team returns")] }),
 
-  /* ===== FASE 2 ===== */
+  // Fase 2
   mk({ id: "im3", type: "film", it: "Iron Man 3", en: "Iron Man 3", y: 2013, min: 130, ph: 2, c: "#8c1d26", ab: "IM3", ch: ["ironman"], pc: 1, ok: FILM,
     b: [L("avg", "Tony dopo New York", "Tony after New York")], a: [L("os-king", "Il destino del finto Mandarino", "The fake Mandarin's fate"), L("aou", "Tony e Ultron", "Tony and Ultron")] }),
   mk({ id: "tdw", type: "film", it: "Thor - The Dark World", en: "Thor: The Dark World", y: 2013, min: 112, ph: 2, c: "#2b4a78", ab: "TDW", ch: ["thor", "loki"], pc: 2, ok: FILM,
@@ -321,13 +310,13 @@ const MCU: Title[] = [
   mk({ id: "antman", type: "film", it: "Ant-Man", en: "Ant-Man", y: 2015, min: 117, ph: 2, c: "#6b2a2a", ab: "AM", ch: ["antman"], pc: 2, ok: FILM,
     a: [L("cw", "Scott si unisce a Cap", "Scott joins Cap"), L("amw", "Il seguito di Ant-Man", "Ant-Man's sequel")] }),
 
-  /* ===== Marvel Television · Netflix (nella timeline ufficiale, senza Fase) ===== */
+  // Marvel Television · Netflix (nella timeline ufficiale, senza Fase)
   mk({ id: "dd1", type: "serie", it: "Daredevil (Stagione 1)", en: "Daredevil (Season 1)", y: 2015, min: 700, eps: 13, c: "#6b1414", ab: "DD1", ch: ["daredevil"], th: ["defenders"], ok: IT,
     a: [L("dd2", "La stagione 2", "Season 2"), L("defenders", "Matt nei Defenders", "Matt in The Defenders")] }),
   mk({ id: "jj1", type: "serie", it: "Jessica Jones (Stagione 1)", en: "Jessica Jones (Season 1)", y: 2015, min: 680, eps: 13, c: "#4a2a5a", ab: "JJ1", ch: ["jessica"], th: ["defenders"], ok: IT,
     a: [L("lc1", "Luke Cage debutta qui", "Luke Cage debuts here"), L("jj2", "La stagione 2", "Season 2")] }),
 
-  /* ===== FASE 3 ===== */
+  // Fase 3
   mk({ id: "cw", type: "film", it: "Captain America: Civil War", en: "Captain America: Civil War", y: 2016, min: 147, ph: 3, c: "#24406b", ab: "CW", ch: ["cap", "ironman", "blackwidow", "spidey", "blackpanther", "antman", "falcon", "hawkeye", "wanda"], th: ["avengers"], pc: 2, ok: FILM,
     b: [L("tws", "Steve e Bucky", "Steve and Bucky"), L("aou", "Gli accordi di Sokovia", "The Sokovia Accords")], a: [L("bp", "T'Challa re", "T'Challa as king"), L("homecoming", "Peter dopo Berlino", "Peter after Berlin"), L("bw", "Natasha in fuga", "Natasha on the run")] }),
   mk({ id: "dd2", type: "serie", it: "Daredevil (Stagione 2)", en: "Daredevil (Season 2)", y: 2016, min: 700, eps: 13, c: "#6b1414", ab: "DD2", ch: ["daredevil", "punisher"], th: ["defenders"], ok: IT,
@@ -374,7 +363,7 @@ const MCU: Title[] = [
   mk({ id: "ffh", type: "film", it: "Spider-Man: Far From Home", en: "Spider-Man: Far From Home", y: 2019, min: 129, ph: 3, c: "#8a1c2a", ab: "FFH", ch: ["spidey"], pc: 2, ok: IT,
     b: [L("homecoming", "Il primo Spider-Man MCU", "The first MCU Spider-Man"), L("eg", "Peter dopo Tony", "Peter after Tony")], a: [L("nwh", "L'identità rivelata", "The identity revealed")] }),
 
-  /* ===== FASE 4 ===== */
+  // Fase 4
   mk({ id: "wv", type: "serie", it: "WandaVision", en: "WandaVision", y: 2021, min: 350, eps: 9, ph: 4, c: "#6b1f3a", ab: "WV", ch: ["wanda"], ok: ["it", "y"],
     b: [L("eg", "Wanda dopo Endgame", "Wanda after Endgame")], a: [L("dsmom", "Scarlet Witch", "Scarlet Witch"), L("agatha", "Agatha", "Agatha"), L("visionquest", "Visione", "Vision")] }),
   mk({ id: "fatws", type: "serie", it: "The Falcon and The Winter Soldier", en: "The Falcon and the Winter Soldier", y: 2021, min: 330, eps: 6, ph: 4, c: "#2a4a6b", ab: "FWS", ch: ["falcon", "cap"], ok: IT,
@@ -410,7 +399,7 @@ const MCU: Title[] = [
   mk({ id: "holiday", type: "special", it: "Marvel Studios presenta: Guardiani della Galassia Holiday Special", en: "The Guardians of the Galaxy Holiday Special", y: 2022, min: 44, ph: 4, c: "#2a5a3a", ab: "GHS", ch: ["gotg"], ok: IT,
     b: [L("gotg2", "I Guardiani", "The Guardians")], a: [L("gotg3", "Il terzo film", "The third film")] }),
 
-  /* ===== FASE 5 ===== */
+  // Fase 5
   mk({ id: "quantumania", type: "film", it: "Ant-Man and the Wasp: Quantumania", en: "Ant-Man and the Wasp: Quantumania", y: 2023, min: 124, ph: 5, c: "#6b2a2a", ab: "AMQ", ch: ["antman"], th: ["multi"], pc: 2, ok: FILM,
     b: [L("amw", "Il secondo Ant-Man", "The second Ant-Man"), L("loki1", "Colui che rimane", "He Who Remains")], a: [L("loki2", "Le varianti di Kang", "Kang's variants")] }),
   mk({ id: "gotg3", type: "film", it: "Guardiani della Galassia: Volume 3", en: "Guardians of the Galaxy Vol. 3", y: 2023, min: 150, ph: 5, c: "#5a2d6b", ab: "GG3", ch: ["gotg"], pc: 2, ok: FILM,
@@ -446,7 +435,7 @@ const MCU: Title[] = [
   mk({ id: "zombies", type: "anim", it: "Marvel Zombies", en: "Marvel Zombies", y: 2025, min: 160, eps: 4, ph: 6, c: "#3a4a2a", ab: "MZ", th: ["multi"], ok: IT,
     b: [L("whatif1", "Nasce dall'episodio zombie", "Spun off from the zombie episode")] }),
 
-  /* ===== FASE 6 ===== */
+  // Fase 6
   mk({ id: "ff", type: "film", it: "I Fantastici 4: Gli Inizi", en: "The Fantastic Four: First Steps", y: 2025, min: 115, ph: 6, c: "#1f4a7a", ab: "FF", ch: ["fantastic4"], pc: 2, ok: FILM }),
   mk({ id: "wonderman", type: "serie", it: "Wonder Man", en: "Wonder Man", y: 2026, min: 260, eps: 8, ph: 6, c: "#6b4a1a", ab: "WM", ok: ["y", "eps"] }),
   mk({ id: "ddba2", type: "serie", it: "Daredevil: Rinascita (Stagione 2)", en: "Daredevil: Born Again (Season 2)", y: 2026, min: 400, eps: 8, ph: 6, c: "#6b1414", ab: "DBA2", ch: ["daredevil", "punisher"], th: ["defenders"], ok: IT,
@@ -459,17 +448,15 @@ const MCU: Title[] = [
     b: [L("wv", "Visione", "Vision"), L("agatha", "Dopo Agatha", "After Agatha")] }),
 ];
 
-/* ----------------------------------------------------------------------------
-   BLOCCO 2 — FUORI DALL'MCU, presenti su Disney+ Italia
-   Fonte [E]: pagine dei singoli titoli su disneyplus.com/it-it (titolo
-   italiano, anno, durata, stagioni/episodi). L'ordine cronologico dentro
-   ogni universo per ora segue l'uscita → da verificare.
-   ---------------------------------------------------------------------------- */
+// Blocco 2 - fuori dall'MCU, presenti su Disney+ Italia
+// Fonte [E]: pagine dei singoli titoli su disneyplus.com/it-it (titolo
+// italiano, anno, durata, stagioni/episodi). L'ordine cronologico dentro
+// ogni universo per ora segue l'uscita -> da verificare.
 const DP: Field[] = ["it", "y", "min"];   // film: confermati dalla pagina Disney+ del titolo
 const DPS: Field[] = ["it", "y", "eps"];  // serie: anno ed episodi dalla pagina Disney+
 
 const OTHERS: Title[] = [
-  /* ===== X-Men (20th Century Fox) ===== */
+  // X-Men (20th Century Fox)
   mk({ uni: "xmen", cr: 1, id: "xmen", type: "film", it: "X-Men", en: "X-Men", y: 2000, min: 105, c: "#3b4a5c", ab: "XM", ch: ["wolverine"], ok: DP,
     a: [L("x2", "Il seguito diretto", "The direct sequel")] }),
   mk({ uni: "xmen", cr: 2, id: "x2", type: "film", it: "X-Men 2", en: "X2", y: 2003, min: 134, c: "#2e3b52", ab: "X2", ch: ["wolverine"], ok: DP,
@@ -495,21 +482,21 @@ const OTHERS: Title[] = [
   mk({ uni: "xmen", cr: 12, id: "darkphoenix", type: "film", it: "X-Men: Dark Phoenix", en: "Dark Phoenix", y: 2019, min: 116, c: "#6b2a1f", ab: "DPX", ok: DP,
     b: [L("apocalypse", "Il film precedente", "The previous film")] }),
 
-  /* ===== Fantastici 4 (20th Century Fox) ===== */
+  // Fantastici 4 (20th Century Fox)
   mk({ uni: "f4fox", cr: 1, id: "ff2005", type: "film", it: "I Fantastici 4", en: "Fantastic Four", y: 2005, min: 106, c: "#1f4a7a", ab: "F4", ch: ["fantastic4"], ok: DP,
     a: [L("ff2007", "Il seguito", "The sequel")] }),
   mk({ uni: "f4fox", cr: 2, id: "ff2007", type: "film", it: "I fantastici 4 e Silver Surfer", en: "Fantastic Four: Rise of the Silver Surfer", y: 2007, min: 92, c: "#2a4a6b", ab: "F4SS", ch: ["fantastic4"], ok: DP,
     b: [L("ff2005", "Il primo film", "The first film")] }),
   mk({ uni: "f4fox", cr: 3, id: "fant4stic", type: "film", it: "Fantastic 4 - I fantastici quattro", en: "Fantastic Four", y: 2015, min: 102, c: "#2a3a5a", ab: "F4·15", ch: ["fantastic4"], ok: DP }),
 
-  /* ===== Spider-Man (Sony Pictures) ===== */
+  // Spider-Man (Sony Pictures)
   mk({ uni: "sony", cr: 1, id: "tasm", type: "film", it: "The Amazing Spider-Man", en: "The Amazing Spider-Man", y: 2012, min: 136, c: "#8a1c2a", ab: "TASM", ch: ["spidey"], ok: DP,
     a: [L("tasm2", "Il seguito", "The sequel")] }),
   mk({ uni: "sony", cr: 2, id: "tasm2", type: "film", it: "The Amazing Spider-Man 2", en: "The Amazing Spider-Man 2", y: 2014, min: 141, c: "#7a1c3a", ab: "TASM2", ch: ["spidey"], ok: DP,
     b: [L("tasm", "Il primo film", "The first film")], a: [L("nwh", "Questo Peter torna", "This Peter returns")] }),
   mk({ uni: "sony", cr: 3, id: "spiderverse", type: "anim", it: "Spider-Man: Un nuovo universo", en: "Spider-Man: Into the Spider-Verse", y: 2018, min: 116, c: "#6b1f5a", ab: "SV", ch: ["spidey"], th: ["multi"], ok: DP }),
 
-  /* ===== Animazione Marvel (fuori MCU) ===== */
+  // Animazione Marvel (fuori MCU)
   mk({ uni: "animation", cr: 1, id: "hulkwmd", type: "anim", it: "Hulk: nella terra dei mostri", en: "Hulk: Where Monsters Dwell", y: 2016, min: 77, c: "#2f5d3a", ab: "HWMD", ch: ["hulk", "strange"], ok: DP }),
   mk({ uni: "animation", cr: 2, id: "sm2017", type: "anim", it: "Spider-Man", en: "Marvel's Spider-Man", y: 2017, min: 1320, eps: 60, c: "#8a1c2a", ab: "SM17", ch: ["spidey"], ok: DPS }),
   mk({ uni: "animation", cr: 3, id: "smshorts", type: "anim", it: "Spider-Man (Shorts)", en: "Spider-Man (Shorts)", y: 2017, min: 20, eps: 6, c: "#8a1c2a", ab: "SMS", ch: ["spidey"], ok: DPS }),
@@ -517,7 +504,7 @@ const OTHERS: Title[] = [
   mk({ uni: "animation", cr: 5, id: "fnsm", type: "anim", it: "Il vostro amichevole Spider-Man di quartiere", en: "Your Friendly Neighborhood Spider-Man", y: 2025, min: 280, eps: 10, c: "#8a1c2a", ab: "FNSM", ch: ["spidey", "daredevil"], ok: DPS }),
   mk({ uni: "animation", cr: 6, id: "jeff", type: "anim", it: "Jeff e i suoi amici supereroi", en: "Jeff and His Superhero Friends", y: 2026, min: 30, eps: 6, c: "#2a5a6b", ab: "JEFF", ok: DPS }),
 
-  /* ===== Spider-Man e Sony (fuori da Disney+) ===== */
+  // Spider-Man e Sony (fuori da Disney+)
   mk({ uni: "sony", id: "sm1", type: "film", it: "Spider-Man", en: "Spider-Man", y: 2002, min: 121, c: "#8a1c2a", ab: "SM1", ch: ["spidey"] }),
   mk({ uni: "sony", id: "sm2", type: "film", it: "Spider-Man 2", en: "Spider-Man 2", y: 2004, min: 127, c: "#8a1c2a", ab: "SM2", ch: ["spidey"] }),
   mk({ uni: "sony", id: "sm3", type: "film", it: "Spider-Man 3", en: "Spider-Man 3", y: 2007, min: 139, c: "#2a2a3a", ab: "SM3", ch: ["spidey"] }),
@@ -529,10 +516,10 @@ const OTHERS: Title[] = [
   mk({ uni: "sony", id: "venom3", type: "film", it: "Venom: The Last Dance", en: "Venom: The Last Dance", y: 2024, min: 109, c: "#1a1a22", ab: "VNM3", ch: ["venom"] }),
   mk({ uni: "sony", id: "kraven", type: "film", it: "Kraven - Il cacciatore", en: "Kraven the Hunter", y: 2024, min: 127, c: "#4a3a1a", ab: "KRV" }),
 
-  /* ===== Fox, fuori da Disney+ ===== */
+  // Fox, fuori da Disney+
   mk({ uni: "xmen", id: "newmutants", type: "film", it: "The New Mutants", en: "The New Mutants", y: 2020, min: 94, c: "#3a2a4a", ab: "NM" }),
 
-  /* ===== Altri film Marvel (altri studi) ===== */
+  // Altri film Marvel (altri studi)
   mk({ uni: "other", id: "daredevil03", type: "film", it: "Daredevil", en: "Daredevil", y: 2003, min: 103, c: "#6b1414", ab: "DD03", ch: ["daredevil"] }),
   mk({ uni: "other", id: "elektra", type: "film", it: "Elektra", en: "Elektra", y: 2005, min: 97, c: "#5a1a2a", ab: "ELK", ch: ["daredevil"] }),
   mk({ uni: "other", id: "howard", type: "film", it: "Howard e il destino del mondo", en: "Howard the Duck", y: 1986, min: 110, c: "#5a4a2a", ab: "HTD" }),
@@ -548,7 +535,7 @@ const OTHERS: Title[] = [
   mk({ uni: "other", id: "warzone", type: "film", it: "Punisher - Zona di guerra", en: "Punisher: War Zone", y: 2008, min: 103, c: "#2a2a2a", ab: "PWZ", ch: ["punisher"] }),
   mk({ uni: "other", id: "ghostrider2", type: "film", it: "Ghost Rider - Spirito di vendetta", en: "Ghost Rider: Spirit of Vengeance", y: 2012, min: 96, c: "#6b2a0a", ab: "GR2", ch: ["ghostrider"] }),
 
-  /* ===== Serie live-action fuori dalla timeline MCU (Marvel Television, ABC, Hulu, Freeform, FX…) ===== */
+  // Serie live-action fuori dalla timeline MCU (Marvel Television, ABC, Hulu, Freeform, FX…)
   mk({ uni: "tv", id: "hulk77", type: "serie", it: "L'incredibile Hulk (1977)", en: "The Incredible Hulk", y: 1977, min: 3800, eps: 80, c: "#2f5d3a", ab: "HLK77", ch: ["hulk"] }),
   mk({ uni: "tv", id: "asm77", type: "serie", it: "L'uomo ragno (1977)", en: "The Amazing Spider-Man", y: 1977, min: 600, eps: 13, c: "#8a1c2a", ab: "ASM77", ch: ["spidey"] }),
   mk({ uni: "tv", id: "genx", type: "special", it: "Generation X", en: "Generation X", y: 1996, min: 85, c: "#3a3f5a", ab: "GENX" }),
@@ -562,7 +549,7 @@ const OTHERS: Title[] = [
   mk({ uni: "tv", id: "cloakdagger", type: "serie", it: "Cloak & Dagger", en: "Cloak & Dagger", y: 2018, min: 860, eps: 20, c: "#2a2a4a", ab: "C&D" }),
   mk({ uni: "tv", id: "helstrom", type: "serie", it: "Helstrom", en: "Helstrom", y: 2020, min: 450, eps: 10, c: "#3a1a1a", ab: "HLS" }),
 
-  /* ===== Animazione classica e recente (fuori MCU) ===== */
+  // Animazione classica e recente (fuori MCU)
   mk({ uni: "animation", id: "msh66", type: "anim", it: "The Marvel Super Heroes", en: "The Marvel Super Heroes", y: 1966, min: 1300, eps: 65, c: "#4a3a2a", ab: "MSH" }),
   mk({ uni: "animation", id: "f467", type: "anim", it: "I Fantastici 4 (1967)", en: "Fantastic Four", y: 1967, min: 400, eps: 20, c: "#1f4a7a", ab: "F4·67", ch: ["fantastic4"] }),
   mk({ uni: "animation", id: "sm67", type: "anim", it: "L'Uomo Ragno (1967)", en: "Spider-Man", y: 1967, min: 1100, eps: 52, c: "#8a1c2a", ab: "SM67", ch: ["spidey"] }),

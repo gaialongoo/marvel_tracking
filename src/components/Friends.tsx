@@ -1,12 +1,10 @@
-/* ============================================================================
-   AMICI
-   - FriendsSection (nel Profilo): ricerca per @tag, richieste ricevute
-     (Accetta / Rifiuta), richieste mandate (Annulla) e lista degli amici
-   - FriendPage (#/u/<tag>): la pagina di un amico con avatar, nome, numeri,
-     cosa sta guardando e i suoi voti. Se non siete amici si vede solo la
-     sua scheda pubblica (avatar, nome, @tag) e il pulsante per chiedere.
-   Solo "amici": niente seguiti/follower. La logica è in friends.ts.
-   ============================================================================ */
+// Amici
+// - FriendsSection (nel Profilo): ricerca per @tag, richieste ricevute
+//   (Accetta / Rifiuta), richieste mandate (Annulla) e lista degli amici
+// - FriendPage (#/u/<tag>): la pagina di un amico con avatar, nome, numeri,
+//   cosa sta guardando e i suoi voti. Se non siete amici si vede solo la
+//   sua scheda pubblica (avatar, nome, @tag) e il pulsante per chiedere.
+// Solo "amici": niente seguiti/follower. La logica è in friends.ts.
 import { useEffect, useMemo, useState } from "react";
 import { computeBadges } from "../badges";
 import { DATA } from "../data/titles";
@@ -29,9 +27,7 @@ import { Thumb } from "./Thumb";
 /** Nome da mostrare di una persona: il nome scelto, altrimenti il @tag */
 const shown = (p: Person) => p.name || `@${p.handle}`;
 
-/* ---------------------------------------------------------------------------
-   SEZIONE AMICI DEL PROFILO
-   --------------------------------------------------------------------------- */
+// Sezione amici del profilo
 export function FriendsSection({ onPickHandle }: { onPickHandle: () => void }) {
   const { t } = useT();
   useActTexts();
@@ -138,8 +134,10 @@ function PersonRow({ p, children }: { p: Person; children?: React.ReactNode }) {
   );
 }
 
-/** Ricerca per @tag: risultati dopo una breve pausa, con il pulsante giusto
-    per ognuno (Aggiungi / Accetta / Richiesta inviata / Amici) */
+/**
+ * Ricerca per @tag: risultati dopo una breve pausa, con il pulsante giusto
+ * per ognuno (Aggiungi / Accetta / Richiesta inviata / Amici)
+ */
 function FriendSearch() {
   const { t } = useT();
   useFriends(); // si ridisegna quando cambiano le amicizie (pulsanti aggiornati)
@@ -188,9 +186,7 @@ function FriendSearch() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   PAGINA DI UN AMICO (#/u/<tag>)
-   --------------------------------------------------------------------------- */
+// Pagina di un amico (#/u/<tag>)
 export function FriendPage({ tag }: { tag: string }) {
   const { t } = useT();
   useActTexts();
@@ -331,9 +327,7 @@ function FriendStats({ d }: { d: SavedData }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   INVITA AMICI — condivide (telefono) o copia (PC) il link alla tua pagina
-   --------------------------------------------------------------------------- */
+// Invita amici - condivide (telefono) o copia (PC) il link alla tua pagina
 function InviteButton({ handle }: { handle: string }) {
   const { t } = useT();
   return (
@@ -348,10 +342,8 @@ function InviteButton({ handle }: { handle: string }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   SEGNALA — finestra con il motivo e una nota facoltativa.
-   La segnalazione arriva a chi gestisce il sito (tabella "reports").
-   --------------------------------------------------------------------------- */
+// Segnala - finestra con il motivo e una nota facoltativa.
+// La segnalazione arriva a chi gestisce il sito (tabella "reports").
 function ReportDialog({ p, onClose }: { p: Person; onClose: () => void }) {
   const { t } = useT();
   const [reason, setReason] = useState<ReportReason>("handle");

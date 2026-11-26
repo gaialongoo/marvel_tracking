@@ -1,11 +1,9 @@
-/* ============================================================================
-   BENVENUTO — mini guida in 3 schede al primo accesso
-   1. scegli universo e ordine   2. segna i visti e vota   3. amici e badge
-   Si sfoglia con Avanti/Indietro (o le frecce della tastiera), si chiude con
-   «Salta», con Esc o con «Inizia» nell'ultima scheda.
-   Una volta chiusa non riappare: lo ricorda il profilo (introDone), quindi
-   vale su tutti i dispositivi. Dal Profilo «Rivedi la guida» la riapre.
-   ============================================================================ */
+// Benvenuto - mini guida in 3 schede al primo accesso
+// 1. scegli universo e ordine   2. segna i visti e vota   3. amici e badge
+// Si sfoglia con Avanti/Indietro (o le frecce della tastiera), si chiude con
+// «Salta», con Esc o con «Inizia» nell'ultima scheda.
+// Una volta chiusa non riappare: lo ricorda il profilo (introDone), quindi
+// vale su tutti i dispositivi. Dal Profilo «Rivedi la guida» la riapre.
 import { useEffect, useState } from "react";
 import { DOOR_COLOR, DOOR_SYMBOL } from "../data/universeArt";
 import { useT } from "../i18n";

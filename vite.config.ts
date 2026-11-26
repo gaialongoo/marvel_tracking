@@ -1,4 +1,4 @@
-/* Configurazione di Vite (lo strumento che avvia e impacchetta l'app) */
+// Configurazione di Vite (lo strumento che avvia e impacchetta l'app)
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 

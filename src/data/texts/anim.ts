@@ -1,9 +1,7 @@
-/* ============================================================================
-   TESTI — BLOCCO ANIMAZIONE fuori MCU (serie e film, 1966-2026)
-   Scritti da Claude. syn = senza spoiler · full = riassunto, con spoiler
-   Per le serie lunghe "full" riassume gli archi principali e il finale.
-   Dove la fonte non bastava, "full" manca (resta "da scrivere").
-   ============================================================================ */
+// Testi - blocco animazione fuori MCU (serie e film, 1966-2026)
+// Scritti da Claude. syn = senza spoiler · full = riassunto, con spoiler
+// Per le serie lunghe "full" riassume gli archi principali e il finale.
+// Dove la fonte non bastava, "full" manca (resta "da scrivere").
 import type { TitleTexts } from "./types";
 
 export const ANIM: Record<string, TitleTexts> = {

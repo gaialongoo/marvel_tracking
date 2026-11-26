@@ -1,16 +1,14 @@
-/* ============================================================================
-   AVATAR (dati) — i personaggi del profilo in stile "si affacciano dal bordo":
-   testa larga e tonda, contorno nero spesso, colori piatti, occhi a puntino,
-   due manine appoggiate a una linea in basso e un dettaglio del personaggio
-   che spunta (scudo, Mjolnir, artigli, guanto…).
-   - Disegni SVG originali, fatti da noi (viewBox 100x100).
-   - Effetto "disegnato a mano": un filtro SVG fa ondeggiare leggermente
-     tutte le linee, come un tratto a pennarello (vedi HAND più sotto).
-   - La stessa lista serve per scegliere il "personaggio preferito".
-   - path = percorso del Catalogo legato al personaggio (se esiste):
-     cliccando il preferito nel Profilo si apre quel percorso.
-   Il componente che li mostra è in components/Avatar.tsx.
-   ============================================================================ */
+// Avatar (dati) - i personaggi del profilo in stile "si affacciano dal bordo":
+// testa larga e tonda, contorno nero spesso, colori piatti, occhi a puntino,
+// due manine appoggiate a una linea in basso e un dettaglio del personaggio
+// che spunta (scudo, Mjolnir, artigli, guanto…).
+// - Disegni SVG originali, fatti da noi (viewBox 100x100).
+// - Effetto "disegnato a mano": un filtro SVG fa ondeggiare leggermente
+//   tutte le linee, come un tratto a pennarello (vedi HAND più sotto).
+// - La stessa lista serve per scegliere il "personaggio preferito".
+// - path = percorso del Catalogo legato al personaggio (se esiste):
+//   cliccando il preferito nel Profilo si apre quel percorso.
+// Il componente che li mostra è in components/Avatar.tsx.
 import type { I18nText } from "../types";
 
 export interface AvatarDef extends I18nText {
@@ -21,11 +19,9 @@ export interface AvatarDef extends I18nText {
   svg: string;        // disegno (stringa costante scritta da noi)
 }
 
-/* ---------------------------------------------------------------------------
-   PEZZI COMUNI
-   La testa è un'ellisse larga (centro 50,52 · raggi 35 e 30) che poggia
-   sulla linea del bordo a y = 82.
-   --------------------------------------------------------------------------- */
+// Pezzi comuni
+// La testa è un'ellisse larga (centro 50,52 · raggi 35 e 30) che poggia
+// sulla linea del bordo a y = 82.
 const INK = "#1a1a1a";
 const SKIN = "#f7caa6";
 const PALE = "#f6e6da";
@@ -39,8 +35,10 @@ const f = (d: string, c: string, extra = "") => `<path d="${d}" fill="${c}" ${OL
 const line = (d: string, c = INK, w = 2.6) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
 /** Cerchio con contorno */
 const circ = (x: number, y: number, r: number, c: string, extra = "") => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" ${OL} ${extra}/>`;
-/** Specchia un tracciato rispetto all'asse verticale x = 50
-    (solo comandi a coppie di numeri M, L, Q: niente archi A né H/V da soli) */
+/**
+ * Specchia un tracciato rispetto all'asse verticale x = 50
+ * (solo comandi a coppie di numeri M, L, Q: niente archi A né H/V da soli)
+ */
 const mirror = (d: string) => d.replace(/(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)/g, (_, x, y) => `${+(100 - Number(x)).toFixed(2)} ${y}`);
 /** Forma + la sua copia speculare */
 const pair = (d: string, c: string, extra = "") => f(d, c, extra) + f(mirror(d), c, extra);
@@ -48,8 +46,10 @@ const pair = (d: string, c: string, extra = "") => f(d, c, extra) + f(mirror(d),
 /** Testa e ripasso del suo contorno (da mettere sopra i dettagli, per bordi puliti) */
 const head = (c: string) => `<ellipse cx="50" cy="52" rx="35" ry="30" fill="${c}" ${OL}/>`;
 const RIM = `<ellipse cx="50" cy="52" rx="35" ry="30" fill="none" ${OL}/>`;
-/** Linea del bordo su cui si appoggiano le mani (nera: risalta sul
-    fondo grigio chiaro del cerchio, vedi .avatar in styles.css) */
+/**
+ * Linea del bordo su cui si appoggiano le mani (nera: risalta sul
+ * fondo grigio chiaro del cerchio, vedi .avatar in styles.css)
+ */
 const LEDGE = line("M3 82 H97", INK, 3.2);
 /** Una manina: ovale + due righe per le dita */
 const hand = (x: number, c: string, fingers = INK) =>
@@ -68,7 +68,7 @@ const brows = (c = INK, y = 54, angry = false) =>
 
 /** Capelli sulla testa con la frangia (calotta) */
 const capHair = (c: string) => f("M15.5 56 Q14 25 50 22 Q86 25 84.5 56 Q80 44 70 43 Q60 38 50 42 Q40 38 30 43 Q20 44 15.5 56Z", c);
-/** Capelli lunghi ai lati (da disegnare PRIMA della testa) */
+/** Capelli lunghi ai lati (da disegnare prima della testa) */
 const sideHair = (c: string) => pair("M17.5 54 Q12 70 15.5 82 L28 82 L28.5 58Z", c);
 /** Orecchie (da disegnare prima della testa) */
 const ears = (c: string) => pair("M17 60 Q9 60 10 67 Q11 73 19 71Z", c);
@@ -113,10 +113,8 @@ const katana = (x: number, y: number, deg: number) =>
   + line("M-3 -17 L3 -13 M3 -17 L-3 -13 M-3 -11 L3 -7 M3 -11 L-3 -7", "#8a8f98", 1.2)
   + `<rect x="-6.5" y="-3" width="13" height="4" rx="1.2" fill="#c9a24b" ${OL} stroke-width="2.2"/></g>`;
 
-/* ---------------------------------------------------------------------------
-   I PERSONAGGI — 16 eroi principali, poi i cattivi
-   (ordine dei pezzi = ordine di disegno: prima il dietro, poi il davanti)
-   --------------------------------------------------------------------------- */
+// I personaggi - 16 eroi principali, poi i cattivi
+// (ordine dei pezzi = ordine di disegno: prima il dietro, poi il davanti)
 const LIST: AvatarDef[] = [
   {
     key: "spidey", it: "Spider-Man", en: "Spider-Man", bg: "#dfe9ff", path: "spidey",
@@ -273,7 +271,7 @@ const LIST: AvatarDef[] = [
       + f("M24 50 Q36 42 46 53 L44.5 66 Q31 69 24.5 60Z", "#ff4a32") + f("M76 50 Q64 42 54 53 L55.5 66 Q69 69 75.5 60Z", "#ff4a32")
       + line("M38 74 H62 M41 78.5 H59", "#9aa0a8", 2.2) + RIM + LEDGE + hands("#8a3a28"),
   },
-  // ---------------- CATTIVI ----------------
+  // Cattivi
   {
     key: "thanos", it: "Thanos", en: "Thanos", bg: "#fff1c4", villain: true,
     // pelle viola, mento a righe, elmo dorato; il Guanto dell'Infinito al posto della mano destra
@@ -333,13 +331,11 @@ const LIST: AvatarDef[] = [
   },
 ];
 
-/* ---------------------------------------------------------------------------
-   EFFETTO "DISEGNATO A MANO" — un rumore (feTurbulence) sposta di pochissimo
-   ogni punto del disegno (feDisplacementMap): le linee non sono più
-   perfette ma tremano appena, come fatte a pennarello.
-   Il filtro è dentro ogni disegno (stesso id, stesso contenuto: si può
-   ripetere più volte nella pagina senza problemi).
-   --------------------------------------------------------------------------- */
+// Effetto "disegnato A mano" - un rumore (feTurbulence) sposta di pochissimo
+// ogni punto del disegno (feDisplacementMap): le linee non sono più
+// perfette ma tremano appena, come fatte a pennarello.
+// Il filtro è dentro ogni disegno (stesso id, stesso contenuto: si può
+// ripetere più volte nella pagina senza problemi).
 const HAND = `<defs><filter id="av-hand" x="-5%" y="-5%" width="110%" height="110%">`
   + `<feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="7"/>`
   + `<feDisplacementMap in="SourceGraphic" scale="1.3" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`;

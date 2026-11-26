@@ -1,7 +1,5 @@
-/* ============================================================================
-   TESTI — BLOCCO MCU 2: Fase 3 (da Civil War a Far From Home)
-   Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
-   ============================================================================ */
+// Testi - blocco MCU 2: Fase 3 (da Civil War a Far From Home)
+// Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
 import type { TitleTexts } from "./types";
 
 export const MCU2: Record<string, TitleTexts> = {

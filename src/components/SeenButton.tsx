@@ -1,10 +1,8 @@
-/* ============================================================================
-   PULSANTE "VISTO"
-   - film, o serie non iniziata → cerchio vuoto
-   - serie iniziata (1–99%)     → anello di avanzamento con la percentuale
-   - visto / serie al 100%      → spunta verde
-   Cliccando una serie a metà la si segna come vista tutta.
-   ============================================================================ */
+// Pulsante "visto"
+// - film, o serie non iniziata -> cerchio vuoto
+// - serie iniziata (1–99%)     -> anello di avanzamento con la percentuale
+// - visto / serie al 100%      -> spunta verde
+// Cliccando una serie a metà la si segna come vista tutta.
 import { useT } from "../i18n";
 import { toggleSeen, useStore } from "../store";
 import type { Title } from "../types";

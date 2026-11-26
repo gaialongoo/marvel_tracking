@@ -1,6 +1,4 @@
-/* ============================================================================
-   ICONE — piccole icone SVG a tratto, colore = colore del testo (currentColor)
-   ============================================================================ */
+// Icone - piccole icone SVG a tratto, colore = colore del testo (currentColor)
 
 const base = { viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: 1.5, "aria-hidden": true } as const;
 

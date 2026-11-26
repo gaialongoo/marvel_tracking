@@ -1,8 +1,6 @@
-/* ============================================================================
-   LOCANDINE — indirizzo dell'immagine su TMDB per un titolo del catalogo.
-   I percorsi sono in data/posters.ts (generato da scripts/tmdb-posters.mjs).
-   Usato dalle miniature (Thumb) e dal muro di locandine della pagina di accesso.
-   ============================================================================ */
+// Locandine - indirizzo dell'immagine su TMDB per un titolo del catalogo.
+// I percorsi sono in data/posters.ts (generato da scripts/tmdb-posters.mjs).
+// Usato dalle miniature (Thumb) e dal muro di locandine della pagina di accesso.
 import { POSTERS } from "./data/posters";
 import type { Lang } from "./types";
 

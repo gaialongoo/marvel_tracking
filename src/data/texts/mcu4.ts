@@ -1,14 +1,12 @@
-/* ============================================================================
-   TESTI — BLOCCO MCU 4: Fase 5 e Fase 6
-   Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
-   Per i titoli 2025-2026 la trama viene da Wikipedia (en), letta il 18/11/2026.
-   Dove la fonte non bastava per tutta la trama, "full" manca (resta "da scrivere")
-   e le scene dopo i titoli non confermate sono null.
-   ============================================================================ */
+// Testi - blocco MCU 4: Fase 5 e Fase 6
+// Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
+// Per i titoli 2025-2026 la trama viene da Wikipedia (en), letta il 18/11/2026.
+// Dove la fonte non bastava per tutta la trama, "full" manca (resta "da scrivere")
+// e le scene dopo i titoli non confermate sono null.
 import type { TitleTexts } from "./types";
 
 export const MCU4: Record<string, TitleTexts> = {
-  /* ===== FASE 5 ===== */
+  // Fase 5
   quantumania: {
     syn: {
       it: "Scott Lang, Hope e la loro famiglia vengono risucchiati nel Regno Quantico, un mondo pieno di creature strane dove li aspetta Kang il Conquistatore.",
@@ -253,7 +251,7 @@ export const MCU4: Record<string, TitleTexts> = {
     ],
   },
 
-  /* ===== FASE 6 ===== */
+  // Fase 6
   eow: {
     syn: {
       it: "Gli Hatut Zaraze, guerrieri segreti del Wakanda, viaggiano nel mondo in epoche diverse per recuperare manufatti di vibranio prima che finiscano nelle mani sbagliate.",

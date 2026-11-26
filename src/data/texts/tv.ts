@@ -1,7 +1,5 @@
-/* ============================================================================
-   TESTI — BLOCCO SERIE TV fuori MCU (live action, 1977-2020)
-   Scritti da Claude. syn = senza spoiler · full = riassunto della serie, con spoiler
-   ============================================================================ */
+// Testi - blocco serie TV fuori MCU (live action, 1977-2020)
+// Scritti da Claude. syn = senza spoiler · full = riassunto della serie, con spoiler
 import type { TitleTexts } from "./types";
 
 export const TV: Record<string, TitleTexts> = {

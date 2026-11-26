@@ -1,9 +1,7 @@
-/* ============================================================================
-   CATALOGO — l'elenco completo: universo + ordine + tipo.
-   (Prima era la Home; statistiche e backup ora sono nel Profilo.)
-   Le scelte arrivano da App, così restano uguali quando torni dalla scheda
-   di un titolo; all'avvio partono dalle preferenze di visione del profilo.
-   ============================================================================ */
+// Catalogo - l'elenco completo: universo + ordine + tipo.
+// (Prima era la Home; statistiche e backup ora sono nel Profilo.)
+// Le scelte arrivano da App, così restano uguali quando torni dalla scheda
+// di un titolo; all'avvio partono dalle preferenze di visione del profilo.
 import { useLayoutEffect } from "react";
 import { DATA } from "../data/titles";
 import { PATHS, UNIVERSES } from "../data/meta";
@@ -45,7 +43,7 @@ export function Catalog({ s: raw, set }: { s: HomeState; set: (p: Partial<HomeSt
         <div className="sub">{t("listSub")} · {DATA.length} {t("titles")} · {t("isSeen").toLowerCase()} {seenN}/{visible.length}</div>
 
         {/* Universi: si combinano con ogni ordine e filtro.
-            (Le liste Disney+ sono in data/collections.ts, per ora non mostrate.) */}
+   (Le liste Disney+ sono in data/collections.ts, per ora non mostrate.) */}
         <div className="uni-tabs" role="tablist" aria-label={t("universe")}>
           {UNIVERSES.map((u) => (
             <button key={u.k} className={s.uni === u.k ? "on" : ""} onClick={() => set({ uni: u.k })}>

@@ -1,10 +1,8 @@
-/* ============================================================================
-   SCELTE DEL CATALOGO (universo, ordine, percorso, tipi…) e costruzione
-   dei gruppi dell'elenco.
-   - Le scelte sono tenute in App, così restano uguali quando torni da una scheda.
-   - All'avvio partono dalle "preferenze di visione" del profilo.
-   - buildGroups è usata dal Catalogo e dalla bacheca (per il "prossimo titolo").
-   ============================================================================ */
+// Scelte del catalogo (universo, ordine, percorso, tipi…) e costruzione
+// dei gruppi dell'elenco.
+// - Le scelte sono tenute in App, così restano uguali quando torni da una scheda.
+// - All'avvio partono dalle "preferenze di visione" del profilo.
+// - buildGroups è usata dal Catalogo e dalla bacheca (per il "prossimo titolo").
 import { DATA } from "./data/titles";
 import { PATHS, UNIVERSES } from "./data/meta";
 import type { Lang, Order, Profile, Title, TitleType } from "./types";
@@ -25,9 +23,11 @@ export interface HomeState {
 
 export const defaultHome: HomeState = { uni: "all", order: "release", path: "ironman", types: [] };
 
-/** Scelte "pulite": valori non validi (es. da una versione precedente
-    dell'app o da un profilo vecchio) tornano ai predefiniti, altrimenti
-    l'elenco resterebbe vuoto. */
+/**
+ * Scelte "pulite": valori non validi (es. da una versione precedente
+ * dell'app o da un profilo vecchio) tornano ai predefiniti, altrimenti
+ * l'elenco resterebbe vuoto.
+ */
 export function sanitize(raw: Partial<HomeState>): HomeState {
   return {
     uni: UNIVERSES.some((u) => u.k === raw.uni) ? raw.uni! : defaultHome.uni,
@@ -50,13 +50,15 @@ function cleanTypes(raw: unknown): TitleType[] {
 export const prefsToHome = (p?: Profile): HomeState =>
   sanitize({ uni: p?.prefUni, order: p?.prefOrder, path: p?.prefPath, types: p?.prefTypes });
 
-/** Il "prossimo da guardare" secondo le preferenze di visione:
-    il primo titolo non visto che viene DOPO quello visto più in fondo
-    alla lista. I titoli saltati più indietro non contano (se li hai
-    lasciati indietro è una scelta tua). Le serie iniziate contano come
-    "arrivato fin qui", ma non vengono proposte: stanno già in
-    "Continua a guardare". Se la lista è finita non c'è un prossimo.
-    n = quanti titoli restituire (il prossimo e quelli che vengono dopo). */
+/**
+ * Il "prossimo da guardare" secondo le preferenze di visione:
+ * il primo titolo non visto che viene dopo quello visto più in fondo
+ * alla lista. I titoli saltati più indietro non contano (se li hai
+ * lasciati indietro è una scelta tua). Le serie iniziate contano come
+ * "arrivato fin qui", ma non vengono proposte: stanno già in
+ * "Continua a guardare". Se la lista è finita non c'è un prossimo.
+ * n = quanti titoli restituire (il prossimo e quelli che vengono dopo).
+ */
 export function nextUp(list: Title[], isSeen: (d: Title) => boolean, isStarted: (d: Title) => boolean, n = 1): Title[] {
   let last = -1; // posizione dell'ultimo titolo visto (o iniziato)
   list.forEach((d, i) => { if (isSeen(d) || isStarted(d)) last = i; });
@@ -68,13 +70,11 @@ export interface Group { h: string | null; items: Title[] }
 /** Testi che servono per le intestazioni dei gruppi */
 type GroupT = (k: "phaseN" | "inf" | "multi" | "noPhase") => string;
 
-/* ---------------------------------------------------------------------------
-   Costruisce i gruppi dell'elenco secondo universo, tipo e ordine.
-   - Uscita: una lista per anno
-   - Cronologico: dentro ogni universo (con "Tutto" un gruppo per universo)
-   - Fase: Fasi per l'MCU, un gruppo per ciascun altro universo
-   - Percorsi: titoli del percorso; se attraversa più universi, per anno
-   --------------------------------------------------------------------------- */
+// Costruisce i gruppi dell'elenco secondo universo, tipo e ordine.
+// - Uscita: una lista per anno
+// - Cronologico: dentro ogni universo (con "Tutto" un gruppo per universo)
+// - Fase: Fasi per l'MCU, un gruppo per ciascun altro universo
+// - Percorsi: titoli del percorso; se attraversa più universi, per anno
 export function buildGroups(s: HomeState, lang: Lang, t: GroupT): Group[] {
   const items = DATA.filter((d) => (s.uni === "all" || d.uni === s.uni) && (s.types.length === 0 || s.types.includes(d.type)));
   const unis = UNIVERSES.filter((u) => u.k !== "all" && items.some((d) => d.uni === u.k));

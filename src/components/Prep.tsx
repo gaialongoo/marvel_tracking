@@ -1,8 +1,6 @@
-/* ============================================================================
-   PREPARAZIONE — prossime uscite, conto alla rovescia, liste di visione
-   (minima/estesa) e ripasso veloce. Le righe sono gli STESSI titoli della
-   Home: segnarli qui li segna ovunque.
-   ============================================================================ */
+// Preparazione - prossime uscite, conto alla rovescia, liste di visione
+// (minima/estesa) e ripasso veloce. Le righe sono gli stessi titoli della
+// Home: segnarli qui li segna ovunque.
 import { useEffect, useState } from "react";
 import { BY_ID } from "../data/titles";
 import { UPCOMING } from "../data/meta";

@@ -1,8 +1,6 @@
-/* ============================================================================
-   RIGA DI UN TITOLO (Home e Preparazione)
-   numero | miniatura | titolo + info | voto | pulsante "visto"
-   Cliccando la riga si apre la scheda.
-   ============================================================================ */
+// Riga di un titolo (Home e Preparazione)
+// numero | miniatura | titolo + info | voto | pulsante "visto"
+// Cliccando la riga si apre la scheda.
 import { useMetaLine } from "../hooks";
 import { useT } from "../i18n";
 import { go } from "../router";

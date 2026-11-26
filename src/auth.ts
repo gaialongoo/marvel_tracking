@@ -1,11 +1,9 @@
-/* ============================================================================
-   AUTH — chi ha fatto l'accesso.
-   - useAuth() dice ai componenti: sto ancora controllando? c'è un utente?
-     l'utente è arrivato dal link "nuova password"?
-   - Le funzioni qui sotto (accedi, registrati, esci, recupero password)
-     chiamano Supabase e restituiscono un codice d'errore da tradurre,
-     oppure null se è andato tutto bene.
-   ============================================================================ */
+// Auth - chi ha fatto l'accesso.
+// - useAuth() dice ai componenti: sto ancora controllando? c'è un utente?
+//   l'utente è arrivato dal link "nuova password"?
+// - Le funzioni qui sotto (accedi, registrati, esci, recupero password)
+//   chiamano Supabase e restituiscono un codice d'errore da tradurre,
+//   oppure null se è andato tutto bene.
 import { useSyncExternalStore } from "react";
 import type { User } from "@supabase/supabase-js";
 import { redirectUrl, supabase } from "./supabase";
@@ -18,9 +16,9 @@ interface AuthState {
                         // già usato o aperto in un altro browser)
 }
 
-/* Il link dell'email torna con ?code=… (va bene) oppure con un errore
-   (?error=… o #error=…, es. link scaduto). Lo guardo PRIMA che Supabase
-   pulisca l'indirizzo. */
+// Il link dell'email torna con ?code=… (va bene) oppure con un errore
+// (?error=… o #error=…, es. link scaduto). Lo guardo prima che Supabase
+// pulisca l'indirizzo.
 const hadCode = location.search.includes("code=");
 const urlErr = /[?&#]error(_code|_description)?=/.test(location.search + location.hash);
 // L'errore nel "#" rovinerebbe la navigazione dell'app (#/…): lo tolgo subito
@@ -53,11 +51,11 @@ export function onUserChange(cb: (user: User | null) => void) {
   check(); // se la sessione era già nota, parte subito
 }
 
-/* Ascolta Supabase: all'avvio arriva INITIAL_SESSION (sessione salvata o
-   nessuna), poi SIGNED_IN / SIGNED_OUT / TOKEN_REFRESHED… e
-   PASSWORD_RECOVERY quando si apre il link per scegliere una nuova password.
-   L'utente viene sostituito solo se cambia davvero (il rinnovo del token
-   non deve far ricaricare i dati). */
+// Ascolta Supabase: all'avvio arriva INITIAL_SESSION (sessione salvata o
+// nessuna), poi SIGNED_IN / SIGNED_OUT / TOKEN_REFRESHED… e
+// PASSWORD_RECOVERY quando si apre il link per scegliere una nuova password.
+// L'utente viene sostituito solo se cambia davvero (il rinnovo del token
+// non deve far ricaricare i dati).
 supabase?.auth.onAuthStateChange((event, session) => {
   const user = session?.user ?? null;
   // Dopo un link via email l'indirizzo contiene ?code=…: lo tolgo (resta il #/…)
@@ -75,10 +73,8 @@ supabase?.auth.onAuthStateChange((event, session) => {
 /** Nasconde l'avviso sul link (quando si chiede un link nuovo o si accede) */
 export const clearLinkErr = () => setState({ linkErr: false });
 
-/* ---------------------------------------------------------------------------
-   ERRORI — Supabase risponde con codici in inglese; li riduco a poche chiavi
-   che i18n.ts traduce (err_…).
-   --------------------------------------------------------------------------- */
+// Errori - Supabase risponde con codici in inglese; li riduco a poche chiavi
+// che i18n.ts traduce (err_…).
 export type AuthErr = "err_credentials" | "err_notConfirmed" | "err_exists" | "err_weak" | "err_rate" | "err_emailRate"
   | "err_samePw" | "err_network" | "err_generic";
 
@@ -102,8 +98,10 @@ export async function signIn(email: string, password: string): Promise<AuthErr |
   return toErr(error);
 }
 
-/** Crea un account. Supabase manda un'email con il link di conferma;
-    "needsConfirm" è true finché il link non viene cliccato. */
+/**
+ * Crea un account. Supabase manda un'email con il link di conferma;
+ * "needsConfirm" è true finché il link non viene cliccato.
+ */
 export async function signUp(email: string, password: string): Promise<{ err: AuthErr | null; needsConfirm: boolean }> {
   const { data, error } = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: redirectUrl() } });
   // Email già registrata e confermata: per privacy Supabase non dà errore
@@ -125,9 +123,11 @@ export async function updatePassword(password: string): Promise<AuthErr | null> 
   return toErr(error);
 }
 
-/** Elimina l'account e TUTTI i suoi dati (funzione delete_my_account in
-    supabase/schema.sql). Poi esce. "missing" = la funzione non c'è ancora
-    nel database (schema.sql da rieseguire). */
+/**
+ * Elimina l'account e tutti i suoi dati (funzione delete_my_account in
+ * supabase/schema.sql). Poi esce. "missing" = la funzione non c'è ancora
+ * nel database (schema.sql da rieseguire).
+ */
 export async function deleteAccount(): Promise<"ok" | "missing" | "error"> {
   const { error } = await supabase!.rpc("delete_my_account");
   if (error) return error.code === "PGRST202" || /function|schema cache/i.test(error.message) ? "missing" : "error";

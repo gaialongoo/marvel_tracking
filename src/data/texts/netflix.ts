@@ -1,7 +1,5 @@
-/* ============================================================================
-   TESTI — BLOCCO NETFLIX: serie Marvel Television (2015-2019), stagione per stagione
-   Scritti da Claude. syn = senza spoiler · full = riassunto della stagione, con spoiler
-   ============================================================================ */
+// Testi - blocco Netflix: serie Marvel Television (2015-2019), stagione per stagione
+// Scritti da Claude. syn = senza spoiler · full = riassunto della stagione, con spoiler
 import type { TitleTexts } from "./types";
 
 export const NETFLIX: Record<string, TitleTexts> = {

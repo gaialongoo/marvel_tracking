@@ -1,13 +1,11 @@
-/* ============================================================================
-   CONDIVISIONE
-   - shareCard(): disegna un'immagine 1080x1350 (formato dei post e delle
-     storie) con avatar, nome, @tag, titoli visti, ore, badge e una barra per
-     ogni universo, poi la condivide (telefono) o la scarica (PC).
-   - shareInvite(): condivide (o copia) il link di invito #/u/<tag>: chi lo
-     apre vede la tua pagina e può chiederti l'amicizia, anche dopo essersi
-     registrato (vedi rememberInvite / takeInvite).
-   Il disegno è fatto con <canvas>: niente servizi esterni.
-   ============================================================================ */
+// Condivisione
+// - shareCard(): disegna un'immagine 1080x1350 (formato dei post e delle
+//   storie) con avatar, nome, @tag, titoli visti, ore, badge e una barra per
+//   ogni universo, poi la condivide (telefono) o la scarica (PC).
+// - shareInvite(): condivide (o copia) il link di invito #/u/<tag>: chi lo
+//   apre vede la tua pagina e può chiederti l'amicizia, anche dopo essersi
+//   registrato (vedi rememberInvite / takeInvite).
+// Il disegno è fatto con <canvas>: niente servizi esterni.
 import { ARC_SVG } from "./components/ArcReactor";
 import { computeBadges } from "./badges";
 import { AVATAR_BY_KEY } from "./data/avatars";
@@ -18,9 +16,7 @@ import { SITE_URL } from "./config";
 import type { Lang, SavedData } from "./types";
 import { fmtMin, watchedMin } from "./utils";
 
-/* ---------------------------------------------------------------------------
-   IMMAGINE DA CONDIVIDERE
-   --------------------------------------------------------------------------- */
+// Immagine da condividere
 const W = 1080, H = 1350;
 const GOLD = "#c9a24b", TEXT = "#e6e8ec", MUTED = "#868d99", LINE = "#24282f";
 
@@ -136,8 +132,10 @@ function lighten(hex: string) {
   return `rgb(${ch(n >> 16)},${ch((n >> 8) & 255)},${ch(n & 255)})`;
 }
 
-/** Condivide l'immagine (telefono: menu di condivisione) o la scarica (PC).
-    "shared" | "downloaded" | "cancelled" */
+/**
+ * Condivide l'immagine (telefono: menu di condivisione) o la scarica (PC).
+ * "shared" | "downloaded" | "cancelled"
+ */
 export async function shareCard(d: SavedData, name: string, handle: string | null, lang: Lang, text: string) {
   const blob = await drawCard(d, name, handle, lang);
   const file = new File([blob], "marvel-tracker.png", { type: "image/png" });
@@ -151,14 +149,14 @@ export async function shareCard(d: SavedData, name: string, handle: string | nul
   return "downloaded";
 }
 
-/* ---------------------------------------------------------------------------
-   LINK DI INVITO
-   --------------------------------------------------------------------------- */
+// Link di invito
 /** Il link di invito di un @tag */
 export const inviteUrl = (handle: string) => `${SITE_URL}#/u/${encodeURIComponent(handle)}`;
 
-/** Condivide il link (telefono) o lo copia negli appunti (PC).
-    "shared" | "copied" | "cancelled" | "error" */
+/**
+ * Condivide il link (telefono) o lo copia negli appunti (PC).
+ * "shared" | "copied" | "cancelled" | "error"
+ */
 export async function shareInvite(handle: string, text: string) {
   const url = inviteUrl(handle);
   if (navigator.share) {
@@ -169,9 +167,9 @@ export async function shareInvite(handle: string, text: string) {
   catch { return "error"; }
 }
 
-/* Chi apre un link di invito senza aver fatto l'accesso deve prima
-   registrarsi (e magari confermare l'email, che riapre il sito senza il
-   "#/u/…"): il tag dell'invito resta salvato nel browser fino all'accesso. */
+// Chi apre un link di invito senza aver fatto l'accesso deve prima
+// registrarsi (e magari confermare l'email, che riapre il sito senza il
+// "#/u/…"): il tag dell'invito resta salvato nel browser fino all'accesso.
 const INVITE_KEY = "marvel-tracker-invite";
 
 /** Ricorda l'invito presente nell'indirizzo (se c'è); restituisce il tag */

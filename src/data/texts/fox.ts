@@ -1,11 +1,9 @@
-/* ============================================================================
-   TESTI — BLOCCO FOX: X-Men e Fantastici Quattro (20th Century Fox)
-   Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
-   ============================================================================ */
+// Testi - blocco Fox: X-Men e Fantastici Quattro (20th Century Fox)
+// Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
 import type { TitleTexts } from "./types";
 
 export const FOX: Record<string, TitleTexts> = {
-  /* ===== X-MEN ===== */
+  // X-MEN
   xmen: {
     syn: {
       it: "In un mondo che teme i mutanti, la giovane Rogue e il solitario Wolverine trovano rifugio nella scuola del professor Xavier, mentre Magneto prepara un piano contro l'umanità.",
@@ -181,7 +179,7 @@ export const FOX: Record<string, TitleTexts> = {
     },
   },
 
-  /* ===== FANTASTICI QUATTRO (Fox) ===== */
+  // Fantastici quattro (Fox)
   ff2005: {
     syn: {
       it: "Quattro persone vengono colpite da una tempesta cosmica durante un esperimento nello spazio e tornano sulla Terra con poteri straordinari.",

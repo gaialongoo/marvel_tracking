@@ -1,8 +1,6 @@
-/* ============================================================================
-   BACKUP — i dati si salvano già da soli nell'account; qui puoi anche
-   scaricarne una copia (.json) e reimportarla. Importare un backup
-   sostituisce i dati dell'account (su tutti i dispositivi).
-   ============================================================================ */
+// Backup - i dati si salvano già da soli nell'account; qui puoi anche
+// scaricarne una copia (.json) e reimportarla. Importare un backup
+// sostituisce i dati dell'account (su tutti i dispositivi).
 import { useT } from "../i18n";
 import { getData, isSavedData, replaceData } from "../store";
 import { showToast } from "../toast";

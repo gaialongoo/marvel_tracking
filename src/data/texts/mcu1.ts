@@ -1,11 +1,9 @@
-/* ============================================================================
-   TESTI — BLOCCO MCU 1: Fase 1 e Fase 2 + corti "Irripetibili Marvel"
-   Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
-   ============================================================================ */
+// Testi - blocco MCU 1: Fase 1 e Fase 2 + corti "Irripetibili Marvel"
+// Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
 import type { TitleTexts } from "./types";
 
 export const MCU1: Record<string, TitleTexts> = {
-  /* ===== FASE 1 ===== */
+  // Fase 1
   im: {
     syn: {
       it: "Tony Stark, geniale e arrogante produttore di armi, viene rapito durante una dimostrazione in Afghanistan. Per sopravvivere costruisce un'armatura che cambierà la sua vita e il suo modo di vedere il mondo.",
@@ -135,7 +133,7 @@ export const MCU1: Record<string, TitleTexts> = {
     ],
   },
 
-  /* ===== FASE 2 ===== */
+  // Fase 2
   im3: {
     syn: {
       it: "Dopo la battaglia di New York Tony Stark non dorme più. Quando un terrorista chiamato il Mandarino colpisce la sua vita privata, deve contare sul proprio ingegno più che sulle armature.",

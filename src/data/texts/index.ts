@@ -1,15 +1,12 @@
-/* ============================================================================
-   TESTI DEI TITOLI — sinossi senza spoiler, riassunto completo, scene dopo i titoli
-   ----------------------------------------------------------------------------
-   Scritti da Claude (IT + EN), a blocchi, un file per blocco.
-   - syn:  sinossi SENZA spoiler (solo la premessa)
-   - full: riassunto completo CON spoiler (trama, finale, rivelazioni)
-   - pc:   una descrizione per ogni scena dopo i titoli (nell'ordine in cui compaiono)
-   Fonti: pagine ufficiali (Disney+, marvel.com) per la premessa; per la trama
-   completa anche fonti secondarie affidabili (Wikipedia).
-   Per non riprodurre testi protetti, le sinossi ufficiali NON sono copiate:
-   la scheda rimanda alla pagina ufficiale Disney+.
-   ============================================================================ */
+// Testi dei titoli - sinossi senza spoiler, riassunto completo, scene dopo i titoli
+// Scritti da Claude (IT + EN), a blocchi, un file per blocco.
+// - syn:  sinossi senza spoiler (solo la premessa)
+// - full: riassunto completo con spoiler (trama, finale, rivelazioni)
+// - pc:   una descrizione per ogni scena dopo i titoli (nell'ordine in cui compaiono)
+// Fonti: pagine ufficiali (Disney+, marvel.com) per la premessa; per la trama
+// completa anche fonti secondarie affidabili (Wikipedia).
+// Per non riprodurre testi protetti, le sinossi ufficiali non sono copiate:
+// la scheda rimanda alla pagina ufficiale Disney+.
 import { MCU1 } from "./mcu1";
 import { MCU2 } from "./mcu2";
 import { MCU3 } from "./mcu3";

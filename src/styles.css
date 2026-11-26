@@ -1,13 +1,9 @@
-/* ==========================================================================
-   MARVEL TRACKER — STILI GLOBALI (stile "Stark Industries")
+/* Marvel Tracker - stili globali (stile "Stark Industries")
    Portati dal prototipo (prototype/design.html). Le classi qui sotto sono
-   usate dai componenti React in src/components.
-   ========================================================================== */
+   usate dai componenti React in src/components. */
 
-/* ==========================================================================
-   1. VARIABILI — palette Stark Industries
-   Oro = accento principale. Rosso = SOLO avvisi e spoiler.
-   ========================================================================== */
+/* 1. Variabili - palette Stark Industries
+   Oro = accento principale. Rosso = solo avvisi e spoiler. */
 :root{
   --bg:#0b0c0f;        /* sfondo pagina */
   --surface:#121418;   /* colonne e pannelli */
@@ -35,7 +31,7 @@
   color-scheme:dark;            /* barre di scorrimento e campi del browser scuri */
 }
 
-/* TEMA CHIARO (theme.ts mette data-theme="light" su <html>): carta chiara,
+/* Tema chiaro (theme.ts mette data-theme="light" su <html>): carta chiara,
    oro più scuro per restare leggibile. Miniature e porte degli universi
    restano scure: sono "locandine" colorate. */
 :root[data-theme="light"]{
@@ -49,9 +45,7 @@
   color-scheme:light;
 }
 
-/* ==========================================================================
-   2. BASE
-   ========================================================================== */
+/* 2. Base */
 *{box-sizing:border-box}
 html,body{height:100%}
 /* niente zoom col doppio tocco su telefono (vedi anche il viewport in index.html) */
@@ -67,12 +61,10 @@ h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
 /* Barre di scorrimento discrete */
 ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
 
-/* ==========================================================================
-   3. LAYOUT — barra in alto fissa + pagina centrale
+/* 3. Layout - barra in alto fissa + pagina centrale
    Barra: [logo] [selettore Home | Preparazione] [ricerca + lingua]
-   Le schede dei titoli NON sono nel selettore: si aprono solo cliccando un
-   titolo o dalla ricerca, e hanno un pulsante "Home" per tornare.
-   ========================================================================== */
+   Le schede dei titoli non sono nel selettore: si aprono solo cliccando un
+   titolo o dalla ricerca, e hanno un pulsante "Home" per tornare. */
 .top{position:sticky;top:0;z-index:20;height:60px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
   padding:0 24px;background:var(--topbar);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;cursor:pointer;justify-self:start}
@@ -119,9 +111,7 @@ h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
 .page-enter{animation:enter .2s ease-out}
 @keyframes enter{from{opacity:0;transform:translateY(4px)}}
 
-/* ==========================================================================
-   4. COLONNA LISTA
-   ========================================================================== */
+/* 4. Colonna lista */
 /* Riquadro che contiene l'elenco */
 .list-wrap{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;margin-top:14px}
 .list-head{padding:18px 0 0}
@@ -190,13 +180,11 @@ select.input{background:var(--surface);border:1px solid var(--line);border-radiu
 .row:hover .seen-btn.partial::before{background:var(--surface2)}
 .seen-btn.partial span{position:relative;font-family:var(--mono);font-size:8.5px;color:var(--ok);letter-spacing:-.02em}
 
-/* ==========================================================================
-   5. GEMME DELL'INFINITO — forme ispirate ai film
+/* 5. Gemme dell'Infinito - forme ispirate ai film
    Spazio=cubo (Tesseract) · Mente=goccia · Realtà=forma fluida (Aether)
    Potere=sfera con anelli (Orb) · Tempo=occhio (Occhio di Agamotto) · Anima=ovale
-   Accesa  → colore pieno + riflessi (.hl) + leggero alone
-   Spenta  → solo contorno grigio
-   ========================================================================== */
+   Accesa  -> colore pieno + riflessi (.hl) + leggero alone
+   Spenta  -> solo contorno grigio */
 .gems{display:inline-flex;gap:3px;align-items:center}
 .gem{width:15px;height:15px;display:block;overflow:visible}
 .gem .f{fill:var(--c);stroke:var(--c);stroke-width:.6;stroke-linejoin:round;transition:.2s}
@@ -221,9 +209,7 @@ select.input{background:var(--surface);border:1px solid var(--line);border-radiu
   border-top:1px solid var(--gold-soft);padding-top:8px;display:flex;gap:8px;align-items:center}
 .gauntlet::before{content:"";width:6px;height:6px;background:var(--gold);transform:rotate(45deg)}
 
-/* ==========================================================================
-   6. PAGINA SCHEDA — due colonne su PC: [info, voto, testi] [collegamenti, mappa]
-   ========================================================================== */
+/* 6. Pagina scheda - due colonne su PC: [info, voto, testi] [collegamenti, mappa] */
 .detail-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start}
 .detail-grid > div > .block:first-child{margin-top:0}
 /* Pulsante "Home" in cima alla scheda */
@@ -288,7 +274,7 @@ a.btn{color:var(--text);text-decoration:none}
 
 /* Mappa dei collegamenti
    Tre colonne HTML [Prima | Questo titolo | Dopo]; le linee sono un SVG
-   disegnato SOPRA misurando la posizione reale dei riquadri (drawMap()),
+   disegnato sopra misurando la posizione reale dei riquadri (drawMap()),
    così la mappa si adatta a qualsiasi larghezza.
    Su schermi stretti le colonne diventano righe e le linee verticali. */
 .map2{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:34px;align-items:center}
@@ -325,9 +311,7 @@ a.btn{color:var(--text);text-decoration:none}
   .mnode.cur{width:70%}
 }
 
-/* ==========================================================================
-   7. VISTE A PAGINA INTERA (Preparazione, Statistiche)
-   ========================================================================== */
+/* 7. Viste A pagina intera (Preparazione, Statistiche) */
 .page-head h1{font-size:22px}
 .page-head p{color:var(--muted);margin:4px 0 0}
 .grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-top:18px}
@@ -384,9 +368,7 @@ label.btn{cursor:pointer}
 .proto-note{padding:6px 24px;font-family:var(--mono);font-size:10.5px;color:var(--muted);border-bottom:1px solid var(--line);background:var(--surface);text-align:center}
 .proto-note b{color:var(--red)}
 
-/* ==========================================================================
-   8. RESPONSIVE — tablet e telefono
-   ========================================================================== */
+/* 8. Responsive - tablet e telefono */
 @media (max-width:1000px){
   .grid4{grid-template-columns:repeat(2,1fr)}
   .detail-grid{grid-template-columns:minmax(0,1fr)} /* minmax: niente può allargare la colonna oltre lo schermo */
@@ -425,9 +407,7 @@ label.btn{cursor:pointer}
   .row > .gems{display:none}
 }
 
-/* ==========================================================================
-   AGGIUNTE PER L'APP REACT
-   ========================================================================== */
+/* Aggiunte per l'app React */
 /* Righe senza numero (lista della Preparazione) */
 .row.no-n{grid-template-columns:44px 1fr auto 34px}
 @media (max-width:760px){ .row.no-n{grid-template-columns:40px 1fr auto 30px} }
@@ -435,7 +415,7 @@ label.btn{cursor:pointer}
 /* Contenitore principale */
 main{display:block}
 
-/* ---------- Collezioni Disney+ (schede in alto nella Home) ---------- */
+/* Collezioni Disney+ (schede in alto nella Home) */
 /* Su PC le schede vanno a capo (sono tante); su telefono scorrono di lato */
 .uni-tabs{flex-wrap:wrap;row-gap:12px;column-gap:20px}
 .uni-tabs .tab-sep{align-self:center;padding:0 0 10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);opacity:.75;white-space:nowrap}
@@ -446,11 +426,9 @@ main{display:block}
 /* Etichetta "aggiunto" sui titoli che non sono nella lista Disney+ */
 .row .t .added{margin-left:8px;padding:1px 6px;border:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-radius:3px;font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);vertical-align:middle}
 
-/* ==========================================================================
-   ACCOUNT — pagina di accesso, finestra "dati del browser", menu in alto
+/* Account - pagina di accesso, finestra "dati del browser", menu in alto
    (componenti in src/components/Auth.tsx). Oro = azioni e informazioni,
-   rosso = solo errori e salvataggio non riuscito.
-   ========================================================================== */
+   rosso = solo errori e salvataggio non riuscito. */
 /* Pagina di accesso: riquadro centrato su tutta la pagina */
 .auth{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
 .auth-box{width:min(400px,100%);padding:24px}
@@ -502,10 +480,8 @@ main{display:block}
 .sync-txt{font-size:11.5px;color:var(--muted)}
 .sync-txt.sync-error{color:var(--red)}
 
-/* ==========================================================================
-   AVATAR — riquadro colorato con il personaggino (components/Avatar.tsx)
-   --bg = colore del riquadro; senza avatar si vede l'iniziale del nome
-   ========================================================================== */
+/* Avatar - riquadro colorato con il personaggino (components/Avatar.tsx)
+   --bg = colore del riquadro; senza avatar si vede l'iniziale del nome */
 /* Cerchio con fondo grigio chiaro uguale per tutti: fa risaltare il contorno
    nero, la linea di appoggio e i personaggi scuri (Venom, Black Panther, Hela) */
 .avatar{display:inline-grid;place-items:center;flex:none;border-radius:50%;overflow:hidden;
@@ -519,10 +495,8 @@ main{display:block}
 .am-head > div{min-width:0}
 .am-mail{display:block;color:var(--muted);font-size:11.5px;overflow-wrap:anywhere}
 
-/* ==========================================================================
-   HOME (components/Home.tsx): intestazione, porte degli universi,
-   continua a guardare
-   ========================================================================== */
+/* Home (components/Home.tsx): intestazione, porte degli universi,
+   continua a guardare */
 /* Intestazione: avatar | nome e numeri | prossima uscita */
 .home-head{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;margin-bottom:22px}
 .home-av{border-radius:50%;transition:transform .15s}
@@ -556,10 +530,8 @@ main{display:block}
 .home-badges{display:none}
 .home-friends{display:none}
 
-/* --------------------------------------------------------------------------
-   HOME SU PC: 3 colonne
-   sinistra = profilo + amici · centro = universi · destra = Continua a guardare + Preparazione
-   -------------------------------------------------------------------------- */
+/* Home su PC: 3 colonne
+   sinistra = profilo + amici · centro = universi · destra = Continua a guardare + Preparazione */
 @media (min-width:1100px){
   .page.home{display:grid;grid-template-columns:280px minmax(0,1fr) 320px;
     grid-template-areas:"me doors side" "friends doors side";grid-template-rows:auto 1fr;gap:20px 24px;align-items:start}
@@ -594,7 +566,7 @@ main{display:block}
 .door-sym{position:absolute;right:-6%;top:50%;height:125%;width:auto;aspect-ratio:1;transform:translateY(-50%) rotate(-8deg);z-index:-2;
   fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.17;transition:transform .5s,opacity .3s}
 .door-mcu .door-sym{right:4%;height:140%}
-/* la scritta MARVEL è larga: più dentro, così si legge intera */
+/* la scritta Marvel è larga: più dentro, così si legge intera */
 .door-other .door-sym{right:3%;height:110%}
 /* la maschera è alta: più piccola, così resta intera dentro il banner */
 .door-sony .door-sym{right:2%;height:100%;transform:translateY(-50%) rotate(-12deg)}
@@ -630,9 +602,7 @@ main{display:block}
 .cw-tag{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);
   margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ==========================================================================
-   PROFILO (components/Profile.tsx)
-   ========================================================================== */
+/* Profilo (components/Profile.tsx) */
 .prof-head{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:start;padding:22px}
 .prof-main{min-width:0}
 .prof-main h1{font-size:26px;margin-top:4px;overflow-wrap:anywhere}
@@ -674,9 +644,7 @@ main{display:block}
 .handle-msg{font-size:12px;color:var(--muted)}
 .handle-msg.ok{color:#5fbf7a}.handle-msg.bad{color:var(--red)}
 
-/* ==========================================================================
-   BADGE (components/Badges.tsx)
-   ========================================================================== */
+/* Badge (components/Badges.tsx) */
 .badges-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:4px}
 /* Tendine dei gruppi: intestazione cliccabile con nome, frazione, livelli e barra */
 .badge-group{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-top:10px}
@@ -754,9 +722,7 @@ main{display:block}
   .av-pick .avatar{width:56px!important;height:56px!important}
 }
 
-/* ==========================================================================
-   AMICI (components/Friends.tsx) e riquadro Amici della Home
-   ========================================================================== */
+/* Amici (components/Friends.tsx) e riquadro Amici della Home */
 .link-btn{color:var(--gold);font-size:13px;text-decoration:underline;text-underline-offset:3px}
 .friends .eyebrow small{color:var(--muted);margin-left:4px}
 .fr-search{display:grid;gap:8px;margin-top:12px;max-width:520px}
@@ -816,12 +782,10 @@ main{display:block}
   .facts{flex-wrap:wrap}
 }
 
-/* ==========================================================================
-   HOME — porte che si adattano alla colonna in cui stanno
+/* Home - porte che si adattano alla colonna in cui stanno
    Su PC (3 colonne) la colonna centrale può essere stretta: le colonne
    laterali si restringono un po' e le porte piccole, se strette, mostrano solo
-   nome e barra (il sottotitolo sparisce), così il testo non esce dal bordo.
-   ========================================================================== */
+   nome e barra (il sottotitolo sparisce), così il testo non esce dal bordo. */
 .doors{container-type:inline-size}
 .door:not(.door-mcu){min-height:96px}
 @media (min-width:1100px){
@@ -836,9 +800,7 @@ main{display:block}
   .door-mcu .door-txt b{font-size:28px}
 }
 
-/* ==========================================================================
-   NOVITÀ («Nuovo») E LISTA "DA VEDERE"
-   ========================================================================== */
+/* Novità («Nuovo») e lista "da vedere" */
 /* etichetta «Nuovo»: come "aggiunto" ma azzurra */
 .added.new{color:var(--new);border-color:color-mix(in srgb,var(--new) 50%,transparent)}
 .new-fact{padding:0 6px;border:1px solid color-mix(in srgb,var(--new) 50%,transparent);border-radius:3px;color:var(--new);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
@@ -869,9 +831,7 @@ main{display:block}
   .home-extra{grid-column:auto}
 }
 
-/* ==========================================================================
-   PRIVACY, PIÈ DI PAGINA, CONDIVISIONE, BLOCCA/SEGNALA, ELIMINA ACCOUNT
-   ========================================================================== */
+/* Privacy, piè di pagina, condivisione, blocca/segnala, ELIMINA account */
 /* piè di pagina con la nota di non affiliazione */
 .site-foot{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;align-items:center;text-align:center;
   padding:22px 16px 30px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;margin-top:20px}
@@ -921,9 +881,7 @@ main{display:block}
   .fr-safety{justify-content:flex-start}
 }
 
-/* ==========================================================================
-   TEMA: pulsante sole/luna (dentro il gruppo della lingua) e scelta nel Profilo
-   ========================================================================== */
+/* Tema: pulsante sole/luna (dentro il gruppo della lingua) e scelta nel Profilo */
 .seg .theme-btn{display:grid;place-items:center;padding:5px 8px;color:var(--muted);border-left:1px solid var(--line)}
 .seg .theme-btn:hover{color:var(--gold)}
 .theme-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 4px}
@@ -937,9 +895,7 @@ main{display:block}
 .tmdb-credit{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .tmdb-credit img{height:16px;width:auto;display:block}
 
-/* ==========================================================================
-   PAGINA DI ACCESSO: muro di locandine che scorre dietro al riquadro
-   ========================================================================== */
+/* Pagina di accesso: muro di locandine che scorre dietro al riquadro */
 .auth{position:relative;isolation:isolate;overflow:hidden}
 .wall{position:fixed;inset:-25% -10%;z-index:-2;display:flex;flex-direction:column;justify-content:center;gap:16px;transform:rotate(-8deg);pointer-events:none}
 .wall-row{display:flex;gap:16px;width:max-content;animation:wall-left 140s linear infinite}
@@ -969,18 +925,16 @@ main{display:block}
 /* tema chiaro: velo un po' più pieno, le locandine colorate disturbano di più */
 :root[data-theme="light"] .auth::before{background:radial-gradient(ellipse 55% 70% at 50% 50%,color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 72%,transparent) 100%)}
 
-/* Profilo → Account: con chi hai fatto l'accesso + Esci */
+/* Profilo -> Account: con chi hai fatto l'accesso + Esci */
 .logout-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .logout-row .muted-p{margin:0}
 .logout-row b{color:var(--text);font-weight:600}
 
-/* casella "ho almeno 14 anni…": NON larga come i campi di testo (.auth-form input), sennò spinge fuori la frase */
+/* casella "ho almeno 14 anni…": non larga come i campi di testo (.auth-form input), sennò spinge fuori la frase */
 .auth-form .auth-agree input{width:16px;height:16px;padding:0;margin:2px 0 0;flex:none;cursor:pointer}
 .auth-form .auth-agree span{flex:1;min-width:0}
 
-/* ==========================================================================
-   SCELTA DEL TITOLO PREFERITO (TitlePicker): ricerca + universi a tendina
-   ========================================================================== */
+/* Scelta del titolo preferito (TitlePicker): ricerca + universi a tendina */
 .tp-field{grid-column:1/-1;display:grid;gap:6px;min-width:0}
 .tp{display:grid;gap:8px}
 .tp-current{display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;min-height:44px}
@@ -1011,9 +965,7 @@ main{display:block}
 .tp-none:hover{color:var(--red-text);background:var(--surface)}
 .tp-empty{margin:6px 4px}
 
-/* ==========================================================================
-   GUIDA DI BENVENUTO (Welcome): 3 schede al primo accesso
-   ========================================================================== */
+/* Guida di benvenuto (Welcome): 3 schede al primo accesso */
 .modal.wl{position:relative;width:min(480px,100%);padding:22px 24px 20px;text-align:center}
 .wl h2{font-size:21px;margin:6px 0 10px}
 .wl p{margin:0 auto;max-width:400px;color:var(--text2);font-size:14px;line-height:1.6;min-height:112px}

@@ -1,22 +1,20 @@
-/* ============================================================================
-   HOME — la prima pagina dopo l'accesso.
-   Su PC (schermo largo) è divisa in 3 colonne:
-     sinistra = profilo + amici · centro = universi ·
-     destra = Continua a guardare + Preparazione
-   Su telefono e tablet le parti vanno una sotto l'altra, in questo ordine:
-   1. Intestazione: avatar, nome, @tag, frase e quanto hai visto in tutto
-      (su PC diventa la scheda del profilo, con i badge; sotto c'è "Amici")
-   2. In alto, affiancati:
-      - Continua a guardare: serie iniziate e non finite + il prossimo titolo
-        secondo le preferenze di visione del Profilo (universo, ordine, tipi):
-        quello dopo l'ultimo visto della lista, senza tornare ai saltati
-      - Preparazione: la prossima uscita con il conto alla rovescia
-        (cliccando si va alla pagina Preparazione)
-   3. Le "porte" degli universi: un riquadro per ogni universo, con la sua
-      avanzata; cliccando si apre il Catalogo su quell'universo
-   Ogni porta ha il colore del suo universo e un grande simbolo in filigrana
-   (disegni SVG nostri, in data/universeArt.ts: li usano anche i badge).
-   ============================================================================ */
+// Home - la prima pagina dopo l'accesso.
+// Su PC (schermo largo) è divisa in 3 colonne:
+//   sinistra = profilo + amici · centro = universi ·
+//   destra = Continua a guardare + Preparazione
+// Su telefono e tablet le parti vanno una sotto l'altra, in questo ordine:
+// 1. Intestazione: avatar, nome, @tag, frase e quanto hai visto in tutto
+//    (su PC diventa la scheda del profilo, con i badge; sotto c'è "Amici")
+// 2. In alto, affiancati:
+//    - Continua a guardare: serie iniziate e non finite + il prossimo titolo
+//      secondo le preferenze di visione del Profilo (universo, ordine, tipi):
+//      quello dopo l'ultimo visto della lista, senza tornare ai saltati
+//    - Preparazione: la prossima uscita con il conto alla rovescia
+//      (cliccando si va alla pagina Preparazione)
+// 3. Le "porte" degli universi: un riquadro per ogni universo, con la sua
+//    avanzata; cliccando si apre il Catalogo su quell'universo
+// Ogni porta ha il colore del suo universo e un grande simbolo in filigrana
+// (disegni SVG nostri, in data/universeArt.ts: li usano anche i badge).
 import { DATA, BY_ID } from "../data/titles";
 import { PATHS, UNIVERSES, UPCOMING } from "../data/meta";
 import { DOOR_COLOR, DOOR_SYMBOL } from "../data/universeArt";
@@ -49,15 +47,15 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
   const badgesWon = badges.filter((b) => b.level > 0).length;
   const badgesGold = badges.filter((b) => b.level === 3).length;
 
-  // --- 1. quanto ho visto in tutto ---
+  // 1. quanto ho visto in tutto
   const seenN = DATA.filter((d) => data.seen[d.id]).length;
   const minutes = DATA.reduce((a, d) => a + watchedMin(d, data), 0);
 
-  // --- 3. continua a guardare ---
+  // 3. continua a guardare
   const started = DATA.filter((d) => hasEps(d) && !data.seen[d.id] && epsSeen(data, d.id) > 0);
   const prefs = prefsToHome(p);
   // Massimo 3 titoli in tutto: prima le serie iniziate, poi i "da guardare"
-  // (i primi non visti DOPO l'ultimo visto della lista, vedi nextUp; il primo è il "prossimo")
+  // (i primi non visti dopo l'ultimo visto della lista, vedi nextUp; il primo è il "prossimo")
   const MAX_CW = 3;
   const startedShown = started.slice(0, MAX_CW);
   const nexts = nextUp(buildGroups(prefs, lang, t).flatMap((g) => g.items), (d) => !!data.seen[d.id], (d) => started.includes(d), MAX_CW - startedShown.length);
@@ -68,12 +66,12 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
     ? `${t("paths")} · ${PATHS.find((x) => x.key === prefs.path)?.[lang] ?? ""}`
     : `${t(prefs.order)}${prefs.uni !== "all" && uni ? ` · ${uni.short || uni[lang]}` : ""}`;
 
-  // --- novità (usciti da poco) e lista "Da vedere" ---
+  // novità (usciti da poco) e lista "Da vedere"
   const fresh = DATA.filter((d) => isNew(d.id));
   const wl = watchIds(data).map((id) => BY_ID[id]).filter(Boolean);
   const MAX_WL = 4;
 
-  // --- prossima uscita: la prima con data futura ---
+  // prossima uscita: la prima con data futura
   const today = new Date().toISOString().slice(0, 10);
   const up = UPCOMING.find((u) => u.date > today);
   const days = up ? Math.ceil((new Date(up.date + "T00:00:00").getTime() - Date.now()) / 86400000) : 0;
@@ -82,7 +80,7 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
 
   return (
     <div className="page page-enter home">
-      {/* 1. INTESTAZIONE */}
+      {/* 1. Intestazione */}
       <header className="home-head">
         <button className="home-av" onClick={() => go({ page: "profile" })} aria-label={t("profile")}>
           <Avatar k={p.avatar} size={64} fallback={name} />
@@ -101,8 +99,8 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
         </div>
       </header>
 
-      {/* AMICI (solo su PC, colonna di sinistra): richieste in arrivo e i
-          primi amici; ricerca e lista completa sono nel Profilo */}
+      {/* Amici (solo su PC, colonna di sinistra): richieste in arrivo e i
+   primi amici; ricerca e lista completa sono nel Profilo */}
       <section className="home-friends panel">
         <h2 className="home-h2">{t("friends")} <small className="mono muted">{friends.length}</small></h2>
         {incoming.length > 0 && (
@@ -121,7 +119,7 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
         <button className="link-btn" onClick={() => go({ page: "profile" })}>{handle ? t("frManage") : t("pickHandle")} →</button>
       </section>
 
-      {/* 2. IN ALTO: CONTINUA A GUARDARE (a sinistra) + PREPARAZIONE (a destra) */}
+      {/* 2. In alto: continua a guardare (a sinistra) + preparazione (a destra) */}
       <section className="home-top">
           {(started.length > 0 || next) && (
             <div className="home-cw">
@@ -145,14 +143,14 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
               </button>
             </div>
           )}
-          {/* APPENA USCITI: titoli usciti da poco (solo se ce ne sono) */}
+          {/* Appena usciti: titoli usciti da poco (solo se ce ne sono) */}
           {fresh.length > 0 && (
             <div className="home-extra">
               <h2 className="home-h2">{t("newTitles")}</h2>
               <div className="mini-list">{fresh.map((d) => <MiniRow key={d.id} d={d} tag={t("newTag")} />)}</div>
             </div>
           )}
-          {/* DA VEDERE: i primi titoli della lista (aggiunti dalla scheda) */}
+          {/* Da vedere: i primi titoli della lista (aggiunti dalla scheda) */}
           <div className="home-extra">
             <h2 className="home-h2">{t("watchlist")} <small className="mono muted">{wl.length}</small></h2>
             {wl.length === 0 ? <p className="muted-p">{t("watchEmpty")}</p> : (
@@ -162,7 +160,7 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
           </div>
       </section>
 
-      {/* 3. PORTE DEGLI UNIVERSI (la prima, l'MCU, è più grande) */}
+      {/* 3. Porte degli universi (la prima, l'MCU, è più grande) */}
       <section className="doors">
         {UNIVERSES.filter((u) => u.k !== "all").map((u) => {
           const items = DATA.filter((d) => d.uni === u.k);
@@ -177,10 +175,8 @@ export function Home({ openUni, openWatch }: { openUni: (uni: string) => void; o
   );
 }
 
-/* ---------------------------------------------------------------------------
-   RIGA PICCOLA (Appena usciti, Da vedere): miniatura, titolo, anno e tipo.
-   tag = etichetta a destra (es. «Nuovo»)
-   --------------------------------------------------------------------------- */
+// Riga piccola (Appena usciti, Da vedere): miniatura, titolo, anno e tipo.
+// tag = etichetta a destra (es. «Nuovo»)
 function MiniRow({ d, tag }: { d: Title; tag?: string }) {
   const { t, lang } = useT();
   return (
@@ -192,9 +188,7 @@ function MiniRow({ d, tag }: { d: Title; tag?: string }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   PORTA di un universo: colore, simbolo in filigrana, nome, visti e barra.
-   --------------------------------------------------------------------------- */
+// Porta di un universo: colore, simbolo in filigrana, nome, visti e barra.
 function Door({ k, title, sub, seen, total, onClick }: { k: string; title: string; sub: string; seen: number; total: number; onClick: () => void }) {
   const pct = total ? (seen / total) * 100 : 0;
   return (
@@ -213,10 +207,8 @@ function Door({ k, title, sub, seen, total, onClick }: { k: string; title: strin
   );
 }
 
-/* ---------------------------------------------------------------------------
-   Riquadro di "Continua a guardare": miniatura, titolo, episodi visti.
-   tag = etichetta in alto (per il "prossimo titolo")
-   --------------------------------------------------------------------------- */
+// Riquadro di "Continua a guardare": miniatura, titolo, episodi visti.
+// tag = etichetta in alto (per il "prossimo titolo")
 function ContinueCard({ d, tag }: { d: Title; tag?: string }) {
   const { t, lang } = useT();
   const { data } = useStore();
@@ -237,11 +229,9 @@ function ContinueCard({ d, tag }: { d: Title; tag?: string }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   FILA CHE SCORRE DI LATO con una barra sotto che mostra dove sei.
-   La barra è disegnata da noi: quella del browser sul telefono (soprattutto
-   iPhone) sparisce da sola. Se tutto ci sta, la barra non si vede.
-   --------------------------------------------------------------------------- */
+// Fila che scorre di lato con una barra sotto che mostra dove sei.
+// La barra è disegnata da noi: quella del browser sul telefono (soprattutto
+// iPhone) sparisce da sola. Se tutto ci sta, la barra non si vede.
 function ScrollRow({ children }: { children: React.ReactNode }) {
   const row = useRef<HTMLDivElement>(null);
   // size = larghezza del cursore (0–1), pos = posizione (0–1)

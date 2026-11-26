@@ -1,10 +1,8 @@
-/* ============================================================================
-   LOCANDINE — generato da scripts/tmdb-posters.mjs il 2026-11-26. NON modificare a mano.
-   Per ogni titolo il percorso dell'immagine su TMDB in italiano e in inglese.
-   L'indirizzo completo si compone in components/Thumb.tsx (image.tmdb.org).
-   Fonte: The Movie Database (TMDB). Le locandine appartengono ai rispettivi
-   proprietari. Rilanciare lo script almeno ogni 6 mesi (condizioni TMDB).
-   ============================================================================ */
+// Locandine - generato da scripts/tmdb-posters.mjs il 2026-11-26. Non modificare a mano.
+// Per ogni titolo il percorso dell'immagine su TMDB in italiano e in inglese.
+// L'indirizzo completo si compone in components/Thumb.tsx (image.tmdb.org).
+// Fonte: The Movie Database (TMDB). Le locandine appartengono ai rispettivi
+// proprietari. Rilanciare lo script almeno ogni 6 mesi (condizioni TMDB).
 export const POSTERS: Record<string, { it?: string; en?: string }> = {
  "msh66": {
   "it": "/nkY0h3WxWWKIxrcpUJdziMV3IN3.jpg",

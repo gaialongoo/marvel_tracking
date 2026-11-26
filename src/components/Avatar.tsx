@@ -1,8 +1,6 @@
-/* ============================================================================
-   AVATAR — riquadro con il personaggio del profilo (disegni in data/avatars.ts,
-   stile "si affacciano dal bordo" con il tratto disegnato a mano).
-   Senza avatar scelto si vede l'iniziale del nome su sfondo grafite.
-   ============================================================================ */
+// Avatar - riquadro con il personaggio del profilo (disegni in data/avatars.ts,
+// stile "si affacciano dal bordo" con il tratto disegnato a mano).
+// Senza avatar scelto si vede l'iniziale del nome su sfondo grafite.
 import { AVATAR_BY_KEY } from "../data/avatars";
 
 /** size = lato in pixel */

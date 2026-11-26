@@ -1,11 +1,9 @@
-/* ============================================================================
-   TESTI — BLOCCO FILM FUORI MCU: Sony (Spider-Man e collegati) e altri studi
-   Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
-   ============================================================================ */
+// Testi - blocco FILM fuori MCU: Sony (Spider-Man e collegati) e altri studi
+// Scritti da Claude. syn = senza spoiler · full = con spoiler · pc = scene dopo i titoli
 import type { TitleTexts } from "./types";
 
 export const FILMS: Record<string, TitleTexts> = {
-  /* ===== SONY ===== */
+  // Sony
   sm1: {
     syn: {
       it: "Il timido studente Peter Parker viene morso da un ragno geneticamente modificato e ottiene poteri straordinari, mentre a New York compare un nemico folle: Goblin.",
@@ -183,7 +181,7 @@ export const FILMS: Record<string, TitleTexts> = {
     },
   },
 
-  /* ===== ALTRI STUDI ===== */
+  // Altri studi
   howard: {
     syn: {
       it: "Howard, un papero parlante di un pianeta di anatre, viene catapultato a Cleveland, dove aiuta una cantante rock e si trova a salvare la Terra.",

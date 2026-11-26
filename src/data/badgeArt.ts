@@ -1,9 +1,7 @@
-/* ============================================================================
-   DISEGNI DEI BADGE — piccole icone kawaii (viewBox 100x100) nello stesso
-   stile degli avatar: contorno nero spesso, colori piatti, faccine.
-   Sono stringhe SVG costanti scritte da noi: si inseriscono con
-   dangerouslySetInnerHTML senza rischi (nessun testo dell'utente).
-   ============================================================================ */
+// Disegni dei badge - piccole icone kawaii (viewBox 100x100) nello stesso
+// stile degli avatar: contorno nero spesso, colori piatti, faccine.
+// Sono stringhe SVG costanti scritte da noi: si inseriscono con
+// dangerouslySetInnerHTML senza rischi (nessun testo dell'utente).
 
 const INK = "#1a1a1a";
 /** Contorno standard */

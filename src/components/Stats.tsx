@@ -1,8 +1,6 @@
-/* ============================================================================
-   STATISTICHE — tutto calcolato dai dati salvati
-   <Kpis items/>  = 4 riquadri (nel Profilo, su tutto il catalogo)
-   <StatsDetail/> = barre per universo, Fase, tipo e distribuzione dei voti
-   ============================================================================ */
+// Statistiche - tutto calcolato dai dati salvati
+// <Kpis items/>  = 4 riquadri (nel Profilo, su tutto il catalogo)
+// <StatsDetail/> = barre per universo, Fase, tipo e distribuzione dei voti
 import { DATA } from "../data/titles";
 import { UNIVERSES } from "../data/meta";
 import { useT } from "../i18n";

@@ -1,9 +1,7 @@
-/* ============================================================================
-   MINIATURA — locandina del titolo (da TMDB) oppure, se manca o non si
-   carica, la copertina generata (colore del titolo + sigla).
-   Le locandine sono in data/posters.ts (generato da scripts/tmdb-posters.mjs)
-   e si caricano dal server di TMDB, nella lingua dell'interfaccia.
-   ============================================================================ */
+// Miniatura - locandina del titolo (da TMDB) oppure, se manca o non si
+// carica, la copertina generata (colore del titolo + sigla).
+// Le locandine sono in data/posters.ts (generato da scripts/tmdb-posters.mjs)
+// e si caricano dal server di TMDB, nella lingua dell'interfaccia.
 import { useState } from "react";
 import { useT } from "../i18n";
 import { posterPath, posterUrl } from "../poster";

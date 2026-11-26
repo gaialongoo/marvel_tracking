@@ -1,6 +1,4 @@
-/* ============================================================================
-   HOOK CONDIVISI tra più componenti
-   ============================================================================ */
+// Hook condivisi tra più componenti
 import { useAuth } from "./auth";
 import { useT } from "./i18n";
 import { useStore } from "./store";
@@ -18,8 +16,10 @@ export function useMetaLine() {
   };
 }
 
-/** Nome da mostrare: quello scelto nel profilo, altrimenti la parte
-    dell'email prima di "@" (es. "mario.rossi@…" → "mario.rossi") */
+/**
+ * Nome da mostrare: quello scelto nel profilo, altrimenti la parte
+ * dell'email prima di "@" (es. "mario.rossi@…" -> "mario.rossi")
+ */
 export function useDisplayName() {
   const { data } = useStore();
   const { user } = useAuth();

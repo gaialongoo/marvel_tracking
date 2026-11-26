@@ -1,19 +1,17 @@
-/* ============================================================================
-   PROFILO — la scheda personale:
-   1. Intestazione: avatar, nome, frase, personaggio e titolo preferiti
-      (pulsante "Modifica profilo" per cambiarli)
-   Subito sotto: Amici (ricerca per @tag, richieste, lista; vedi Friends.tsx)
-   2. Modifica (finestra a comparsa aperta col pulsante): scelta dell'avatar
-      a griglia, nome, frase, personaggio preferito, titolo preferito
-   3. Preferenze di visione: universo, ordine e tipi con cui si apre il Catalogo
-      (servono anche al "prossimo titolo" della Home)
-   4. Badge: traguardi a livelli (components/Badges.tsx)
-   5. Statistiche (riquadri + dettagli)
-   6. Backup dei dati
-   Il tag utente (@nome) si sceglie nella finestra di modifica; è unico tra
-   tutti gli utenti e sta in una tabella a parte (vedi handle.ts).
-   Ogni modifica si salva subito nell'account, come visti e voti.
-   ============================================================================ */
+// Profilo - la scheda personale:
+// 1. Intestazione: avatar, nome, frase, personaggio e titolo preferiti
+//    (pulsante "Modifica profilo" per cambiarli)
+// Subito sotto: Amici (ricerca per @tag, richieste, lista; vedi Friends.tsx)
+// 2. Modifica (finestra a comparsa aperta col pulsante): scelta dell'avatar
+//    a griglia, nome, frase, personaggio preferito, titolo preferito
+// 3. Preferenze di visione: universo, ordine e tipi con cui si apre il Catalogo
+//    (servono anche al "prossimo titolo" della Home)
+// 4. Badge: traguardi a livelli (components/Badges.tsx)
+// 5. Statistiche (riquadri + dettagli)
+// 6. Backup dei dati
+// Il tag utente (@nome) si sceglie nella finestra di modifica; è unico tra
+// tutti gli utenti e sta in una tabella a parte (vedi handle.ts).
+// Ogni modifica si salva subito nell'account, come visti e voti.
 import { useEffect, useState } from "react";
 import { checkHandle, HANDLE_RE, normHandle, saveHandle, useHandle } from "../handle";
 import { deleteAccount, useAuth } from "../auth";
@@ -58,7 +56,7 @@ export function Profile({ openPath }: { openPath: (path: string) => void }) {
 
   return (
     <div className="page page-enter">
-      {/* 1. INTESTAZIONE */}
+      {/* 1. Intestazione */}
       <section className="panel prof-head">
         <Avatar k={p.avatar} size={112} fallback={name} className="prof-av" />
         <div className="prof-main">
@@ -109,39 +107,37 @@ export function Profile({ openPath }: { openPath: (path: string) => void }) {
         </div>
       </section>
 
-      {/* 2. MODIFICA: finestra a comparsa sopra la pagina */}
+      {/* 2. Modifica: finestra a comparsa sopra la pagina */}
       {editing && <EditProfile onClose={() => setEditing(false)} />}
 
-      {/* AMICI: ricerca per @tag, richieste e lista (components/Friends.tsx) */}
+      {/* Amici: ricerca per @tag, richieste e lista (components/Friends.tsx) */}
       <FriendsSection onPickHandle={() => setEditing(true)} />
 
-      {/* 3. PREFERENZE DI VISIONE */}
+      {/* 3. Preferenze di visione */}
       <Prefs />
 
-      {/* 4. BADGE */}
+      {/* 4. Badge */}
       <Badges />
 
-      {/* 5. STATISTICHE */}
+      {/* 5. Statistiche */}
       <section className="block">
         <span className="eyebrow">{t("stats")}</span>
         <Kpis items={DATA} />
         <StatsDetail />
       </section>
 
-      {/* 6. BACKUP */}
+      {/* 6. Backup */}
       <Backup />
 
-      {/* 7. ACCOUNT: eliminazione definitiva */}
+      {/* 7. Account: eliminazione definitiva */}
       <DeleteAccount />
     </div>
   );
 }
 
-/* ---------------------------------------------------------------------------
-   MODIFICA PROFILO — finestra a comparsa (pop-up) sopra la pagina.
-   I campi si salvano mentre scrivi; "Fatto", la X, il tasto Esc o un clic
-   fuori dalla finestra la chiudono.
-   --------------------------------------------------------------------------- */
+// Modifica profilo - finestra a comparsa (pop-up) sopra la pagina.
+// I campi si salvano mentre scrivi; "Fatto", la X, il tasto Esc o un clic
+// fuori dalla finestra la chiudono.
 function EditProfile({ onClose }: { onClose: () => void }) {
   const { t, lang } = useT();
   const { data } = useStore();
@@ -194,7 +190,7 @@ function EditProfile({ onClose }: { onClose: () => void }) {
 
       <div className="form-grid">
         {/* Nome e frase: si salvano mentre scrivi, ma non se contengono
-            parole offensive (resta la bozza con l'avviso in rosso) */}
+   parole offensive (resta la bozza con l'avviso in rosso) */}
         <label>
           <span className="eyebrow">{t("displayName")}</span>
           <input className={`field${badName ? " bad" : ""}`} value={nameDraft} maxLength={MAX_NAME} placeholder={t("namePh")}
@@ -230,11 +226,9 @@ function EditProfile({ onClose }: { onClose: () => void }) {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   TAG UTENTE — campo "@nome" nella finestra di modifica.
-   Mentre scrivi controllo (dopo una breve pausa) se il tag è libero;
-   si salva col pulsante, perché va confermato dal database (è unico).
-   --------------------------------------------------------------------------- */
+// Tag utente - campo "@nome" nella finestra di modifica.
+// Mentre scrivi controllo (dopo una breve pausa) se il tag è libero;
+// si salva col pulsante, perché va confermato dal database (è unico).
 type HandleSt = "idle" | "checking" | "free" | "mine" | "taken" | "invalid" | "bad" | "missing" | "error" | "saved";
 
 function HandleField() {
@@ -297,9 +291,7 @@ function HandleField() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   PREFERENZE DI VISIONE — come si apre il Catalogo
-   --------------------------------------------------------------------------- */
+// Preferenze di visione - come si apre il Catalogo
 function Prefs() {
   const { t, lang } = useT();
   const { data } = useStore();
@@ -351,10 +343,8 @@ function Prefs() {
   );
 }
 
-/* ---------------------------------------------------------------------------
-   ELIMINA ACCOUNT — cancella per sempre account e dati (supabase/schema.sql,
-   funzione delete_my_account). Per sicurezza bisogna scrivere ELIMINA.
-   --------------------------------------------------------------------------- */
+// Elimina account - cancella per sempre account e dati (supabase/schema.sql,
+// funzione delete_my_account). Per sicurezza bisogna scrivere ELIMINA.
 function DeleteAccount() {
   const { t } = useT();
   const { user } = useAuth();

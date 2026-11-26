@@ -1,11 +1,9 @@
-/* ============================================================================
-   TEMA CHIARO / SCURO
-   La scelta vale per questo dispositivo (come la lingua) e resta salvata nel
-   browser. "auto" segue l'impostazione del sistema (telefono o PC).
-   Il tema si applica mettendo data-theme="light" | "dark" su <html>: i
-   colori sono variabili CSS (vedi :root e :root[data-theme="light"] in
-   styles.css).
-   ============================================================================ */
+// Tema chiaro / scuro
+// La scelta vale per questo dispositivo (come la lingua) e resta salvata nel
+// browser. "auto" segue l'impostazione del sistema (telefono o PC).
+// Il tema si applica mettendo data-theme="light" | "dark" su <html>: i
+// colori sono variabili CSS (vedi :root e :root[data-theme="light"] in
+// styles.css).
 import { useSyncExternalStore } from "react";
 
 export type Theme = "auto" | "light" | "dark";

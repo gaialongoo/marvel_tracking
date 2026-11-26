@@ -1,13 +1,11 @@
-/* ============================================================================
-   SCELTA DEL TITOLO PREFERITO (finestra "Modifica profilo")
-   Al posto del vecchio menu a discesa lunghissimo:
-   - un pulsante che mostra la scelta attuale (locandina + titolo);
-   - cliccandolo si apre, sotto, un pannello con:
-       · un campo di RICERCA (titolo italiano o originale, accenti ignorati);
-       · senza ricerca, gli universi come TENDINE apribili (MCU, X-Men…),
-         con il numero di titoli; è già aperta quella del titolo scelto.
-   Scegliere un titolo chiude il pannello.
-   ============================================================================ */
+// Scelta del titolo preferito (finestra "Modifica profilo")
+// Al posto del vecchio menu a discesa lunghissimo:
+// - un pulsante che mostra la scelta attuale (locandina + titolo);
+// - cliccandolo si apre, sotto, un pannello con:
+//     · un campo di ricerca (titolo italiano o originale, accenti ignorati);
+//     · senza ricerca, gli universi come tendine apribili (MCU, X-Men…),
+//       con il numero di titoli; è già aperta quella del titolo scelto.
+// Scegliere un titolo chiude il pannello.
 import { useMemo, useState } from "react";
 import { UNIVERSES } from "../data/meta";
 import { BY_ID, DATA } from "../data/titles";
