@@ -16,7 +16,7 @@
    ============================================================================ */
 import { useSyncExternalStore } from "react";
 import type { User } from "@supabase/supabase-js";
-import { onUserChange } from "./auth";
+import { onUserChange, signOut } from "./auth";
 import { BY_ID, DATA } from "./data/titles";
 import { supabase } from "./supabase";
 import type { Lang, Profile, SavedData } from "./types";
@@ -380,6 +380,15 @@ export const getData = () => state.data;
 /** Prima di uscire dall'account: cancella la copia locale (su un PC
     condiviso non resta niente). Se c'erano modifiche non salvate e non
     partono, la copia resta e verranno inviate al prossimo accesso. */
+/** Esci dall'account: prima salva; se il salvataggio non parte (niente
+    connessione) chiede conferma con il messaggio dato. Usato dal menu
+    dell'avatar e dal Profilo. */
+export async function logout(confirmMsg: string) {
+  const ok = await clearLocalCopy();
+  if (!ok && !confirm(confirmMsg)) return;
+  await signOut();
+}
+
 export async function clearLocalCopy(): Promise<boolean> {
   const ok = await flush();
   if (ok && user) writeLS(cacheKey(), null);

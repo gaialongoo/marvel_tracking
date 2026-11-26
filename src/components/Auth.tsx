@@ -9,12 +9,12 @@
      stato salvataggio, Esci)
    ============================================================================ */
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { clearLinkErr, signIn, signOut, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
+import { clearLinkErr, signIn, signUp, sendReset, updatePassword, useAuth, type AuthErr } from "../auth";
 import { useHandle } from "../handle";
 import { useDisplayName } from "../hooks";
 import { useT } from "../i18n";
 import { go } from "../router";
-import { clearLocalCopy, resolveBrowserData, setLang, useStore } from "../store";
+import { logout, resolveBrowserData, setLang, useStore } from "../store";
 import { isConfigured } from "../supabase";
 import { MIN_AGE } from "../config";
 import { rememberInvite } from "../share";
@@ -336,13 +336,6 @@ export function AccountMenu() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  /** Esce dopo aver salvato; se il salvataggio non parte chiede conferma */
-  const logout = async () => {
-    const ok = await clearLocalCopy();
-    if (!ok && !confirm(t("logoutUnsaved"))) return;
-    await signOut();
-  };
-
   const syncLabel = t(sync === "error" ? "syncError" : sync === "saving" || sync === "loading" ? "syncSaving" : "syncSaved");
 
   return (
@@ -362,7 +355,7 @@ export function AccountMenu() {
           </div>
           <small className={`sync-txt sync-${sync}`}>{syncLabel}</small>
           <button className="btn" onClick={() => { setOpen(false); go({ page: "profile" }); }}>{t("profile")}</button>
-          <button className="btn" onClick={logout}>{t("signOut")}</button>
+          <button className="btn" onClick={() => logout(t("logoutUnsaved"))}>{t("signOut")}</button>
         </div>
       )}
     </div>

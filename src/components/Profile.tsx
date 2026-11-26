@@ -27,7 +27,7 @@ import { useDisplayName } from "../hooks";
 import { ALL_TYPES, ORDERS, prefsToHome } from "../homeState";
 import { useT } from "../i18n";
 import { go } from "../router";
-import { forgetLocal, setProfile, useStore } from "../store";
+import { forgetLocal, logout, setProfile, useStore } from "../store";
 import type { Order } from "../types";
 import { AVATARS, AVATAR_BY_KEY } from "../data/avatars";
 import { Avatar } from "./Avatar";
@@ -380,6 +380,11 @@ function DeleteAccount() {
   return (
     <section className="block panel danger-zone">
       <span className="eyebrow">{t("account")}</span>
+      {/* Esci: lo stesso del menu dell'avatar, qui più facile da trovare */}
+      <div className="logout-row">
+        <span className="muted-p">{t("signedInAs")} <b>{user?.email}</b></span>
+        <button className="btn" onClick={() => logout(t("logoutUnsaved"))}>{t("signOut")}</button>
+      </div>
       <p className="muted-p">{t("deleteInfo")}</p>
       {!open ? <button className="btn danger" onClick={() => setOpen(true)}>{t("deleteAccount")}</button> : (
         <div className="del-confirm">
