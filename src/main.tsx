@@ -18,6 +18,10 @@ import { applyTheme } from "./theme";
 
 // Tema chiaro/scuro subito, prima di disegnare (niente lampo di colore sbagliato)
 applyTheme();
+
+// iPhone ignora user-scalable=no del viewport: blocco a mano il pizzico per zoomare
+// (gesturestart esiste solo su Safari)
+document.addEventListener("gesturestart", (e) => e.preventDefault());
 import App from "./App.tsx";
 
 // Se si arriva da un link di invito (#/u/<tag>) lo ricordo subito, prima
