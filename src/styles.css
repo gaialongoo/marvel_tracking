@@ -594,7 +594,7 @@ main{display:block}
 .door-mcu .door-sym{right:4%;height:140%}
 /* la scritta MARVEL è larga: più dentro, così si legge intera */
 .door-other .door-sym{right:3%;height:110%}
-/* il ragno è alto: più piccolo, così zampe e addome restano dentro il banner */
+/* la maschera è alta: più piccola, così resta intera dentro il banner */
 .door-sony .door-sym{right:2%;height:100%;transform:translateY(-50%) rotate(-12deg)}
 .door-sony:hover .door-sym{transform:translateY(-50%) rotate(-8deg) scale(1.05)}
 /* Velo scuro in basso a sinistra, dove sta il testo */
@@ -934,3 +934,35 @@ main{display:block}
 /* Crediti TMDB nella Privacy: logo ufficiale (più piccolo del nostro marchio) + frase */
 .tmdb-credit{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .tmdb-credit img{height:16px;width:auto;display:block}
+
+/* ==========================================================================
+   PAGINA DI ACCESSO: muro di locandine che scorre dietro al riquadro
+   ========================================================================== */
+.auth{position:relative;isolation:isolate;overflow:hidden}
+.wall{position:fixed;inset:-25% -10%;z-index:-2;display:flex;flex-direction:column;justify-content:center;gap:16px;transform:rotate(-8deg);pointer-events:none}
+.wall-row{display:flex;gap:16px;width:max-content;animation:wall-left 140s linear infinite}
+.wall-row:nth-child(even){animation-name:wall-right;animation-duration:170s}
+.wall img{width:150px;aspect-ratio:2/3;object-fit:cover;border-radius:8px;background:#1a1c22;flex:none}
+@keyframes wall-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes wall-right{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+@media (prefers-reduced-motion:reduce){.wall-row{animation:none}}
+/* velo del colore del tema: più leggero ai lati, più pieno al centro dietro il riquadro */
+.auth::before{content:"";position:fixed;inset:0;z-index:-1;
+  background:radial-gradient(ellipse 55% 70% at 50% 50%,color-mix(in srgb,var(--bg) 88%,transparent),color-mix(in srgb,var(--bg) 62%,transparent) 100%)}
+.auth .auth-box{width:min(440px,100%);padding:30px 32px;border-radius:16px;
+  background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:0 30px 80px var(--shadow),0 0 0 1px color-mix(in srgb,var(--gold) 18%,transparent)}
+.auth .auth-head{margin-bottom:18px}
+.auth .brand b{font-size:14px}
+.auth-tag{margin:0 0 24px;font-size:14px;line-height:1.55;color:var(--text2)}
+.auth .auth-box h2{font-size:22px}
+.auth .site-foot{position:relative}
+@media (max-width:520px){
+  .wall img{width:96px}.wall,.wall-row{gap:10px}
+  .auth .auth-box{padding:22px 18px}
+}
+/* nota in fondo leggibile anche sopra le locandine */
+.auth .site-foot{margin-top:18px;padding:12px 18px;border-radius:12px;
+  background:color-mix(in srgb,var(--surface) 80%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+/* tema chiaro: velo un po' più pieno, le locandine colorate disturbano di più */
+:root[data-theme="light"] .auth::before{background:radial-gradient(ellipse 55% 70% at 50% 50%,color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 72%,transparent) 100%)}

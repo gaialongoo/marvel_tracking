@@ -94,6 +94,7 @@ const it = {
   frRatings: "I suoi voti", frNoRatings: "Non ha ancora votato nessun titolo.",
   // --- account (components/Auth.tsx) ---
   account: "Account", signIn: "Accedi", signUp: "Crea un account", signOut: "Esci", createAccount: "Registrati",
+  authTag: "Tutto l'universo Marvel, un titolo alla volta: film, serie e animazione in ordine di uscita o cronologico, con voti, badge e amici.",
   authSub: "I tuoi visti, voti ed episodi sono salvati nel tuo account: li ritrovi su ogni dispositivo.",
   email: "Email", password: "Password", password2: "Ripeti la password",
   forgot: "Password dimenticata?", noAccount: "Non hai un account? Registrati", haveAccount: "Hai già un account? Accedi",
@@ -210,6 +211,7 @@ const en: Record<keyof typeof it, string> = {
   frRatings: "Their ratings", frNoRatings: "No titles rated yet.",
   // --- account (components/Auth.tsx) ---
   account: "Account", signIn: "Sign in", signUp: "Create an account", signOut: "Sign out", createAccount: "Sign up",
+  authTag: "The whole Marvel universe, one title at a time: films, series and animation in release or chronological order, with ratings, badges and friends.",
   authSub: "Your seen titles, ratings and episodes are saved to your account: you'll find them on every device.",
   email: "Email", password: "Password", password2: "Repeat password",
   forgot: "Forgot your password?", noAccount: "No account yet? Sign up", haveAccount: "Already have an account? Sign in",

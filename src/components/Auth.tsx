@@ -22,6 +22,7 @@ import { ArcReactor } from "./ArcReactor";
 import { SiteFooter } from "./Legal";
 import { Avatar } from "./Avatar";
 import { ThemeButton } from "./ThemeButton";
+import { posterPath, posterUrl } from "../poster";
 
 /** Password lunga almeno 8 caratteri (stessa regola da impostare su Supabase) */
 const MIN_PW = 8;
@@ -42,15 +43,45 @@ export function AuthGate({ children }: { children: ReactNode }) {
   return <>{children}<BrowserDataDialog /></>;
 }
 
-/** Cornice delle pagine di accesso: logo, lingua e riquadro centrale */
-function Shell({ children }: { children: ReactNode }) {
+/* ---------------------------------------------------------------------------
+   MURO DI LOCANDINE — sfondo della pagina di accesso: 4 file di locandine
+   inclinate che scorrono piano (a file alterne in direzioni opposte), coperte
+   da un velo del colore del tema. Ogni fila è ripetuta due volte, così lo
+   scorrimento ricomincia senza salti. Fermo se il sistema chiede meno animazioni.
+   --------------------------------------------------------------------------- */
+const WALL_ROWS = [
+  ["im", "avg", "gotg", "tws", "bp", "iw", "eg", "nwh", "dpw"],
+  ["wv", "loki1", "ragnarok", "ds", "cm", "shangchi", "ff", "thunderbolts", "msmarvel"],
+  ["logan", "spiderverse", "xmen97", "deadpool", "dofp", "venom", "atsv", "hawkeye", "moonknight"],
+  ["cw", "aou", "gotg3", "agatha", "dd1", "jj1", "bnw", "echo", "wf"],
+];
+
+function PosterWall() {
   const { lang } = useT();
   return (
+    <div className="wall" aria-hidden="true">
+      {WALL_ROWS.map((row, i) => {
+        const imgs = row.map((id) => posterPath(id, lang)).filter((p): p is string => !!p);
+        return (
+          <div className="wall-row" key={i}>
+            {[...imgs, ...imgs].map((p, j) => <img key={j} src={posterUrl(p, "w185")} alt="" decoding="async" />)}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Cornice delle pagine di accesso: muro di locandine, logo, lingua e riquadro centrale */
+function Shell({ children }: { children: ReactNode }) {
+  const { t, lang } = useT();
+  return (
     <div className="auth">
+      <PosterWall />
       <div className="auth-box panel">
         <div className="auth-head">
           <div className="brand">
-            <ArcReactor size={32} />
+            <ArcReactor size={36} />
             <b>MARVEL TRACKER</b>
           </div>
           <div className="seg">
@@ -60,6 +91,8 @@ function Shell({ children }: { children: ReactNode }) {
             <ThemeButton />
           </div>
         </div>
+        {/* Frase di benvenuto: cosa fa l'app, in una riga */}
+        <p className="auth-tag">{t("authTag")}</p>
         {children}
       </div>
       <SiteFooter />
