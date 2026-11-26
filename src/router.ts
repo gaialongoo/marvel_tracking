@@ -6,22 +6,23 @@
      #/prep      → Preparazione
      #/profile   → Profilo (dati, avatar, statistiche, backup)
      #/t/<id>    → Scheda del titolo
-     #/u/<tag>   → Pagina di un amico (dal suo @tag)
+     #/u/<tag>   → Pagina di un amico (dal suo @tag; è anche il link di invito)
+     #/privacy   → Privacy e condizioni d'uso (si apre anche senza accesso)
    Così i pulsanti Avanti/Indietro del browser funzionano.
    ============================================================================ */
 import { useSyncExternalStore } from "react";
 
 export type Route =
-  | { page: "home" } | { page: "catalog" } | { page: "prep" } | { page: "profile" }
+  | { page: "home" } | { page: "catalog" } | { page: "prep" } | { page: "profile" } | { page: "privacy" }
   | { page: "title"; id: string } | { page: "friend"; tag: string };
 
 /** Pagine senza parametri e il loro indirizzo */
-const SIMPLE = { catalog: "/catalog", prep: "/prep", profile: "/profile" } as const;
+const SIMPLE = { catalog: "/catalog", prep: "/prep", profile: "/profile", privacy: "/privacy" } as const;
 
 /** Trasforma l'indirizzo in una pagina */
 function parse(hash: string): Route {
   const h = hash.replace(/^#\/?/, "");
-  if (h === "catalog" || h === "prep" || h === "profile") return { page: h };
+  if (h === "catalog" || h === "prep" || h === "profile" || h === "privacy") return { page: h };
   if (h.startsWith("t/")) return { page: "title", id: decodeURIComponent(h.slice(2)) };
   if (h.startsWith("u/")) return { page: "friend", tag: decodeURIComponent(h.slice(2)) };
   return { page: "home" };

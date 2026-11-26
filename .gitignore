@@ -25,3 +25,4 @@ dist-ssr
 
 # Originali delle immagini generate (pesanti): nell'app vanno le versioni ottimizzate in public/
 immagini/
+scripts/tmdb-report.txt

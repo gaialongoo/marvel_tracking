@@ -25,6 +25,28 @@
   --space:#3e7bfa; --mind:#f2c230; --reality:#d8323f;
   --power:#9b51e0; --time:#2fbf71; --soul:#f07c22;
   --mono:"IBM Plex Mono",ui-monospace,monospace;
+  /* colori che cambiano con il tema (prima erano scritti a mano) */
+  --topbar:rgba(11,12,15,.92);  /* barra in alto, semitrasparente */
+  --red-text:#f2a7ae;           /* testo rosso su fondo rosso tenue */
+  --map-line:#4a505a;           /* linee della mappa dei collegamenti */
+  --text2:#cfd3da;              /* testo lungo (Privacy) */
+  --new:#6fd3ff;                /* etichetta «Nuovo» */
+  --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;            /* barre di scorrimento e campi del browser scuri */
+}
+
+/* TEMA CHIARO (theme.ts mette data-theme="light" su <html>): carta chiara,
+   oro più scuro per restare leggibile. Miniature e porte degli universi
+   restano scure: sono "locandine" colorate. */
+:root[data-theme="light"]{
+  --bg:#f4f5f7; --surface:#ffffff; --surface2:#eceef2; --line:#d9dde3;
+  --text:#16181d; --muted:#5d6470;
+  --gold:#94701f; --gold-soft:rgba(148,112,31,.12);
+  --red:#b3261e; --red-soft:rgba(179,38,30,.10);
+  --ok:#2e8a54; --off:#c5cad2;
+  --topbar:rgba(255,255,255,.9); --red-text:#a3241c; --map-line:#a7aeb8;
+  --text2:#2d3139; --new:#0a7ba8; --shadow:rgba(20,24,32,.14);
+  color-scheme:light;
 }
 
 /* ==========================================================================
@@ -50,7 +72,7 @@ h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
    titolo o dalla ricerca, e hanno un pulsante "Home" per tornare.
    ========================================================================== */
 .top{position:sticky;top:0;z-index:20;height:60px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;
-  padding:0 24px;background:rgba(11,12,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  padding:0 24px;background:var(--topbar);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;cursor:pointer;justify-self:start}
 /* Logo: anello oro sottile con nucleo (richiamo discreto al reattore) */
 /* Logo: reattore arc con un alone azzurro; il nucleo pulsa piano */
@@ -77,7 +99,7 @@ h1,h2,h3{margin:0;font-weight:600;letter-spacing:-.01em}
 .search input:focus{border-color:var(--gold)}
 .search > svg{position:absolute;left:9px;top:50%;width:14px;height:14px;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 .results{position:absolute;top:calc(100% + 6px);right:0;width:340px;max-width:calc(100vw - 32px);max-height:380px;overflow:auto;
-  background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:4px;display:none}
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 16px 40px var(--shadow);padding:4px;display:none}
 .results.on{display:block}
 .results button{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:center;width:100%;text-align:left;padding:6px 8px;border-radius:6px}
 .results button:hover,.results button.hi{background:var(--surface2)}
@@ -146,8 +168,10 @@ select.input{background:var(--surface);border:1px solid var(--line);border-radiu
   display:flex;align-items:flex-end;padding:4px}
 .thumb::before{content:"";position:absolute;inset:0;background:linear-gradient(transparent 60%,rgba(0,0,0,.5)),
   repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 1px,transparent 1px 6px)}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover} /* locandina TMDB */
+.thumb.has-poster::before{background:none}
 .thumb span{position:relative;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.04em;color:#fff}
-.thumb .type{position:absolute;top:3px;right:3px;font-size:8px;padding:0 3px;border-radius:2px;background:rgba(0,0,0,.55);color:var(--gold)}
+.thumb .type{position:absolute;top:3px;right:3px;font-size:8px;padding:0 3px;border-radius:2px;background:rgba(0,0,0,.55);color:#c9a24b}
 .thumb.lg{width:96px;height:132px;padding:8px}
 .thumb.lg span{font-size:15px}
 .thumb.lg .type{font-size:10px;top:6px;right:6px;padding:1px 5px}
@@ -231,7 +255,7 @@ a.btn{color:var(--text);text-decoration:none}
 .spoiler.locked p{filter:blur(6px);user-select:none}
 .spoiler .unlock{display:none}
 .spoiler.locked .unlock{display:inline-flex;position:absolute;inset:0;margin:auto;width:max-content;height:max-content;
-  align-items:center;gap:8px;background:var(--red-soft);border:1px solid var(--red);color:#f2a7ae;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:500}
+  align-items:center;gap:8px;background:var(--red-soft);border:1px solid var(--red);color:var(--red-text);border-radius:7px;padding:7px 12px;font-size:12px;font-weight:500}
 
 /* Episodi: griglia di caselle con spunta */
 .eps{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px}
@@ -267,7 +291,7 @@ a.btn{color:var(--text);text-decoration:none}
    Su schermi stretti le colonne diventano righe e le linee verticali. */
 .map2{position:relative;display:grid;grid-template-columns:1fr 1fr 1fr;gap:34px;align-items:center}
 .map-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
-.map-lines path{fill:none;stroke:#4a505a;stroke-width:1.3}
+.map-lines path{fill:none;stroke:var(--map-line);stroke-width:1.3}
 .map-lines path.todo{stroke-dasharray:4 4}         /* verso un titolo non ancora visto */
 .map-lines path.hot{stroke:var(--gold)}            /* evidenziata al passaggio del mouse */
 .mcol{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px}
@@ -289,7 +313,7 @@ a.btn{color:var(--text);text-decoration:none}
 .mempty{font-size:12px;color:var(--muted);text-align:center;padding:10px;border:1px dashed var(--line);border-radius:8px}
 .map-legend{display:flex;gap:16px;justify-content:flex-end;margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--muted)}
 .map-legend span{display:inline-flex;align-items:center;gap:6px}
-.map-legend i{display:inline-block;width:18px;border-top:1.3px solid #4a505a}
+.map-legend i{display:inline-block;width:18px;border-top:1.3px solid var(--map-line)}
 .map-legend i.todo{border-top-style:dashed}
 @media (max-width:560px){
   .map2{grid-template-columns:1fr;gap:30px}
@@ -470,7 +494,7 @@ main{display:block}
 .account-btn.sync-saving,.account-btn.sync-loading{box-shadow:0 0 0 2px var(--gold-soft);border-color:var(--gold)}
 .account-btn.sync-error{border-color:var(--red);box-shadow:0 0 0 2px var(--red-soft)}
 .account-menu{position:absolute;top:calc(100% + 8px);right:0;width:240px;max-width:calc(100vw - 32px);background:var(--surface);border:1px solid var(--line);
-  border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.5);padding:14px;display:grid;gap:6px;z-index:30}
+  border-radius:10px;box-shadow:0 16px 40px var(--shadow);padding:14px;display:grid;gap:6px;z-index:30}
 .account-menu b{font-size:13px;font-weight:500;overflow-wrap:anywhere}
 .account-menu .btn{justify-content:center;margin-top:6px}
 .sync-txt{font-size:11.5px;color:var(--muted)}
@@ -577,12 +601,12 @@ main{display:block}
 .door::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(15deg,rgba(8,9,11,.92) 10%,rgba(8,9,11,.35) 55%,transparent 80%)}
 .door:hover{transform:translateY(-3px);border-color:rgba(201,162,75,.6)}
 .door:hover .door-sym{transform:translateY(-50%) rotate(-4deg) scale(1.05);opacity:.24}
-.door-txt{position:absolute;left:18px;right:18px;bottom:16px}
+.door-txt{position:absolute;left:18px;right:18px;bottom:16px;color:#e6e8ec} /* sempre chiaro: le porte restano scure anche nel tema chiaro */
 .door-txt b{display:block;font-size:22px;font-weight:700;letter-spacing:-.01em;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .door-mcu .door-txt b{font-size:34px}
 .door-txt small{display:block;color:rgba(230,232,236,.75);font-size:12px;margin-top:1px}
 .door-prog{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;margin-top:10px;max-width:320px}
-.door-prog span{font-size:11.5px;color:var(--text)}
+.door-prog span{font-size:11.5px;color:#e6e8ec}
 .door-prog .progress{background:rgba(255,255,255,.15);height:4px}
 
 .home-h2{font-size:17px;margin-bottom:12px}
@@ -677,11 +701,11 @@ main{display:block}
 .badge-lvl{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .lv1 .badge-lvl{color:#d99a5b}.lv2 .badge-lvl{color:#c9cdd4}.lv3 .badge-lvl{color:var(--gold)}
 .stars{display:inline-flex;gap:1px}
-.stars i{font-style:normal;color:#3a3f48}
+.stars i{font-style:normal;color:var(--off)}
 .lv1 .stars i.on{color:#d99a5b}.lv2 .stars i.on{color:#c9cdd4}.lv3 .stars i.on{color:#f5c43c}
 /* Medaglia: fondo colorato del badge + anello del colore del livello */
 .medal{display:grid;place-items:center;flex:none;border-radius:50%;overflow:hidden;background:var(--tint);margin:4px;
-  box-shadow:0 0 0 3px #3a3f48,inset 0 -6px 0 rgba(0,0,0,.08)}
+  box-shadow:0 0 0 3px var(--off),inset 0 -6px 0 rgba(0,0,0,.08)}
 .medal svg{width:86%;height:86%;display:block}
 .medal.lv1{box-shadow:0 0 0 3px #b87333,0 0 0 5px rgba(184,115,51,.25)}
 .medal.lv2{box-shadow:0 0 0 3px #c9cdd4,0 0 0 5px rgba(201,205,212,.25)}
@@ -814,8 +838,8 @@ main{display:block}
    NOVITÀ («Nuovo») E LISTA "DA VEDERE"
    ========================================================================== */
 /* etichetta «Nuovo»: come "aggiunto" ma azzurra */
-.added.new{color:#6fd3ff;border-color:rgba(111,211,255,.5)}
-.new-fact{padding:0 6px;border:1px solid rgba(111,211,255,.5);border-radius:3px;color:#6fd3ff;text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+.added.new{color:var(--new);border-color:color-mix(in srgb,var(--new) 50%,transparent)}
+.new-fact{padding:0 6px;border:1px solid color-mix(in srgb,var(--new) 50%,transparent);border-radius:3px;color:var(--new);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
 /* segnalibro nella riga del Catalogo */
 .row-wl{display:inline-flex;margin-left:8px;color:var(--gold);vertical-align:middle}
 /* pulsante "Da vedere" nella scheda: oro quando il titolo è in lista */
@@ -842,3 +866,71 @@ main{display:block}
   .home-prep{grid-column:3}
   .home-extra{grid-column:auto}
 }
+
+/* ==========================================================================
+   PRIVACY, PIÈ DI PAGINA, CONDIVISIONE, BLOCCA/SEGNALA, ELIMINA ACCOUNT
+   ========================================================================== */
+/* piè di pagina con la nota di non affiliazione */
+.site-foot{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;align-items:center;text-align:center;
+  padding:22px 16px 30px;border-top:1px solid var(--line);color:var(--muted);font-size:11.5px;margin-top:20px}
+.site-foot a{color:var(--gold);text-decoration:underline;text-underline-offset:3px}
+.auth .site-foot{border-top:none;max-width:460px;margin:0 auto}
+/* pagina Privacy */
+.legal{min-height:100vh;background:var(--bg)}
+.legal-top{display:flex;justify-content:space-between;align-items:center;padding:14px clamp(16px,3vw,48px);border-bottom:1px solid var(--line)}
+.legal-top .brand{display:flex;align-items:center;gap:10px}
+.legal-top .brand b{font-size:13px;letter-spacing:.12em}
+.legal-page{max-width:760px}
+.legal-page h1{font-size:28px;margin:18px 0 4px}
+.legal-page h2{font-size:17px;margin:26px 0 8px;color:var(--gold)}
+.legal-page p,.legal-page li{line-height:1.65;font-size:14.5px;color:var(--text2)}
+.legal-page ul{padding-left:20px;margin:0}
+.legal-page li + li{margin-top:6px}
+.legal-page a{color:var(--gold)}
+/* registrazione: età e privacy */
+.auth-agree{display:flex!important;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.5}
+.auth-agree input{margin-top:3px;accent-color:var(--gold);flex:none}
+.auth-agree a{color:var(--gold);text-decoration:underline}
+.auth-invite{margin:-4px 0 14px;padding:10px 12px;border:1px solid var(--gold-soft);border-radius:8px;background:var(--gold-soft);font-size:13px}
+.auth-invite b{color:var(--gold)}
+/* profilo: pulsanti dell'intestazione */
+.prof-btns{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.field.bad{border-color:var(--red)}
+/* amici: invita, blocca/segnala */
+.fr-invite{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:14px}
+.fr-invite .muted-p{margin:0}
+.fr-safety{grid-column:1/-1;display:flex;gap:16px;justify-content:flex-end}
+.link-btn.muted{color:var(--muted)}
+.link-btn.muted:hover{color:var(--red)}
+.report-box{max-width:440px}
+.report-body{display:grid;gap:10px;padding:4px 20px 12px}
+.report-opt{display:flex;gap:10px;align-items:center;font-size:14px}
+.report-opt input{accent-color:var(--gold)}
+.report-body textarea{resize:vertical;font:inherit}
+/* elimina account */
+.danger-zone{border-color:rgba(192,49,63,.35)}
+.btn.danger{border-color:var(--red);color:var(--red-text)}
+.btn.danger:hover:not(:disabled){background:var(--red-soft)}
+.del-confirm{display:grid;gap:10px;max-width:360px;margin-top:6px}
+.del-confirm label{display:grid;gap:6px}
+.del-btns{display:flex;gap:8px}
+@media (max-width:760px){
+  .prof-btns{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .fr-safety{justify-content:flex-start}
+}
+
+/* ==========================================================================
+   TEMA: pulsante sole/luna (dentro il gruppo della lingua) e scelta nel Profilo
+   ========================================================================== */
+.seg .theme-btn{display:grid;place-items:center;padding:5px 8px;color:var(--muted);border-left:1px solid var(--line)}
+.seg .theme-btn:hover{color:var(--gold)}
+.theme-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:10px 0 4px}
+.theme-row .muted-p{margin:0}
+/* tema chiaro: piccoli ritocchi dove il fondo scuro era dato per scontato */
+:root[data-theme="light"] .seen-btn.on svg{stroke:#fff}
+:root[data-theme="light"] .modal-back{background:rgba(20,24,32,.45)}
+:root[data-theme="light"] .auth-invite{border-color:color-mix(in srgb,var(--gold) 35%,transparent)}
+
+/* Crediti TMDB nella Privacy: logo ufficiale (più piccolo del nostro marchio) + frase */
+.tmdb-credit{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tmdb-credit img{height:16px;width:auto;display:block}

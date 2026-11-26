@@ -4,6 +4,8 @@
    - handles: @tag + nome e avatar "pubblici" (per riconoscersi nella ricerca)
    - friendships: una riga per coppia, 'pending' (richiesta) o 'accepted' (amici)
    - progress: i dati di un amico si possono LEGGERE solo se siete amici
+   - blocks: le persone che hai bloccato (non possono mandarti richieste)
+   - reports: segnalazioni (si possono solo inviare; le legge chi gestisce il sito)
    useFriends() dà ai componenti la situazione aggiornata; le funzioni qui
    sotto la modificano e poi la ricaricano.
    ============================================================================ */
@@ -22,7 +24,7 @@ export interface Person {
 }
 
 /** Rapporto con una persona */
-export type Relation = "friend" | "incoming" | "outgoing" | "none";
+export type Relation = "friend" | "incoming" | "outgoing" | "blocked" | "none";
 
 interface FriendsState {
   loading: boolean;
@@ -30,9 +32,10 @@ interface FriendsState {
   friends: Person[];             // amicizie accettate
   incoming: Person[];            // richieste ricevute (da accettare)
   outgoing: Person[];            // richieste mandate (in attesa)
+  blocked: Person[];             // persone che ho bloccato
 }
 
-const EMPTY: FriendsState = { loading: false, missing: false, friends: [], incoming: [], outgoing: [] };
+const EMPTY: FriendsState = { loading: false, missing: false, friends: [], incoming: [], outgoing: [], blocked: [] };
 let state: FriendsState = EMPTY;
 const listeners = new Set<() => void>();
 const setState = (p: Partial<FriendsState>) => { state = { ...state, ...p }; listeners.forEach((l) => l()); };
@@ -51,12 +54,17 @@ export async function reloadFriends(): Promise<void> {
   const me = currentUser();
   if (!supabase || !me) { setState(EMPTY); return; }
   setState({ loading: true });
-  const { data: rows, error } = await supabase.from("friendships").select("requester, addressee, status");
+  const [{ data: rows, error }, { data: blockRows, error: bErr }] = await Promise.all([
+    supabase.from("friendships").select("requester, addressee, status"),
+    supabase.from("blocks").select("blocked"),
+  ]);
   if (currentUser()?.id !== me.id) return;
   if (error) { setState({ ...EMPTY, missing: isMissing(error) }); return; }
-  // Le persone dall'altra parte di ogni riga
+  // blocchi: se la tabella non c'è ancora (schema.sql non rieseguito) la lista resta vuota
+  const blockedIds = bErr ? [] : (blockRows ?? []).map((b) => b.blocked as string);
+  // Le persone dall'altra parte di ogni riga (e quelle bloccate)
   const other = (r: { requester: string; addressee: string }) => (r.requester === me.id ? r.addressee : r.requester);
-  const ids = [...new Set((rows ?? []).map(other))];
+  const ids = [...new Set([...(rows ?? []).map(other), ...blockedIds])];
   const people: Record<string, Person> = {};
   if (ids.length) {
     const { data: cards } = await supabase.from("handles").select("user_id, handle, name, avatar").in("user_id", ids);
@@ -70,6 +78,7 @@ export async function reloadFriends(): Promise<void> {
     friends: (rows ?? []).filter((r) => r.status === "accepted").map((r) => person(other(r))).sort(byName),
     incoming: (rows ?? []).filter((r) => r.status === "pending" && r.addressee === me.id).map((r) => person(r.requester)),
     outgoing: (rows ?? []).filter((r) => r.status === "pending" && r.requester === me.id).map((r) => person(r.addressee)),
+    blocked: blockedIds.map(person).sort(byName),
   });
 }
 
@@ -80,6 +89,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 
 /** Rapporto con una persona (per il pulsante nella ricerca) */
 export function relationOf(id: string): Relation {
+  if (state.blocked.some((p) => p.id === id)) return "blocked";
   if (state.friends.some((p) => p.id === id)) return "friend";
   if (state.incoming.some((p) => p.id === id)) return "incoming";
   if (state.outgoing.some((p) => p.id === id)) return "outgoing";
@@ -94,7 +104,9 @@ export async function searchPeople(q: string): Promise<Person[] | "missing" | "e
   const { data, error } = await supabase.from("handles").select("user_id, handle, name, avatar")
     .ilike("handle", `${clean}%`).neq("user_id", me.id).order("handle").limit(10);
   if (error) return isMissing(error) ? "missing" : "error";
-  return (data ?? []).map((c) => ({ id: c.user_id, handle: c.handle, name: c.name, avatar: c.avatar }));
+  // le persone che ho bloccato non compaiono nella ricerca
+  return (data ?? []).filter((c) => !state.blocked.some((b) => b.id === c.user_id))
+    .map((c) => ({ id: c.user_id, handle: c.handle, name: c.name, avatar: c.avatar }));
 }
 
 /** Risultato di un'azione: null = ok, altrimenti cosa è andato storto */
@@ -130,6 +142,37 @@ export async function removeFriendship(id: string): Promise<ActErr> {
   const { error } = await supabase.from("friendships").delete()
     .or(`and(requester.eq.${me.id},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${me.id})`);
   return done(error);
+}
+
+/** Blocca una persona: toglie l'amicizia (o la richiesta) e la blocca.
+    Da quel momento non può più mandarti richieste. */
+export async function blockPerson(id: string): Promise<ActErr> {
+  const me = currentUser();
+  if (!supabase || !me) return "error";
+  await supabase.from("friendships").delete()
+    .or(`and(requester.eq.${me.id},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${me.id})`);
+  const { error } = await supabase.from("blocks").insert({ blocker: me.id, blocked: id });
+  return done(error && error.code !== "23505" ? error : null); // 23505 = era già bloccata
+}
+
+/** Sblocca una persona */
+export async function unblockPerson(id: string): Promise<ActErr> {
+  const me = currentUser();
+  if (!supabase || !me) return "error";
+  const { error } = await supabase.from("blocks").delete().eq("blocker", me.id).eq("blocked", id);
+  return done(error);
+}
+
+/** Motivi di una segnalazione (gli stessi accettati dal database) */
+export const REPORT_REASONS = ["handle", "name", "bio", "spam", "other"] as const;
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+/** Segnala una persona a chi gestisce il sito (motivo + nota facoltativa) */
+export async function reportPerson(id: string, reason: ReportReason, note: string): Promise<ActErr> {
+  const me = currentUser();
+  if (!supabase || !me) return "error";
+  const { error } = await supabase.from("reports").insert({ reporter: me.id, reported: id, reason, note: note.trim().slice(0, 300) || null });
+  return error ? (isMissing(error) ? "missing" : "error") : null;
 }
 
 /** Dati di un amico (visti, episodi, voti, profilo). null = non siete

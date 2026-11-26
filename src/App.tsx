@@ -15,6 +15,8 @@ import { syncCard, useHandle } from "./handle";
 import { Prep } from "./components/Prep";
 import { Profile } from "./components/Profile";
 import { FriendPage } from "./components/Friends";
+import { Privacy, SiteFooter } from "./components/Legal";
+import { takeInvite } from "./share";
 import { TopBar } from "./components/TopBar";
 import { useT } from "./i18n";
 import { go, useRoute } from "./router";
@@ -66,12 +68,23 @@ export default function App() {
     go({ page: "catalog" });
   };
 
+  // Invito: dopo l'accesso, se eri arrivata da un link di invito, si apre la
+  // pagina di chi ti ha invitato (lì c'è il pulsante "Aggiungi")
+  useEffect(() => {
+    if (!loaded) return;
+    const inv = takeInvite();
+    if (inv && inv !== handle) go({ page: "friend", tag: inv });
+  }, [loaded, handle]);
+
   // Lingua del documento (per lettori di schermo e sillabazione)
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);
 
   // Le pagine partono dall'alto (il Catalogo ripristina da solo la sua posizione)
   const key = route.page === "title" ? `t-${route.id}` : route.page === "friend" ? `u-${route.tag}` : route.page;
   useEffect(() => { if (route.page !== "catalog") window.scrollTo(0, 0); }, [key, route.page]);
+
+  // La Privacy si legge anche senza account (serve prima di registrarsi)
+  if (route.page === "privacy") return <Privacy />;
 
   return (
     <>
@@ -86,6 +99,7 @@ export default function App() {
           {route.page === "title" && <Detail key={route.id} id={route.id} />}
           {route.page === "friend" && <FriendPage key={route.tag} tag={route.tag} />}
         </main>
+        <SiteFooter />
       </AuthGate>
       <Toast />
     </>

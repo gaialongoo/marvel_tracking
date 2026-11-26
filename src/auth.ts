@@ -125,6 +125,16 @@ export async function updatePassword(password: string): Promise<AuthErr | null> 
   return toErr(error);
 }
 
+/** Elimina l'account e TUTTI i suoi dati (funzione delete_my_account in
+    supabase/schema.sql). Poi esce. "missing" = la funzione non c'è ancora
+    nel database (schema.sql da rieseguire). */
+export async function deleteAccount(): Promise<"ok" | "missing" | "error"> {
+  const { error } = await supabase!.rpc("delete_my_account");
+  if (error) return error.code === "PGRST202" || /function|schema cache/i.test(error.message) ? "missing" : "error";
+  await supabase!.auth.signOut({ scope: "local" });
+  return "ok";
+}
+
 /** Esci dall'account su questo dispositivo */
 export async function signOut() {
   await supabase!.auth.signOut({ scope: "local" });

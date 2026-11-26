@@ -14,6 +14,7 @@ import { hasEps, norm } from "../utils";
 import { ArcReactor } from "./ArcReactor";
 import { AccountMenu } from "./Auth";
 import { IconSearch } from "./Icons";
+import { ThemeButton } from "./ThemeButton";
 import { Thumb } from "./Thumb";
 
 export function TopBar({ route }: { route: Route }) {
@@ -39,6 +40,7 @@ export function TopBar({ route }: { route: Route }) {
           {(["it", "en"] as const).map((l) => (
             <button key={l} className={lang === l ? "on" : ""} onClick={() => setLang(l)}>{l.toUpperCase()}</button>
           ))}
+          <ThemeButton />
         </div>
         {/* Account: avatar con lo stato del salvataggio; menu con Profilo ed Esci */}
         <AccountMenu />

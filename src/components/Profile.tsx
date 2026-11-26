@@ -16,14 +16,18 @@
    ============================================================================ */
 import { useEffect, useState } from "react";
 import { checkHandle, HANDLE_RE, normHandle, saveHandle, useHandle } from "../handle";
-import { useAuth } from "../auth";
+import { deleteAccount, useAuth } from "../auth";
+import { isOffensive } from "../moderation";
+import { shareCard } from "../share";
+import { setTheme, useTheme, type Theme } from "../theme";
+import { showToast } from "../toast";
 import { DATA, BY_ID } from "../data/titles";
 import { PATHS, UNIVERSES } from "../data/meta";
 import { useDisplayName } from "../hooks";
 import { ALL_TYPES, ORDERS, prefsToHome } from "../homeState";
 import { useT } from "../i18n";
 import { go } from "../router";
-import { setProfile, useStore } from "../store";
+import { forgetLocal, setProfile, useStore } from "../store";
 import type { Order } from "../types";
 import { AVATARS, AVATAR_BY_KEY } from "../data/avatars";
 import { Avatar } from "./Avatar";
@@ -45,6 +49,7 @@ export function Profile({ openPath }: { openPath: (path: string) => void }) {
   const name = useDisplayName();
   const p = data.profile ?? {};
   const [editing, setEditing] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const { handle } = useHandle();
 
   const favChar = p.favChar ? AVATAR_BY_KEY[p.favChar] : undefined;
@@ -89,7 +94,16 @@ export function Profile({ openPath }: { openPath: (path: string) => void }) {
             </div>
           </div>
         </div>
-        <button className="btn prof-edit" onClick={() => setEditing(true)}>{t("editProfile")}</button>
+        <div className="prof-btns">
+          <button className="btn prof-edit" onClick={() => setEditing(true)}>{t("editProfile")}</button>
+          {/* Immagine con i miei numeri da condividere (o scaricare su PC) */}
+          <button className="btn" disabled={sharing} onClick={async () => {
+            setSharing(true);
+            const r = await shareCard(data, name, handle, lang, t("shareText"));
+            setSharing(false);
+            if (r === "downloaded") showToast(t("shareSaved"));
+          }}>{sharing ? "…" : t("shareCard")}</button>
+        </div>
       </section>
 
       {/* 2. MODIFICA: finestra a comparsa sopra la pagina */}
@@ -113,6 +127,9 @@ export function Profile({ openPath }: { openPath: (path: string) => void }) {
 
       {/* 6. BACKUP */}
       <Backup />
+
+      {/* 7. ACCOUNT: eliminazione definitiva */}
+      <DeleteAccount />
     </div>
   );
 }
@@ -130,6 +147,10 @@ function EditProfile({ onClose }: { onClose: () => void }) {
   const villains = AVATARS.filter((a) => a.villain);
   // Titoli raggruppati per universo, in ordine di uscita (per la tendina del preferito)
   const byUni = UNIVERSES.filter((u) => u.k !== "all").map((u) => ({ u, items: DATA.filter((d) => d.uni === u.k) }));
+  // bozze di nome e frase (vedi il controllo delle parole offensive sotto)
+  const [nameDraft, setNameDraft] = useState(p.name ?? "");
+  const [bioDraft, setBioDraft] = useState(p.bio ?? "");
+  const badName = isOffensive(nameDraft), badBio = isOffensive(bioDraft);
 
   // Esc chiude; la pagina sotto non scorre finché la finestra è aperta
   useEffect(() => {
@@ -170,15 +191,19 @@ function EditProfile({ onClose }: { onClose: () => void }) {
       {grid(villains)}
 
       <div className="form-grid">
+        {/* Nome e frase: si salvano mentre scrivi, ma non se contengono
+            parole offensive (resta la bozza con l'avviso in rosso) */}
         <label>
           <span className="eyebrow">{t("displayName")}</span>
-          <input className="field" value={p.name ?? ""} maxLength={MAX_NAME} placeholder={t("namePh")}
-            onChange={(e) => setProfile({ name: e.target.value })} />
+          <input className={`field${badName ? " bad" : ""}`} value={nameDraft} maxLength={MAX_NAME} placeholder={t("namePh")}
+            onChange={(e) => { setNameDraft(e.target.value); if (!isOffensive(e.target.value)) setProfile({ name: e.target.value }); }} />
+          {badName && <small className="handle-msg bad">{t("offensive")}</small>}
         </label>
         <label>
-          <span className="eyebrow">{t("bio")} <small>{(p.bio ?? "").length}/{MAX_BIO}</small></span>
-          <input className="field" value={p.bio ?? ""} maxLength={MAX_BIO} placeholder={t("bioPh")}
-            onChange={(e) => setProfile({ bio: e.target.value })} />
+          <span className="eyebrow">{t("bio")} <small>{bioDraft.length}/{MAX_BIO}</small></span>
+          <input className={`field${badBio ? " bad" : ""}`} value={bioDraft} maxLength={MAX_BIO} placeholder={t("bioPh")}
+            onChange={(e) => { setBioDraft(e.target.value); if (!isOffensive(e.target.value)) setProfile({ bio: e.target.value }); }} />
+          {badBio && <small className="handle-msg bad">{t("offensive")}</small>}
         </label>
         <label>
           <span className="eyebrow">{t("favChar")}</span>
@@ -214,7 +239,7 @@ function EditProfile({ onClose }: { onClose: () => void }) {
    Mentre scrivi controllo (dopo una breve pausa) se il tag è libero;
    si salva col pulsante, perché va confermato dal database (è unico).
    --------------------------------------------------------------------------- */
-type HandleSt = "idle" | "checking" | "free" | "mine" | "taken" | "invalid" | "missing" | "error" | "saved";
+type HandleSt = "idle" | "checking" | "free" | "mine" | "taken" | "invalid" | "bad" | "missing" | "error" | "saved";
 
 function HandleField() {
   const { t } = useT();
@@ -230,7 +255,7 @@ function HandleField() {
 
   // Controllo se è libero 400 ms dopo l'ultimo tasto
   useEffect(() => {
-    if (!draft || draft === handle || !HANDLE_RE.test(draft)) return;
+    if (!draft || draft === handle || !HANDLE_RE.test(draft) || isOffensive(draft)) return;
     let stop = false;
     const id = window.setTimeout(async () => {
       const r = await checkHandle(draft);
@@ -244,6 +269,7 @@ function HandleField() {
   if (saved && saved.h === draft) st = saved.r;
   else if (!draft || draft === handle) st = missing ? "missing" : "idle";
   else if (!HANDLE_RE.test(draft)) st = "invalid";
+  else if (isOffensive(draft)) st = "bad";
   else if (checked && checked.h === draft) st = checked.r;
   else st = "checking";
 
@@ -256,7 +282,7 @@ function HandleField() {
 
   const msg: Record<HandleSt, string> = {
     idle: "", checking: t("handleChecking"), free: t("handleFree"), mine: t("handleMine"), taken: t("handleTaken"),
-    invalid: t("handleInvalid"), missing: t("handleMissing"), error: t("handleError"), saved: t("handleSaved"),
+    invalid: t("handleInvalid"), bad: t("offensive"), missing: t("handleMissing"), error: t("handleError"), saved: t("handleSaved"),
   };
   const good = st === "free" || st === "saved" || st === "mine";
   return (
@@ -281,10 +307,22 @@ function HandleField() {
 function Prefs() {
   const { t, lang } = useT();
   const { data } = useStore();
+  const { choice } = useTheme();
   const cur = prefsToHome(data.profile); // valori attuali (con i predefiniti)
   return (
     <section className="panel block">
       <span className="eyebrow">{t("prefs")}</span>
+      {/* Tema: vale per questo dispositivo (come la lingua) */}
+      <div className="theme-row">
+        <span className="muted-p">{t("theme")}</span>
+        <div className="tabs-seg">
+          {(["auto", "light", "dark"] as Theme[]).map((x) => (
+            <button key={x} className={choice === x ? "on" : ""} onClick={() => setTheme(x)}>
+              {t(x === "auto" ? "themeAuto" : x === "light" ? "themeLight" : "themeDark")}
+            </button>
+          ))}
+        </div>
+      </div>
       <p className="muted-p">{t("prefsSub")}</p>
       <div className="controls">
         <select className="input" value={cur.uni} onChange={(e) => setProfile({ prefUni: e.target.value })} aria-label={t("universe")}>
@@ -313,6 +351,50 @@ function Prefs() {
           ))}
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   ELIMINA ACCOUNT — cancella per sempre account e dati (supabase/schema.sql,
+   funzione delete_my_account). Per sicurezza bisogna scrivere ELIMINA.
+   --------------------------------------------------------------------------- */
+function DeleteAccount() {
+  const { t } = useT();
+  const { user } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [word, setWord] = useState("");
+  const [busy, setBusy] = useState(false);
+  const confirmWord = t("deleteWord"); // "ELIMINA" / "DELETE"
+
+  const doDelete = async () => {
+    if (!user) return;
+    setBusy(true);
+    const id = user.id;
+    const r = await deleteAccount();
+    setBusy(false);
+    if (r === "ok") { forgetLocal(id); showToast(t("deleted")); }
+    else showToast(r === "missing" ? t("deleteMissing") : t("handleError"), true);
+  };
+
+  return (
+    <section className="block panel danger-zone">
+      <span className="eyebrow">{t("account")}</span>
+      <p className="muted-p">{t("deleteInfo")}</p>
+      {!open ? <button className="btn danger" onClick={() => setOpen(true)}>{t("deleteAccount")}</button> : (
+        <div className="del-confirm">
+          <label>
+            <span className="muted-p">{t("deleteType")} <b className="mono">{confirmWord}</b></span>
+            <input className="field" value={word} onChange={(e) => setWord(e.target.value)} autoComplete="off" />
+          </label>
+          <div className="del-btns">
+            <button className="btn" onClick={() => { setOpen(false); setWord(""); }}>{t("frCancel")}</button>
+            <button className="btn danger" disabled={busy || word.trim().toUpperCase() !== confirmWord} onClick={doDelete}>
+              {busy ? "…" : t("deleteForever")}
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

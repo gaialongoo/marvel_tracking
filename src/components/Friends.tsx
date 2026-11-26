@@ -11,8 +11,10 @@ import { useEffect, useMemo, useState } from "react";
 import { computeBadges } from "../badges";
 import { DATA } from "../data/titles";
 import {
-  acceptRequest, fetchFriendData, relationOf, removeFriendship, searchPeople, sendRequest, useFriends, type Person,
+  acceptRequest, blockPerson, fetchFriendData, relationOf, removeFriendship, reportPerson, REPORT_REASONS, searchPeople,
+  sendRequest, unblockPerson, useFriends, type Person, type ReportReason,
 } from "../friends";
+import { shareInvite } from "../share";
 import { useHandle } from "../handle";
 import { useT } from "../i18n";
 import { go, goBack } from "../router";
@@ -33,7 +35,7 @@ const shown = (p: Person) => p.name || `@${p.handle}`;
 export function FriendsSection({ onPickHandle }: { onPickHandle: () => void }) {
   const { t } = useT();
   useActTexts();
-  const { friends, incoming, outgoing, missing } = useFriends();
+  const { friends, incoming, outgoing, blocked, missing } = useFriends();
   const { handle } = useHandle();
 
   return (
@@ -48,6 +50,9 @@ export function FriendsSection({ onPickHandle }: { onPickHandle: () => void }) {
           )}
 
           <FriendSearch />
+
+          {/* Invita: link alla tua pagina (chi lo apre può chiederti l'amicizia) */}
+          {handle && <InviteButton handle={handle} />}
 
           {/* Richieste ricevute */}
           {incoming.length > 0 && (
@@ -76,6 +81,18 @@ export function FriendsSection({ onPickHandle }: { onPickHandle: () => void }) {
               </div>
             )}
           </div>
+
+          {/* Persone bloccate: si possono sbloccare */}
+          {blocked.length > 0 && (
+            <div className="fr-block">
+              <h3 className="av-group">{t("frBlocked")} <small>{blocked.length}</small></h3>
+              {blocked.map((p) => (
+                <PersonRow key={p.id} p={p}>
+                  <button className="btn" onClick={() => act(unblockPerson(p.id), t("frUnblocked"))}>{t("frUnblock")}</button>
+                </PersonRow>
+              ))}
+            </div>
+          )}
 
           {/* Richieste mandate, in attesa */}
           {outgoing.length > 0 && (
@@ -181,6 +198,8 @@ export function FriendPage({ tag }: { tag: string }) {
   // chi è (dal @tag) e i suoi dati (solo se siete amici)
   const [person, setPerson] = useState<Person | null | undefined>(undefined); // undefined = carico
   const [data, setData] = useState<SavedData | null | undefined>(undefined);
+  const [reporting, setReporting] = useState(false);
+  const { handle: myHandle } = useHandle();
 
   // Trovo la persona dal @tag
   useEffect(() => {
@@ -235,10 +254,22 @@ export function FriendPage({ tag }: { tag: string }) {
           </>}
           {rel === "outgoing" && <button className="btn" onClick={() => act(removeFriendship(person.id))}>{t("frCancel")}</button>}
           {rel === "friend" && <button className="btn" onClick={() => { if (confirm(t("frRemoveAsk"))) void act(removeFriendship(person.id)); }}>{t("frRemove")}</button>}
+          {rel === "blocked" && <button className="btn" onClick={() => act(unblockPerson(person.id), t("frUnblocked"))}>{t("frUnblock")}</button>}
         </div>
+        {/* Blocca e Segnala (non sulla propria pagina) */}
+        {person.handle !== myHandle && (
+          <div className="fr-safety">
+            {rel !== "blocked" && (
+              <button className="link-btn muted" onClick={() => { if (confirm(t("frBlockAsk"))) void act(blockPerson(person.id), t("frBlockedMsg")); }}>{t("frBlock")}</button>
+            )}
+            <button className="link-btn muted" onClick={() => setReporting(true)}>{t("frReport")}</button>
+          </div>
+        )}
       </section>
+      {reporting && <ReportDialog p={person} onClose={() => setReporting(false)} />}
 
-      {rel !== "friend" ? <p className="muted-p block">{t("frOnlyFriends")}</p>
+      {rel === "blocked" ? <p className="muted-p block">{t("frIsBlocked")}</p>
+        : rel !== "friend" ? <p className="muted-p block">{t("frOnlyFriends")}</p>
         : data === undefined ? <p className="muted-p block">{t("handleChecking")}</p>
         : !data ? <p className="muted-p block">{t("frNoData")}</p>
         : <FriendStats d={data} />}
@@ -297,5 +328,73 @@ function FriendStats({ d }: { d: SavedData }) {
         )}
       </section>
     </>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   INVITA AMICI — condivide (telefono) o copia (PC) il link alla tua pagina
+   --------------------------------------------------------------------------- */
+function InviteButton({ handle }: { handle: string }) {
+  const { t } = useT();
+  return (
+    <div className="fr-invite">
+      <button className="btn primary" onClick={async () => {
+        const r = await shareInvite(handle, t("inviteText"));
+        if (r === "copied") showToast(t("inviteCopied"));
+        if (r === "error") showToast(t("handleError"), true);
+      }}>{t("invite")}</button>
+      <small className="muted-p">{t("inviteHelp")}</small>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------------------
+   SEGNALA — finestra con il motivo e una nota facoltativa.
+   La segnalazione arriva a chi gestisce il sito (tabella "reports").
+   --------------------------------------------------------------------------- */
+function ReportDialog({ p, onClose }: { p: Person; onClose: () => void }) {
+  const { t } = useT();
+  const [reason, setReason] = useState<ReportReason>("handle");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  // Esc chiude la finestra
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const send = async () => {
+    setBusy(true);
+    const err = await reportPerson(p.id, reason, note);
+    setBusy(false);
+    if (err) showToast(err === "missing" ? t("friendsMissing") : t("handleError"), true);
+    else { showToast(t("frReportSent")); onClose(); }
+  };
+
+  return (
+    <div className="modal-back" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal panel report-box" role="dialog" aria-modal="true" aria-labelledby="rep-title">
+        <div className="ep-head">
+          <h2 id="rep-title">{t("frReport")} @{p.handle}</h2>
+          <button className="ep-x" onClick={onClose} aria-label={t("frCancel")}>✕</button>
+        </div>
+        <div className="report-body">
+          {REPORT_REASONS.map((r) => (
+            <label key={r} className="report-opt">
+              <input type="radio" name="reason" checked={reason === r} onChange={() => setReason(r)} />
+              <span>{t(`rep_${r}` as const)}</span>
+            </label>
+          ))}
+          <textarea className="field" rows={3} maxLength={300} value={note} placeholder={t("repNotePh")} onChange={(e) => setNote(e.target.value)} />
+          <p className="muted-p">{t("repInfo")}</p>
+        </div>
+        <div className="ep-foot">
+          <button className="btn" onClick={onClose}>{t("frCancel")}</button>
+          <button className="btn primary" disabled={busy} onClick={send}>{busy ? "…" : t("repSend")}</button>
+        </div>
+      </div>
+    </div>
   );
 }

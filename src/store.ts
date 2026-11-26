@@ -110,6 +110,12 @@ let saving: Promise<void> | null = null;
 
 const cacheKey = () => CACHE_PREFIX + user!.id;
 
+/** Cancella dal browser la copia locale dei dati di un utente
+    (dopo l'eliminazione dell'account non deve restare niente) */
+export function forgetLocal(userId: string) {
+  writeLS(CACHE_PREFIX + userId, null);
+}
+
 /** Copia locale: i dati + se sono ancora da inviare all'account */
 function writeCache() {
   if (user) writeLS(cacheKey(), JSON.stringify({ data: state.data, pending }));

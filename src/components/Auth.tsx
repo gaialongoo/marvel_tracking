@@ -16,8 +16,12 @@ import { useT } from "../i18n";
 import { go } from "../router";
 import { clearLocalCopy, resolveBrowserData, setLang, useStore } from "../store";
 import { isConfigured } from "../supabase";
+import { MIN_AGE } from "../config";
+import { rememberInvite } from "../share";
 import { ArcReactor } from "./ArcReactor";
+import { SiteFooter } from "./Legal";
 import { Avatar } from "./Avatar";
+import { ThemeButton } from "./ThemeButton";
 
 /** Password lunga almeno 8 caratteri (stessa regola da impostare su Supabase) */
 const MIN_PW = 8;
@@ -53,10 +57,12 @@ function Shell({ children }: { children: ReactNode }) {
             {(["it", "en"] as const).map((l) => (
               <button key={l} className={lang === l ? "on" : ""} onClick={() => setLang(l)}>{l.toUpperCase()}</button>
             ))}
+            <ThemeButton />
           </div>
         </div>
         {children}
       </div>
+      <SiteFooter />
     </div>
   );
 }
@@ -95,9 +101,12 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
+  const [agree, setAgree] = useState(false); // registrazione: età minima + Privacy accettata
   const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState<AuthErr | "err_short" | "err_mismatch" | null>(null);
+  const [err, setErr] = useState<AuthErr | "err_short" | "err_mismatch" | "err_agree" | null>(null);
   const [info, setInfo] = useState<"infoConfirm" | "infoReset" | null>(null);
+  // Arrivata da un link di invito? (il @tag di chi ha invitato)
+  const [invite] = useState(() => rememberInvite());
 
   /** Cambia modalità tenendo l'email già scritta */
   const switchTo = (m: Mode) => { setMode(m); setErr(null); setInfo(null); setPw(""); setPw2(""); clearLinkErr(); };
@@ -109,6 +118,7 @@ function AuthPage() {
     // Controlli prima di disturbare il server
     if (mode === "signup" && pw.length < MIN_PW) return setErr("err_short");
     if (mode === "signup" && pw !== pw2) return setErr("err_mismatch");
+    if (mode === "signup" && !agree) return setErr("err_agree");
     setBusy(true);
     if (mode === "signin") {
       setErr(await signIn(mail, pw)); // se va bene, AuthGate mostra l'app da solo
@@ -131,6 +141,8 @@ function AuthPage() {
     <Shell>
       <h2>{t(mode === "signin" ? "signIn" : mode === "signup" ? "signUp" : "forgotTitle")}</h2>
       <p className="auth-note">{t(mode === "forgot" ? "forgotSub" : "authSub")}</p>
+      {/* Link di invito: chi ti ha invitato (dopo l'accesso si apre la sua pagina) */}
+      {invite && mode !== "forgot" && <p className="auth-invite"><b className="mono">@{invite}</b> {t("invitedYou")}</p>}
 
       <form className="auth-form" onSubmit={submit}>
         <label>
@@ -150,6 +162,13 @@ function AuthPage() {
           <label>
             <span className="eyebrow">{t("password2")}</span>
             <input type="password" required autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} />
+          </label>
+        )}
+        {/* Registrazione: età minima e Privacy (obbligatorio) */}
+        {mode === "signup" && (
+          <label className="auth-agree">
+            <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setErr(null); }} />
+            <span>{t("agree1")} {MIN_AGE} {t("agree2")} <a href="#/privacy">{t("agreePrivacy")}</a>.</span>
           </label>
         )}
 
