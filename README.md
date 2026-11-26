@@ -63,8 +63,8 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 1. **Crea il progetto** su supabase.com → New project.
 2. **Crea le tabelle**: SQL Editor → New query → incolla tutto [supabase/schema.sql](supabase/schema.sql) → Run. Crea la tabella `progress` (una riga per utente) con le regole che permettono a ognuno di leggere e scrivere **solo i propri dati**, la tabella `handles` per i **tag utente** (`@nome`, con nome e avatar accanto per la ricerca amici): il tag è unico, tutti gli utenti collegati possono leggere i tag ma ognuno modifica solo il proprio; la tabella `friendships` per le **amicizie** (richiesta → accettata) e la regola che permette agli **amici** di leggere i tuoi dati (solo lettura, solo se l'amicizia è accettata). Il file si può rieseguire senza problemi: se avevi già creato le tabelle, rieseguilo per aggiungere quelle nuove (ogni volta che il file cambia).
 3. **Indirizzi consentiti**: Authentication → URL Configuration
-   - *Site URL*: `https://gaialongoo.github.io/marvel_tracking/`
-   - *Redirect URLs*: aggiungi `https://gaialongoo.github.io/marvel_tracking/**` e `http://localhost:5173/**`
+   - *Site URL*: `https://marveltracker.com/`
+   - *Redirect URLs*: aggiungi `https://marveltracker.com/**`, `https://gaialongoo.github.io/marvel_tracking/**` (vecchio indirizzo) e `http://localhost:5173/**`
    Servono per i link nelle email (conferma dell'account e nuova password).
 4. **Password**: Authentication → Sign In / Providers → Email: lascia attivi «Enable sign ups» e «Confirm email», e porta la lunghezza minima della password a **8** (l'app chiede almeno 8 caratteri).
 5. **Chiavi in locale**: copia [.env.example](.env.example) come `.env.local` e incolla *Project URL* e *Publishable key* (Project Settings → API Keys; va bene anche la vecchia chiave *anon*). `.env.local` non viene caricato su GitHub. Riavvia `npm run dev`.
@@ -145,7 +145,7 @@ marvel_tracker/
 
 ## Pubblicazione online (GitHub Pages)
 
-L'app è online su **https://gaialongoo.github.io/marvel_tracking/** e si apre anche dal telefono.
+L'app è online su **https://marveltracker.com** (dominio comprato su Cloudflare e collegato a GitHub Pages; il vecchio indirizzo gaialongoo.github.io/marvel_tracking porta lì in automatico) e si apre anche dal telefono.
 - A ogni push su `main`, il flusso `.github/workflows/deploy.yml` compila l'app e pubblica la cartella `dist`.
 - Va fatto **una volta sola**: su GitHub, Settings → Pages → Build and deployment → Source = **GitHub Actions**. Con "Deploy from a branch" GitHub pubblica i file sorgente e la pagina resta bianca.
 - Il flusso legge `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` dalle Variables del repo (vedi «Account e Supabase», punto 6): senza, il sito pubblicato mostra la pagina «Collegamento all'account da configurare».
