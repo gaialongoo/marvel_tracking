@@ -214,6 +214,9 @@ const REL5: typeof REL = {
   wv: { pc: 4 }, fatws: { pc: 2 }, loki1: { pc: 1 }, loki2: { pc: 1 }, whatif1: { pc: 1 }, whatif2: { pc: 1 }, hawkeye: { pc: 1 }, moonknight: { pc: 1 }, msmarvel: { pc: 2 }, shehulk: { pc: 5 }, echo: { pc: 1 }, ironheart: { pc: 1 }, ddba1: { pc: 1 }, groot1: { pc: 1 }, groot2: { pc: 1 },
   si: { pc: 0 }, agatha: { pc: 0 }, wonderman: { pc: 0 }, ddba2: { pc: 0 }, whatif3: { pc: 0 },
   wbn: { pc: 0 }, eow: { pc: 0 }, zombies: { pc: 0 }, fnsm: { pc: 0 }, punolk: { pc: 0 },
+  // VisionQuest (finale del 10/11/2026: mancava nella copia di Wikipedia letta prima):
+  // 2 scene dopo i titoli nell'episodio 8 (Wikipedia aggiornata, Nerdist, SlashFilm)
+  visionquest: { pc: 2 },
 };
 
 /** Verifiche unite: per ogni titolo i campi di REL, REL2, REL3, REL4 e REL5 insieme */
