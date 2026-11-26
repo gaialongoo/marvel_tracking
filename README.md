@@ -70,7 +70,11 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 5. **Chiavi in locale**: copia [.env.example](.env.example) come `.env.local` e incolla *Project URL* e *Publishable key* (Project Settings → API Keys; va bene anche la vecchia chiave *anon*). `.env.local` non viene caricato su GitHub. Riavvia `npm run dev`.
 6. **Chiavi per GitHub Pages**: su GitHub → Settings → Secrets and variables → Actions → scheda **Variables** → crea `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` con gli stessi valori. La chiave publishable è fatta per stare in un sito pubblico: i dati sono protetti dalle regole del punto 2.
 
-**Email:** le email di Supabase gratuite hanno un limite di pochi invii all'ora e possono finire nello spam. Per molti utenti conviene collegare un servizio SMTP (Authentication → Emails → SMTP Settings).
+**Email (configurate il 26/11/2026):**
+- **Ricevere**: `info@marveltracker.com` è inoltrata alla Gmail con Cloudflare Email Routing (Cloudflare → Email → Instradamento email). È il contatto mostrato nella Privacy (`CONTACT_EMAIL` in [src/config.ts](src/config.ts)).
+- **Inviare**: le email dell'accesso (conferma account, password dimenticata) partono da `Marvel Tracker <noreply@marveltracker.com>` tramite **Resend** (regione Irlanda). Record DNS su Cloudflare: DKIM `resend._domainkey`, `send` e `rsend` (aggiunti con «Auto configure» di Resend) e DMARC `_dmarc` = `v=DMARC1; p=none;`.
+- **Supabase** → Authentication → Emails → SMTP Settings: host `smtp.resend.com`, porta `465`, utente `resend`, password = chiave API di Resend (permesso «Sending access», solo nel pannello di Supabase, mai nel codice). Rate limit delle email alzato a 100/ora (Authentication → Rate Limits). Piano gratuito di Resend: 100 email al giorno, 3.000 al mese.
+- Password minima: 8 caratteri (Authentication → Sign In / Providers → Email), la stessa regola che controlla l'app.
 
 **Come funziona il salvataggio** ([src/store.ts](src/store.ts)):
 - dopo l'accesso i dati vengono scaricati dall'account; ogni modifica si vede subito e parte verso l'account dopo meno di un secondo;
@@ -144,6 +148,8 @@ marvel_tracker/
 - Questo README viene **aggiornato a ogni modifica** rilevante.
 
 ## Pubblicazione online (GitHub Pages)
+
+**Dominio:** `marveltracker.com`, comprato su Cloudflare. Record DNS (tutti «Solo DNS», nuvola grigia): quattro `A` su `@` verso `185.199.108.153`, `.109.153`, `.110.153`, `.111.153` e `CNAME` `www` -> `gaialongoo.github.io`. Su GitHub: Settings → Pages → Custom domain = `marveltracker.com`, con «Enforce HTTPS». Il vecchio indirizzo gaialongoo.github.io/marvel_tracking porta al dominio da solo.
 
 L'app è online su **https://marveltracker.com** (dominio comprato su Cloudflare e collegato a GitHub Pages; il vecchio indirizzo gaialongoo.github.io/marvel_tracking porta lì in automatico) e si apre anche dal telefono.
 - A ogni push su `main`, il flusso `.github/workflows/deploy.yml` compila l'app e pubblica la cartella `dist`.
