@@ -75,6 +75,7 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 - **Inviare**: le email dell'accesso (conferma account, password dimenticata) partono da `Marvel Tracker <noreply@marveltracker.com>` tramite **Resend** (regione Irlanda). Record DNS su Cloudflare: DKIM `resend._domainkey`, `send` e `rsend` (aggiunti con «Auto configure» di Resend) e DMARC `_dmarc` = `v=DMARC1; p=none;`.
 - **Supabase** → Authentication → Emails → SMTP Settings: host `smtp.resend.com`, porta `465`, utente `resend`, password = chiave API di Resend (permesso «Sending access», solo nel pannello di Supabase, mai nel codice). Rate limit delle email alzato a 100/ora (Authentication → Rate Limits). Piano gratuito di Resend: 100 email al giorno, 3.000 al mese.
 - Password minima: 8 caratteri (Authentication → Sign In / Providers → Email), la stessa regola che controlla l'app.
+- **Testi delle email**: in italiano con lo stile dell'app, in [supabase/email/](supabase/email/) (`confirm.html` per «Confirm signup», `reset.html` per «Reset password»; l'oggetto è scritto in cima a ogni file). Si incollano in Supabase → Authentication → Emails → Templates. Il logo arriva da `https://marveltracker.com/email-logo.png` ([public/email-logo.png](public/email-logo.png)), quindi deve essere già online.
 
 **Come funziona il salvataggio** ([src/store.ts](src/store.ts)):
 - dopo l'accesso i dati vengono scaricati dall'account; ogni modifica si vede subito e parte verso l'account dopo meno di un secondo;
