@@ -971,3 +971,74 @@ main{display:block}
 .logout-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .logout-row .muted-p{margin:0}
 .logout-row b{color:var(--text);font-weight:600}
+
+/* casella "ho almeno 14 anni…": NON larga come i campi di testo (.auth-form input), sennò spinge fuori la frase */
+.auth-form .auth-agree input{width:16px;height:16px;padding:0;margin:2px 0 0;flex:none;cursor:pointer}
+.auth-form .auth-agree span{flex:1;min-width:0}
+
+/* ==========================================================================
+   SCELTA DEL TITOLO PREFERITO (TitlePicker): ricerca + universi a tendina
+   ========================================================================== */
+.tp-field{grid-column:1/-1;display:grid;gap:6px;min-width:0}
+.tp{display:grid;gap:8px}
+.tp-current{display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;min-height:44px}
+.tp-current b{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tp-current .thumb,.tp-item .thumb{width:26px;height:36px;padding:2px;flex:none}
+.tp-current .thumb span,.tp-current .thumb .type,.tp-item .thumb span,.tp-item .thumb .type{display:none}
+.tp-ph{flex:1;color:var(--muted)}
+.tp-chev{color:var(--muted);transition:transform .2s}.tp-chev.up{transform:rotate(180deg)}
+.tp-panel{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--surface2);display:grid;gap:8px}
+.tp-list{max-height:320px;overflow:auto;display:grid;gap:4px;padding-right:2px}
+.tp-uni{border-radius:8px}
+.tp-uni summary{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;cursor:pointer;
+  font-weight:600;font-size:13.5px;list-style:none;background:var(--surface)}
+.tp-uni summary::-webkit-details-marker{display:none}
+.tp-uni summary::after{content:"▾";color:var(--muted);margin-left:auto;transition:transform .2s}
+.tp-uni[open] summary::after{transform:rotate(180deg)}
+.tp-uni summary small{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+.tp-uni summary:hover{color:var(--gold)}
+.tp-items{display:grid;gap:2px;padding:4px 0 6px 6px}
+.tp-item{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:7px;text-align:left;width:100%}
+.tp-item:hover{background:var(--surface)}
+.tp-item.on{background:var(--gold-soft)}
+.tp-item span{display:grid;min-width:0;flex:1}
+.tp-item b{font-weight:500;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tp-item small{font-size:11.5px;color:var(--muted)}
+.tp-check{font-style:normal;color:var(--gold);font-weight:700}
+.tp-none{padding:7px 10px;border-radius:7px;text-align:left;font-size:13px;color:var(--muted)}
+.tp-none:hover{color:var(--red-text);background:var(--surface)}
+.tp-empty{margin:6px 4px}
+
+/* ==========================================================================
+   GUIDA DI BENVENUTO (Welcome): 3 schede al primo accesso
+   ========================================================================== */
+.modal.wl{position:relative;width:min(480px,100%);padding:22px 24px 20px;text-align:center}
+.wl h2{font-size:21px;margin:6px 0 10px}
+.wl p{margin:0 auto;max-width:400px;color:var(--text2);font-size:14px;line-height:1.6;min-height:112px}
+.wl-skip{position:absolute;top:14px;right:16px;font-size:12.5px;color:var(--muted)}
+.wl-skip:hover{color:var(--gold)}
+.wl-art{height:120px;display:grid;place-items:center;margin:14px 0 10px}
+.wl-doors{display:flex;gap:10px}
+.wl-door{width:86px;height:110px;border-radius:12px;display:grid;place-items:center;box-shadow:0 10px 24px var(--shadow)}
+.wl-door:nth-child(1){transform:rotate(-6deg)}.wl-door:nth-child(3){transform:rotate(6deg)}
+.wl-door:nth-child(2){transform:translateY(-6px)}
+.wl-door svg{width:62px;height:62px;fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.wl-mark{display:flex;align-items:center;gap:14px;padding:14px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface2)}
+.wl-tick{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff}
+.wl-tick svg{stroke:#fff}
+.wl-gems{display:flex;gap:4px}.wl-gems .gem{width:22px;height:22px}
+.wl-book{color:var(--gold);display:grid;place-items:center}
+.wl-friends{display:flex}.wl-friends>*{margin:0 -8px;box-shadow:0 0 0 3px var(--surface);border-radius:50%}
+.wl-friends>*:nth-child(2){transform:translateY(-10px) scale(1.12);z-index:1}
+.wl-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap}
+.wl-dots{display:flex;gap:6px}
+.wl-dots button{width:8px;height:8px;border-radius:50%;background:var(--off);padding:0}
+.wl-dots button.on{background:var(--gold);width:22px;border-radius:4px}
+.wl-btns{display:flex;gap:8px;margin-left:auto}
+@media (max-width:520px){
+  .modal.wl{padding:20px 18px 18px}
+  .wl p{min-height:8em;font-size:13.5px}
+  .wl-door{width:70px;height:90px}.wl-door svg{width:50px;height:50px}
+  .wl-btns{width:100%}.wl-btns .btn{flex:1;justify-content:center}
+  .wl-foot{justify-content:center}
+}

@@ -16,6 +16,7 @@ import { Prep } from "./components/Prep";
 import { Profile } from "./components/Profile";
 import { FriendPage } from "./components/Friends";
 import { Privacy, SiteFooter } from "./components/Legal";
+import { Welcome } from "./components/Welcome";
 import { takeInvite } from "./share";
 import { TopBar } from "./components/TopBar";
 import { useT } from "./i18n";
@@ -100,6 +101,8 @@ export default function App() {
           {route.page === "friend" && <FriendPage key={route.tag} tag={route.tag} />}
         </main>
         <SiteFooter />
+        {/* guida in 3 schede: solo la prima volta */}
+        <Welcome />
       </AuthGate>
       <Toast />
     </>

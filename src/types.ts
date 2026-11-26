@@ -62,6 +62,7 @@ export interface Profile {
   prefOrder?: Order;  //   … ordine
   prefPath?: string;  //   … percorso (se l'ordine è "paths")
   prefTypes?: TitleType[]; // … tipi da guardare (film, serie…); mancante = tutti
+  introDone?: boolean; // guida di benvenuto già vista (components/Welcome.tsx)
 }
 
 /** Dati personali salvati nell'account (e in copia nel browser) */

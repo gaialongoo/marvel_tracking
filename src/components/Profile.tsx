@@ -36,6 +36,7 @@ import { Badges } from "./Badges";
 import { FriendsSection } from "./Friends";
 import { Kpis, StatsDetail } from "./Stats";
 import { Thumb } from "./Thumb";
+import { TitlePicker } from "./TitlePicker";
 
 /** Lunghezze massime dei campi di testo */
 const MAX_NAME = 30;
@@ -96,6 +97,8 @@ export function Profile({ openPath }: { openPath: (path: string) => void }) {
         </div>
         <div className="prof-btns">
           <button className="btn prof-edit" onClick={() => setEditing(true)}>{t("editProfile")}</button>
+          {/* riapre la guida di benvenuto */}
+          <button className="btn" onClick={() => setProfile({ introDone: false })}>{t("wlAgain")}</button>
           {/* Immagine con i miei numeri da condividere (o scaricare su PC) */}
           <button className="btn" disabled={sharing} onClick={async () => {
             setSharing(true);
@@ -146,7 +149,6 @@ function EditProfile({ onClose }: { onClose: () => void }) {
   const heroes = AVATARS.filter((a) => !a.villain);
   const villains = AVATARS.filter((a) => a.villain);
   // Titoli raggruppati per universo, in ordine di uscita (per la tendina del preferito)
-  const byUni = UNIVERSES.filter((u) => u.k !== "all").map((u) => ({ u, items: DATA.filter((d) => d.uni === u.k) }));
   // bozze di nome e frase (vedi il controllo delle parole offensive sotto)
   const [nameDraft, setNameDraft] = useState(p.name ?? "");
   const [bioDraft, setBioDraft] = useState(p.bio ?? "");
@@ -213,17 +215,11 @@ function EditProfile({ onClose }: { onClose: () => void }) {
             <optgroup label={t("villainsG")}>{villains.map((a) => <option key={a.key} value={a.key}>{a[lang]}</option>)}</optgroup>
           </select>
         </label>
-        <label>
+        {/* Titolo preferito: ricerca + universi a tendina (vedi TitlePicker) */}
+        <div className="tp-field">
           <span className="eyebrow">{t("favTitle")}</span>
-          <select className="field" value={p.favTitle ?? ""} onChange={(e) => setProfile({ favTitle: e.target.value })}>
-            <option value="">–</option>
-            {byUni.map(({ u, items }) => (
-              <optgroup key={u.k} label={u[lang]}>
-                {items.map((d) => <option key={d.id} value={d.id}>{d.t[lang]} ({d.y})</option>)}
-              </optgroup>
-            ))}
-          </select>
-        </label>
+          <TitlePicker value={p.favTitle} onChange={(id) => setProfile({ favTitle: id })} />
+        </div>
       </div>
       </div>
       <div className="ep-foot">
