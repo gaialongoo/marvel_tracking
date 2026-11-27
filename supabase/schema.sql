@@ -193,23 +193,32 @@ create policy "sblocco qualcuno" on public.blocks
   for delete to authenticated using ((select auth.uid()) = blocker);
 
 -- C'è un blocco tra due persone (in una delle due direzioni)?
+-- Sta nello schema "private", che Supabase non mette online come API: la usa
+-- solo la regola qui sotto, nessuno può chiamarla da internet.
 -- "security definer": può guardare anche i blocchi degli altri (che le regole
 -- sopra nascondono), ma risponde solo sì/no, e solo se una delle due persone
 -- è chi chiede (così nessuno può scoprire i blocchi tra altri utenti).
-create or replace function public.is_blocked(a uuid, b uuid) returns boolean
+create schema if not exists private;
+revoke all on schema private from public, anon;
+grant usage on schema private to authenticated;
+
+create or replace function private.is_blocked(a uuid, b uuid) returns boolean
 language sql stable security definer set search_path = '' as $$
   select (select auth.uid()) in (a, b) and exists (select 1 from public.blocks
     where (blocker = a and blocked = b) or (blocker = b and blocked = a));
 $$;
-revoke all on function public.is_blocked(uuid, uuid) from public, anon;
-grant execute on function public.is_blocked(uuid, uuid) to authenticated;
+revoke all on function private.is_blocked(uuid, uuid) from public, anon;
+grant execute on function private.is_blocked(uuid, uuid) to authenticated;
 
 -- La richiesta di amicizia ora è permessa solo se non c'è un blocco
 drop policy if exists "chiedo l'amicizia" on public.friendships;
 create policy "chiedo l'amicizia" on public.friendships
   for insert to authenticated
   with check ((select auth.uid()) = requester and status = 'pending'
-    and not public.is_blocked(requester, addressee));
+    and not private.is_blocked(requester, addressee));
+
+-- la vecchia versione stava in "public" (raggiungibile come API): la tolgo
+drop function if exists public.is_blocked(uuid, uuid);
 
 -- ============================================================================
 -- SEGNALAZIONI — "Segnala" sulla pagina di una persona (tag, nome, frase
