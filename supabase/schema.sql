@@ -194,10 +194,11 @@ create policy "sblocco qualcuno" on public.blocks
 
 -- C'è un blocco tra due persone (in una delle due direzioni)?
 -- "security definer": può guardare anche i blocchi degli altri (che le regole
--- sopra nascondono), ma risponde solo sì/no.
+-- sopra nascondono), ma risponde solo sì/no, e solo se una delle due persone
+-- è chi chiede (così nessuno può scoprire i blocchi tra altri utenti).
 create or replace function public.is_blocked(a uuid, b uuid) returns boolean
 language sql stable security definer set search_path = '' as $$
-  select exists (select 1 from public.blocks
+  select (select auth.uid()) in (a, b) and exists (select 1 from public.blocks
     where (blocker = a and blocked = b) or (blocker = b and blocked = a));
 $$;
 revoke all on function public.is_blocked(uuid, uuid) from public, anon;
