@@ -54,7 +54,7 @@ npm run lint    # controlla il codice
 
 > **Errore "running scripts is disabled on this system" in PowerShell?** Usa `npm.cmd run dev`, oppure abilita gli script una volta per sempre (solo per il tuo utente) con `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, oppure usa il terminale Command Prompt o Git Bash in VS Code.
 
-I tuoi dati (visti, voti, episodi e profilo) sono salvati nel tuo account Supabase. Per avviare l'app in locale serve prima il collegamento a Supabase (vedi sotto); senza, l'app mostra una pagina che spiega cosa manca.
+I tuoi dati (visti, voti, episodi e profilo) sono salvati nel tuo account. L'app parla solo con il **backend** (cartella [worker/](worker/), vedi «Backend» più sotto), che a sua volta parla con Supabase. Per avviare l'app in locale serve l'indirizzo del backend in `.env.local` (vedi sotto); senza, l'app mostra una pagina che spiega cosa manca.
 
 ## Account e Supabase (da fare una volta)
 
@@ -65,10 +65,20 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 3. **Indirizzi consentiti**: Authentication → URL Configuration
    - *Site URL*: `https://marveltracker.com/`
    - *Redirect URLs*: aggiungi `https://marveltracker.com/**`, `https://gaialongoo.github.io/marvel_tracking/**` (vecchio indirizzo) e `http://localhost:5173/**`
-   Servono per i link nelle email (conferma dell'account e nuova password).
+   Servono per i link nelle email (conferma dell'account e nuova password): `{{ .SiteURL }}` nei modelli delle email è il *Site URL*.
 4. **Password**: Authentication → Sign In / Providers → Email: lascia attivi «Enable sign ups» e «Confirm email», e porta la lunghezza minima della password a **8** (l'app chiede almeno 8 caratteri).
-5. **Chiavi in locale**: copia [.env.example](.env.example) come `.env.local` e incolla *Project URL* e *Publishable key* (Project Settings → API Keys; va bene anche la vecchia chiave *anon*). `.env.local` non viene caricato su GitHub. Riavvia `npm run dev`.
-6. **Chiavi per GitHub Pages**: su GitHub → Settings → Secrets and variables → Actions → scheda **Variables** → crea `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` con gli stessi valori. La chiave publishable è fatta per stare in un sito pubblico: i dati sono protetti dalle regole del punto 2.
+5. **Chiave per il backend**: *Project URL* e *Publishable key* (Project Settings → API Keys) vanno **solo** nei segreti del backend (vedi «Backend»), mai nel sito.
+6. **Indirizzo del backend nel sito**: copia [.env.example](.env.example) come `.env.local` (in locale `VITE_API_URL=http://localhost:8787`). Per GitHub Pages: GitHub → Settings → Secrets and variables → Actions → scheda **Variables** → `VITE_API_URL` = `https://api.marveltracker.com` (le vecchie `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` non servono più: cancellale).
+
+## Backend (Cloudflare Worker, cartella `worker/`)
+
+Il sito non parla più con Supabase: chiama solo `https://api.marveltracker.com` ([worker/src/index.ts](worker/src/index.ts)). Così dal browser **non si vedono** né l'indirizzo né la chiave di Supabase, né i nomi delle tabelle.
+- **Indirizzi**: `/login`, `/signup`, `/reset`, `/verify` (link delle email), `/me`, `/password`, `/logout`, `/account` (elimina), `/data` (i miei dati), `/handle`, `/handle/check`, `/card`, `/search`, `/people/<tag>`, `/friends`, `/friends/<id>/request|accept|data`, `/blocks/<id>`, `/reports`. Il backend controlla il formato di tutto (id, @tag, motivi delle segnalazioni, dimensione dei dati).
+- **Sessione**: sta in due cookie `httpOnly` (`mt_s`, `mt_r`) che il JavaScript della pagina non può leggere; il backend rinnova il token da solo quando scade. Uscendo, i cookie vengono cancellati.
+- **Sicurezza**: risponde solo a `marveltracker.com` (e `localhost:5173` per le prove; elenco in `ALLOWED_ORIGINS` di [worker/wrangler.toml](worker/wrangler.toml)); le richieste che modificano qualcosa devono essere JSON; parla con Supabase **come l'utente**, quindi le regole RLS di `schema.sql` restano attive come seconda barriera. L'IP di chi usa il sito viene passato a Supabase, così i limiti anti-abuso restano per persona.
+- **Pubblicarlo** (dalla cartella `worker/`): `npm install`, `npx wrangler login` (una volta, apre il browser su Cloudflare), poi `npx wrangler secret put SUPABASE_URL` e `npx wrangler secret put SUPABASE_KEY` (incolla i valori quando li chiede), infine `npx wrangler deploy`. L'indirizzo `api.marveltracker.com` lo crea Cloudflare da solo (dominio sullo stesso account). Piano gratuito: 100.000 richieste al giorno.
+- **Provarlo in locale**: copia `worker/.dev.vars.example` come `worker/.dev.vars` con i valori di Supabase, poi `npm run dev` in `worker/` (porta 8787) e `npm run dev` nella cartella principale.
+- **Link delle email**: i modelli in [supabase/email/](supabase/email/) portano a `https://marveltracker.com/?token_hash=…&type=email` (conferma) o `type=recovery` (nuova password); l'app manda il codice al backend (`/verify`), che apre la sessione. Funzionano in **qualunque browser**, non solo in quello in cui sono stati chiesti. Vanno reincollati in Supabase → Authentication → Emails → Templates quando cambiano.
 
 **Email (configurate il 26/11/2026):**
 - **Ricevere**: `info@marveltracker.com` è inoltrata alla Gmail con Cloudflare Email Routing (Cloudflare → Email → Instradamento email). È il contatto mostrato nella Privacy (`CONTACT_EMAIL` in [src/config.ts](src/config.ts)).
@@ -85,8 +95,8 @@ L'app usa [Supabase](https://supabase.com) (piano gratuito) per gli account e pe
 - il **profilo** sta nella stessa riga dei visti (campo `profile` dentro `data`), come il contatore `back` del badge «Ritorno al passato» (quante volte hai visto un titolo uscito prima dell'ultimo che avevi già visto);
 - il **tag utente** invece sta nella tabella `handles` ([src/handle.ts](src/handle.ts)), perché solo il database può garantire che sia unico. Nella finestra «Modifica profilo» l'app controlla mentre scrivi se il tag è libero e lo salva col pulsante;
 - uscendo dall'account (avatar in alto a destra → Esci) la copia nel browser viene cancellata, così su un PC condiviso non resta niente;
-- i link nelle email (conferma, nuova password) vanno aperti **nello stesso browser** in cui li hai chiesti. Se apri il link di conferma altrove l'email risulta comunque confermata: basta accedere.
-- se un link dell'email non funziona (scaduto, già usato o aperto in un altro browser) la pagina di accesso lo dice e spiega cosa fare, invece di tornare muta all'accesso;
+- i link nelle email (conferma, nuova password) funzionano in qualunque browser: li verifica il backend;
+- se un link dell'email non funziona (scaduto o già usato) la pagina di accesso lo dice e spiega cosa fare, invece di tornare muta all'accesso;
 - **password**: il controllo degli 8 caratteri lo fa l'app (con il contatore sotto il campo, es. «Almeno 8 caratteri · 5/8»), non il browser; se la nuova password è uguale alla vecchia compare un messaggio apposta;
 - **«Manda il link»** dopo un invio resta bloccato 60 secondi con il conto alla rovescia: Supabase permette poche email (con il servizio email gratuito sono pochissime all'ora), e un secondo invio troppo vicino verrebbe rifiutato.
 
@@ -108,7 +118,7 @@ marvel_tracker/
 │   ├── types.ts            ← forma dei dati (Title, SavedData…)
 │   ├── store.ts            ← dati personali: salvataggio nell'account + azioni
 │   ├── auth.ts             ← accesso, registrazione, uscita, recupero password
-│   ├── supabase.ts         ← collegamento a Supabase (legge .env.local)
+│   ├── api.ts              ← collegamento al backend (legge VITE_API_URL da .env.local)
 │   ├── router.ts           ← navigazione con #/…
 │   ├── i18n.ts             ← testi IT/EN
 │   ├── homeState.ts        ← scelte del Catalogo (universo, ordine…) e costruzione dei gruppi dell'elenco
@@ -133,8 +143,9 @@ marvel_tracker/
 ├── scripts/ottimizza-immagini.py ← prepara le immagini generate
 ├── docs/prompt-immagini.md ← testi per generare le immagini
 ├── scripts/tmdb-posters.mjs ← cerca le locandine su TMDB e scrive src/data/posters.ts (da lanciare a mano)
+├── worker/                 ← BACKEND (Cloudflare Worker): src/index.ts, wrangler.toml
 ├── supabase/schema.sql     ← tabelle (progress, handles, friendships, blocks, reports), funzione per eliminare l'account e regole di sicurezza da eseguire su Supabase
-├── .env.example            ← modello per .env.local (indirizzo e chiave di Supabase)
+├── .env.example            ← modello per .env.local (indirizzo del backend)
 ├── prototype/design.html   ← prototipo HTML (riferimento del design)
 ├── index.html              ← pagina di ingresso
 └── vite.config.ts          ← configurazione (base relativa per GitHub Pages)
@@ -156,5 +167,5 @@ marvel_tracker/
 L'app è online su **https://marveltracker.com** (dominio comprato su Cloudflare e collegato a GitHub Pages; il vecchio indirizzo gaialongoo.github.io/marvel_tracking porta lì in automatico) e si apre anche dal telefono.
 - A ogni push su `main`, il flusso `.github/workflows/deploy.yml` compila l'app e pubblica la cartella `dist`.
 - Va fatto **una volta sola**: su GitHub, Settings → Pages → Build and deployment → Source = **GitHub Actions**. Con "Deploy from a branch" GitHub pubblica i file sorgente e la pagina resta bianca.
-- Il flusso legge `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` dalle Variables del repo (vedi «Account e Supabase», punto 6): senza, il sito pubblicato mostra la pagina «Collegamento all'account da configurare».
+- Il flusso legge `VITE_API_URL` dalle Variables del repo (vedi «Account e Supabase», punto 6): senza, il sito pubblicato mostra la pagina «Collegamento all'account da configurare». Il backend si pubblica a parte (vedi «Backend»): **prima** il backend, **poi** il push del sito.
 - Con l'account, «visto» e voti sono gli stessi su telefono e PC.

@@ -1,0 +1,4 @@
+# Copia come ".dev.vars" per provare il backend in locale (npm run dev):
+# NON va su GitHub (è in .gitignore)
+SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
+SUPABASE_KEY=sb_publishable_xxxxxxxxxxxxxxxx

@@ -1,0 +1,15 @@
+# Backend di Marvel Tracker (Cloudflare Worker) - vedi src/index.ts
+# Pubblicazione: dalla cartella worker/ ->  npx wrangler deploy
+# Segreti (una volta sola, NON vanno mai nel codice):
+#   npx wrangler secret put SUPABASE_URL   (indirizzo del progetto Supabase)
+#   npx wrangler secret put SUPABASE_KEY   (chiave "publishable" di Supabase)
+name = "marvel-tracker-api"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+
+# Indirizzo pubblico: Cloudflare crea da solo il record DNS sul dominio
+routes = [{ pattern = "api.marveltracker.com", custom_domain = true }]
+
+[vars]
+# Siti che possono chiamare il backend (il sito vero e quello in locale)
+ALLOWED_ORIGINS = "https://marveltracker.com,https://www.marveltracker.com,http://localhost:5173"

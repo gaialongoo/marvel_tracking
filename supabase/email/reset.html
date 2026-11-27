@@ -29,14 +29,14 @@
           <!-- pulsante -->
           <tr>
             <td align="center" style="padding:16px 32px 8px;">
-              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#c9a24b;color:#14161a;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 32px;border-radius:10px;">Scegli una nuova password</a>
+              <a href="{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=recovery" style="display:inline-block;background:#c9a24b;color:#14161a;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 32px;border-radius:10px;">Scegli una nuova password</a>
             </td>
           </tr>
           <!-- link di riserva e nota in inglese -->
           <tr>
             <td style="padding:16px 32px 24px;font-family:Arial,Helvetica,sans-serif;color:#8b919c;font-size:12px;line-height:1.6;text-align:center;">
               Il pulsante non funziona? Copia questo link nel browser:<br>
-              <a href="{{ .ConfirmationURL }}" style="color:#c9a24b;word-break:break-all;">{{ .ConfirmationURL }}</a>
+              <a href="{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=recovery" style="color:#c9a24b;word-break:break-all;">{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=recovery</a>
               <p style="margin:16px 0 0;">EN: tap the button above to set a new Marvel Tracker password.</p>
             </td>
           </tr>

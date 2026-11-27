@@ -1,8 +1,9 @@
 // Controllo anti-bot di Cloudflare (Turnstile) per accesso, registrazione e
 // "password dimenticata". Di solito non chiede niente: Cloudflare verifica il
-// browser da solo e passa un "gettone" che mandiamo a Supabase insieme alla
-// richiesta. Supabase lo controlla con la chiave segreta (che sta solo nel
-// suo pannello) e rifiuta le richieste senza gettone valido.
+// browser da solo e passa un "gettone" che mandiamo al backend insieme alla
+// richiesta; il backend lo gira a Supabase, che lo controlla con la chiave
+// segreta (che sta solo nel suo pannello) e rifiuta le richieste senza
+// gettone valido.
 // Ogni gettone vale una volta sola: dopo ogni tentativo il widget va rifatto
 // (lo fa AuthPage cambiando la "key" del componente).
 // Si accende solo se TURNSTILE_SITE_KEY in config.ts non è vuota.

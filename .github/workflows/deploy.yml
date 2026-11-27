@@ -28,12 +28,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Indirizzo e chiave pubblica di Supabase, presi dalle Variables del repo
+      # Indirizzo del backend (worker/), preso dalle Variables del repo
       # (Settings → Secrets and variables → Actions → Variables)
       - run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

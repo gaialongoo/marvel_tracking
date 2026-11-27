@@ -1,5 +1,6 @@
 // Amici - ricerca per @tag, richieste di amicizia, lista degli amici.
-// Tabelle su Supabase (vedi supabase/schema.sql):
+// Passa tutto dal backend (api.ts → worker/). Dietro, su Supabase
+// (vedi supabase/schema.sql):
 // - handles: @tag + nome e avatar "pubblici" (per riconoscersi nella ricerca)
 // - friendships: una riga per coppia, 'pending' (richiesta) o 'accepted' (amici)
 // - progress: i dati di un amico si possono leggere solo se siete amici
@@ -9,7 +10,7 @@
 // sotto la modificano e poi la ricaricano.
 import { useSyncExternalStore } from "react";
 import { currentUser, onUserChange } from "./auth";
-import { supabase } from "./supabase";
+import { api } from "./api";
 import { isSavedData } from "./store";
 import type { SavedData } from "./types";
 
@@ -43,40 +44,24 @@ export function useFriends(): FriendsState {
   return useSyncExternalStore((cb) => { listeners.add(cb); return () => listeners.delete(cb); }, () => state);
 }
 
-/** true se l'errore dice che una tabella non c'è ancora */
-const isMissing = (e: { code?: string; message?: string }) =>
-  e.code === "42P01" || e.code === "PGRST205" || e.code === "42703" || /does not exist|schema cache/i.test(e.message || "");
+/** Errore del backend → "missing" (tabelle non ancora create) o "error" */
+const errOf = (e: string): "missing" | "error" => (e === "missing" ? "missing" : "error");
 
-/** Ricarica amici e richieste */
+/** Ricarica amici e richieste (le liste le prepara il backend) */
 export async function reloadFriends(): Promise<void> {
   const me = currentUser();
-  if (!supabase || !me) { setState(EMPTY); return; }
+  if (!me) { setState(EMPTY); return; }
   setState({ loading: true });
-  const [{ data: rows, error }, { data: blockRows, error: bErr }] = await Promise.all([
-    supabase.from("friendships").select("requester, addressee, status"),
-    supabase.from("blocks").select("blocked"),
-  ]);
+  const r = await api<{ friends: Person[]; incoming: Person[]; outgoing: Person[]; blocked: Person[] }>("/friends");
   if (currentUser()?.id !== me.id) return;
-  if (error) { setState({ ...EMPTY, missing: isMissing(error) }); return; }
-  // blocchi: se la tabella non c'è ancora (schema.sql non rieseguito) la lista resta vuota
-  const blockedIds = bErr ? [] : (blockRows ?? []).map((b) => b.blocked as string);
-  // Le persone dall'altra parte di ogni riga (e quelle bloccate)
-  const other = (r: { requester: string; addressee: string }) => (r.requester === me.id ? r.addressee : r.requester);
-  const ids = [...new Set([...(rows ?? []).map(other), ...blockedIds])];
-  const people: Record<string, Person> = {};
-  if (ids.length) {
-    const { data: cards } = await supabase.from("handles").select("user_id, handle, name, avatar").in("user_id", ids);
-    for (const c of cards ?? []) people[c.user_id] = { id: c.user_id, handle: c.handle, name: c.name, avatar: c.avatar };
-  }
-  // chi ha tolto il proprio tag compare comunque, con un segnaposto
-  const person = (id: string): Person => people[id] ?? { id, handle: "?", name: null, avatar: null };
+  if (!r.ok) { setState({ ...EMPTY, missing: r.error === "missing" }); return; }
   const byName = (a: Person, b: Person) => (a.name || a.handle).localeCompare(b.name || b.handle);
   setState({
     loading: false, missing: false,
-    friends: (rows ?? []).filter((r) => r.status === "accepted").map((r) => person(other(r))).sort(byName),
-    incoming: (rows ?? []).filter((r) => r.status === "pending" && r.addressee === me.id).map((r) => person(r.requester)),
-    outgoing: (rows ?? []).filter((r) => r.status === "pending" && r.requester === me.id).map((r) => person(r.addressee)),
-    blocked: blockedIds.map(person).sort(byName),
+    friends: [...r.data.friends].sort(byName),
+    incoming: r.data.incoming,
+    outgoing: r.data.outgoing,
+    blocked: [...r.data.blocked].sort(byName),
   });
 }
 
@@ -96,54 +81,53 @@ export function relationOf(id: string): Relation {
 
 /** Cerca persone per @tag (inizio del tag, max 10). Me stesso escluso. */
 export async function searchPeople(q: string): Promise<Person[] | "missing" | "error"> {
-  const me = currentUser();
   const clean = q.toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9_]/g, "");
-  if (!supabase || !me || clean.length < 2) return [];
-  const { data, error } = await supabase.from("handles").select("user_id, handle, name, avatar")
-    .ilike("handle", `${clean}%`).neq("user_id", me.id).order("handle").limit(10);
-  if (error) return isMissing(error) ? "missing" : "error";
+  if (!currentUser() || clean.length < 2) return [];
+  const r = await api<{ people: Person[] }>(`/search?q=${encodeURIComponent(clean)}`);
+  if (!r.ok) return errOf(r.error);
   // le persone che ho bloccato non compaiono nella ricerca
-  return (data ?? []).filter((c) => !state.blocked.some((b) => b.id === c.user_id))
-    .map((c) => ({ id: c.user_id, handle: c.handle, name: c.name, avatar: c.avatar }));
+  return r.data.people.filter((c) => !state.blocked.some((b) => b.id === c.id));
+}
+
+/** Scheda di una persona dal @tag (null = non esiste) */
+export async function findPerson(tag: string): Promise<Person | null> {
+  const r = await api<{ person: Person | null }>(`/people/${encodeURIComponent(tag)}`);
+  return r.ok ? r.data.person : null;
 }
 
 /** Risultato di un'azione: null = ok, altrimenti cosa è andato storto */
 type ActErr = "missing" | "error" | null;
-const done = async (error: { code?: string; message?: string } | null): Promise<ActErr> => {
+/** Dopo un'azione ricarico le liste e traduco l'esito */
+const done = async (r: { ok: boolean; error?: string }): Promise<ActErr> => {
   await reloadFriends();
-  return error ? (isMissing(error) ? "missing" : "error") : null;
+  return r.ok ? null : errOf(r.error || "");
 };
+/** id nell'indirizzo */
+const enc = (id: string) => encodeURIComponent(id);
 
 /**
  * Manda una richiesta di amicizia. Se l'altra persona me l'aveva già
  * mandata, invece la accetto (così non si incrociano due richieste).
  */
 export async function sendRequest(id: string): Promise<ActErr> {
-  const me = currentUser();
-  if (!supabase || !me) return "error";
+  if (!currentUser()) return "error";
   if (relationOf(id) === "incoming") return acceptRequest(id);
-  const { error } = await supabase.from("friendships").insert({ requester: me.id, addressee: id });
-  return done(error && error.code !== "23505" ? error : null); // 23505 = c'era già: va bene così
+  return done(await api(`/friends/${enc(id)}/request`, "POST"));
 }
 
 /** Accetta una richiesta ricevuta */
 export async function acceptRequest(id: string): Promise<ActErr> {
-  const me = currentUser();
-  if (!supabase || !me) return "error";
-  const { error } = await supabase.from("friendships").update({ status: "accepted" }).eq("requester", id).eq("addressee", me.id);
-  return done(error);
+  if (!currentUser()) return "error";
+  return done(await api(`/friends/${enc(id)}/accept`, "POST"));
 }
 
 /**
  * Rifiuta una richiesta, ritira la propria o toglie un'amicizia:
- * in tutti i casi si cancella la riga della coppia
+ * in tutti i casi si cancella il legame della coppia
  */
 export async function removeFriendship(id: string): Promise<ActErr> {
-  const me = currentUser();
-  if (!supabase || !me) return "error";
-  const { error } = await supabase.from("friendships").delete()
-    .or(`and(requester.eq.${me.id},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${me.id})`);
-  return done(error);
+  if (!currentUser()) return "error";
+  return done(await api(`/friends/${enc(id)}`, "DELETE"));
 }
 
 /**
@@ -151,20 +135,14 @@ export async function removeFriendship(id: string): Promise<ActErr> {
  * Da quel momento non può più mandarti richieste.
  */
 export async function blockPerson(id: string): Promise<ActErr> {
-  const me = currentUser();
-  if (!supabase || !me) return "error";
-  await supabase.from("friendships").delete()
-    .or(`and(requester.eq.${me.id},addressee.eq.${id}),and(requester.eq.${id},addressee.eq.${me.id})`);
-  const { error } = await supabase.from("blocks").insert({ blocker: me.id, blocked: id });
-  return done(error && error.code !== "23505" ? error : null); // 23505 = era già bloccata
+  if (!currentUser()) return "error";
+  return done(await api(`/blocks/${enc(id)}`, "POST"));
 }
 
 /** Sblocca una persona */
 export async function unblockPerson(id: string): Promise<ActErr> {
-  const me = currentUser();
-  if (!supabase || !me) return "error";
-  const { error } = await supabase.from("blocks").delete().eq("blocker", me.id).eq("blocked", id);
-  return done(error);
+  if (!currentUser()) return "error";
+  return done(await api(`/blocks/${enc(id)}`, "DELETE"));
 }
 
 /** Motivi di una segnalazione (gli stessi accettati dal database) */
@@ -173,10 +151,9 @@ export type ReportReason = (typeof REPORT_REASONS)[number];
 
 /** Segnala una persona a chi gestisce il sito (motivo + nota facoltativa) */
 export async function reportPerson(id: string, reason: ReportReason, note: string): Promise<ActErr> {
-  const me = currentUser();
-  if (!supabase || !me) return "error";
-  const { error } = await supabase.from("reports").insert({ reporter: me.id, reported: id, reason, note: note.trim().slice(0, 300) || null });
-  return error ? (isMissing(error) ? "missing" : "error") : null;
+  if (!currentUser()) return "error";
+  const r = await api("/reports", "POST", { id, reason, note: note.trim().slice(0, 300) });
+  return r.ok ? null : errOf(r.error);
 }
 
 /**
@@ -184,9 +161,8 @@ export async function reportPerson(id: string, reason: ReportReason, note: strin
  * amici, oppure non ha ancora salvato niente
  */
 export async function fetchFriendData(id: string): Promise<SavedData | null> {
-  if (!supabase) return null;
-  const { data, error } = await supabase.from("progress").select("data").eq("user_id", id).maybeSingle();
-  if (error || !data || !isSavedData(data.data)) return null;
-  const d = data.data;
+  const r = await api<{ data: unknown }>(`/friends/${enc(id)}/data`);
+  if (!r.ok || !isSavedData(r.data.data)) return null;
+  const d = r.data.data;
   return { seen: d.seen, rating: d.rating, eps: d.eps || {}, ...(d.profile ? { profile: d.profile } : {}), ...(d.back ? { back: d.back } : {}) };
 }

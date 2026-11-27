@@ -13,7 +13,7 @@ import { useDisplayName } from "../hooks";
 import { useT } from "../i18n";
 import { go } from "../router";
 import { logout, resolveBrowserData, setLang, useStore } from "../store";
-import { isConfigured } from "../supabase";
+import { isConfigured } from "../api";
 import { MIN_AGE } from "../config";
 import { rememberInvite } from "../share";
 import { ArcReactor } from "./ArcReactor";
@@ -95,14 +95,14 @@ function Shell({ children }: { children: ReactNode }) {
   );
 }
 
-/** Mostrata se mancano indirizzo e chiave di Supabase (vedi README) */
+/** Mostrata se manca l'indirizzo del backend (VITE_API_URL, vedi README) */
 function SetupHelp() {
   const { t } = useT();
   return (
     <>
       <h2>{t("setupTitle")}</h2>
       <p className="auth-note">{t("setupText")}</p>
-      <pre className="auth-code">VITE_SUPABASE_URL=…{"\n"}VITE_SUPABASE_PUBLISHABLE_KEY=…</pre>
+      <pre className="auth-code">VITE_API_URL=…</pre>
     </>
   );
 }

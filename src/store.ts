@@ -1,8 +1,8 @@
 // Store - i dati personali (visti, voti, episodi, profilo) legati all'account.
 // Il profilo sta nello stesso oggetto dei visti (campo "profile"), quindi
 // finisce nella stessa riga di Supabase e nel backup senza tabelle in più.
-// - Dopo l'accesso i dati vengono scaricati da Supabase (tabella "progress",
-//   una riga per utente, vedi supabase/schema.sql).
+// - Dopo l'accesso i dati vengono scaricati dall'account tramite il backend
+//   (api.ts → worker/; su Supabase è la tabella "progress", vedi supabase/schema.sql).
 // - Ogni modifica si vede subito e viene salvata nell'account poco dopo
 //   (le modifiche ravvicinate partono insieme).
 // - Una copia resta anche nel browser, per partire in fretta e per non
@@ -13,10 +13,9 @@
 //   cosa farne (tenere quelli del browser, quelli dell'account o unirli).
 // - La lingua resta per dispositivo (non va nell'account).
 import { useSyncExternalStore } from "react";
-import type { User } from "@supabase/supabase-js";
-import { onUserChange, signOut } from "./auth";
+import { api } from "./api";
+import { onUserChange, signOut, type User } from "./auth";
 import { BY_ID, DATA } from "./data/titles";
-import { supabase } from "./supabase";
 import type { Lang, Profile, SavedData } from "./types";
 
 const LEGACY_KEY = "marvel-tracker-v1";   // dati salvati nel browser prima degli account
@@ -124,12 +123,12 @@ function readCache(): { data: SavedData; pending: boolean } | null {
 
 /**
  * Scarica i dati dell'account (null = l'account non ha ancora dati).
- * Lancia un errore se Supabase non risponde.
+ * Lancia un errore se il backend non risponde.
  */
 async function fetchRemote(): Promise<SavedData | null> {
-  const { data, error } = await supabase!.from("progress").select("data").eq("user_id", user!.id).maybeSingle();
-  if (error) throw error;
-  return data && isSavedData(data.data) ? clean(data.data) : null;
+  const r = await api<{ data: unknown }>("/data");
+  if (!r.ok) throw new Error(r.error);
+  return isSavedData(r.data.data) ? clean(r.data.data) : null;
 }
 
 /** Invia i dati attuali all'account (crea la riga se non c'è) */
@@ -138,10 +137,9 @@ async function pushNow(): Promise<void> {
   const uid = user.id;
   const sent = state.data;
   patch({ sync: "saving" });
-  const { error } = await supabase!.from("progress")
-    .upsert({ user_id: uid, data: sent, updated_at: new Date().toISOString() });
+  const r = await api("/data", "PUT", { data: sent });
   if (user?.id !== uid) return; // nel frattempo è cambiato utente
-  if (error) {
+  if (!r.ok) {
     patch({ sync: "error" });
     return;
   }

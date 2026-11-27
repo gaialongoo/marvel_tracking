@@ -9,14 +9,13 @@ import { useEffect, useMemo, useState } from "react";
 import { computeBadges } from "../badges";
 import { DATA } from "../data/titles";
 import {
-  acceptRequest, blockPerson, fetchFriendData, relationOf, removeFriendship, reportPerson, REPORT_REASONS, searchPeople,
+  acceptRequest, blockPerson, fetchFriendData, findPerson, relationOf, removeFriendship, reportPerson, REPORT_REASONS, searchPeople,
   sendRequest, unblockPerson, useFriends, type Person, type ReportReason,
 } from "../friends";
 import { shareInvite } from "../share";
 import { useHandle } from "../handle";
 import { useT } from "../i18n";
 import { go, goBack } from "../router";
-import { supabase } from "../supabase";
 import { showToast } from "../toast";
 import type { SavedData } from "../types";
 import { epsSeen, fmtMin, hasEps, watchedMin } from "../utils";
@@ -201,9 +200,8 @@ export function FriendPage({ tag }: { tag: string }) {
   useEffect(() => {
     let stop = false;
     (async () => {
-      if (!supabase) return setPerson(null);
-      const { data: c } = await supabase.from("handles").select("user_id, handle, name, avatar").eq("handle", tag).maybeSingle();
-      if (!stop) setPerson(c ? { id: c.user_id, handle: c.handle, name: c.name, avatar: c.avatar } : null);
+      const p = await findPerson(tag);
+      if (!stop) setPerson(p);
     })();
     return () => { stop = true; };
   }, [tag]);
