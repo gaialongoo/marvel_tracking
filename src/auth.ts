@@ -75,7 +75,15 @@ async function start() {
   const type = q.get("type");
   // link vecchi (prima del backend) o con errore: avviso che non ha funzionato
   const oldLink = q.has("code") || /[?&#]error(_code|_description)?=/.test(location.search + location.hash);
-  if (tokenHash || oldLink) history.replaceState(null, "", location.pathname + (/^#error/.test(location.hash) ? "#/" : location.hash));
+  if (tokenHash || oldLink) {
+    // Se il Site URL di Supabase finisce con "/", il link arriva come
+    // "marveltracker.com//?token_hash=…": "//" da solo il browser lo legge
+    // come un altro sito e blocca replaceState. Riduco le barre doppie a una.
+    const path = location.pathname.replace(/\/{2,}/g, "/");
+    try {
+      history.replaceState(null, "", path + (/^#error/.test(location.hash) ? "#/" : location.hash));
+    } catch { /* non togliere il codice dall'indirizzo non deve bloccare l'accesso */ }
+  }
 
   if (tokenHash) {
     const r = await api<{ user: User; recovery: boolean }>("/verify", "POST", { token_hash: tokenHash, type });
@@ -96,7 +104,9 @@ async function checkSession() {
   else setUser(null);
 }
 
-void start();
+// Qualunque errore imprevisto all'avvio: mostro comunque la pagina (accesso
+// o app), invece di restare per sempre su "Caricamento…"
+start().catch(() => { void checkSession(); });
 
 /** Nasconde l'avviso sul link (quando si chiede un link nuovo o si accede) */
 export const clearLinkErr = () => setState({ linkErr: false });
