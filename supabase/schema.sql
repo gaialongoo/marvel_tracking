@@ -25,7 +25,11 @@ alter table public.progress enable row level security;
 -- Permessi sulla tabella: SOLO agli utenti che hanno fatto l'accesso
 -- (i visitatori anonimi, ruolo "anon", non possono nemmeno leggerla).
 -- Nei progetti Supabase recenti non vengono dati in automatico.
-revoke all on public.progress from anon;
+-- Prima tolgo TUTTO anche agli utenti collegati: Supabase di suo dà anche
+-- TRUNCATE (svuota la tabella ignorando le regole RLS), TRIGGER e REFERENCES,
+-- che all'app non servono. Poi ridò solo quello che serve davvero.
+-- (stessa cosa per tutte le tabelle qui sotto)
+revoke all on public.progress from anon, authenticated;
 grant select, insert, update on public.progress to authenticated;
 
 -- Regole: ogni utente vede, crea e modifica solo la riga con il proprio id.
@@ -65,7 +69,7 @@ create table if not exists public.handles (
 
 alter table public.handles enable row level security;
 
-revoke all on public.handles from anon;
+revoke all on public.handles from anon, authenticated;
 grant select, insert, update, delete on public.handles to authenticated;
 
 drop policy if exists "leggo i tag"        on public.handles;
@@ -123,7 +127,7 @@ create unique index if not exists friendships_pair
 
 alter table public.friendships enable row level security;
 
-revoke all on public.friendships from anon;
+revoke all on public.friendships from anon, authenticated;
 grant select, insert, update, delete on public.friendships to authenticated;
 
 drop policy if exists "vedo le mie amicizie"     on public.friendships;
@@ -178,7 +182,7 @@ create table if not exists public.blocks (
 
 alter table public.blocks enable row level security;
 
-revoke all on public.blocks from anon;
+revoke all on public.blocks from anon, authenticated;
 grant select, insert, delete on public.blocks to authenticated;
 
 drop policy if exists "vedo i miei blocchi"   on public.blocks;
@@ -236,7 +240,7 @@ create table if not exists public.reports (
 
 alter table public.reports enable row level security;
 
-revoke all on public.reports from anon;
+revoke all on public.reports from anon, authenticated;
 grant insert on public.reports to authenticated;
 
 drop policy if exists "invio una segnalazione" on public.reports;
